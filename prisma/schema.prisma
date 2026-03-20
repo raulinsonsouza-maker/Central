@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id                         String                 @id @default(cuid())
+  nome                       String
+  slug                       String                 @unique
+  logoUrl                    String?
+  ativo                      Boolean                @default(true)
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
+  segmento                   String?
+  orcamentoMidiaGoogleMensal Decimal?               @db.Decimal(14, 2)
+  orcamentoMidiaMetaMensal   Decimal?               @db.Decimal(14, 2)
+  agregadosMensal            AgregadoMidiaMensal[]
+  agregadosSemanal           AgregadoMidiaSemanal[]
+  contas                     Conta[]
+  fatosMidia                 FatoMidiaDiario[]
+  fatosAnalyticsDiario       FatoAnalyticsDiario[]
+  fatosAnalyticsPorCanal     FatoAnalyticsPorCanal[]
+  googleAdsCriativos         GoogleAdsCriativo[]
+  metaAdsCriativos           MetaAdsCriativo[]
+  metas                      Meta[]
+  pautasReuniao              PautaReuniao[]
+}
+
+model Conta {
+  id                    String                 @id @default(cuid())
+  clienteId             String
+  plataforma            String
+  accountIdPlataforma   String?
+  googleAdsLoginCustomerId String?
+  nomeConta             String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  cliente               Cliente                 @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  fatosMidia            FatoMidiaDiario[]
+  fatosAnalyticsDiario  FatoAnalyticsDiario[]
+  googleAdsCriativos    GoogleAdsCriativo[]
+  metaAdsCriativos      MetaAdsCriativo[]
+
+  @@unique([clienteId, plataforma])
+}
+
+model FatoMidiaDiario {
+  id                              String   @id @default(cuid())
+  clienteId                       String
+  contaId                         String?
+  data                            DateTime @db.Date
+  canal                           String
+  impressoes                      Int      @default(0)
+  cliques                         Int      @default(0)
+  leads                           Int      @default(0)
+  conversoes                      Int      @default(0)
+  investimento                    Decimal  @default(0) @db.Decimal(14, 2)
+  cpl                             Decimal? @db.Decimal(14, 2)
+  rawRowHash                      String?
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+  contacts                        Int      @default(0)
+  costPerPurchase                 Decimal? @db.Decimal(14, 2)
+  messagingConversationsStarted   Int      @default(0)
+  onFacebookLeads                 Int      @default(0)
+  purchases                       Int      @default(0)
+  websiteLeads                    Int      @default(0)
+  websitePurchaseRoas             Decimal? @db.Decimal(14, 2)
+  websitePurchasesConversionValue Decimal  @default(0) @db.Decimal(14, 2)
+  alcance                         Int      @default(0)
+  checkoutIniciado                Int      @default(0)
+  cliente                         Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  conta                           Conta?   @relation(fields: [contaId], references: [id])
+
+  @@unique([clienteId, data, canal])
+  @@index([clienteId, data])
+  @@index([clienteId, canal, data])
+}
+
+model AgregadoMidiaSemanal {
+  id           String   @id @default(cuid())
+  clienteId    String
+  canal        String
+  ano          Int
+  semanaIso    Int
+  investimento Decimal  @default(0) @db.Decimal(14, 2)
+  impressoes   Int      @default(0)
+  cliques      Int      @default(0)
+  leads        Int      @default(0)
+  conversoes   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cliente      Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@unique([clienteId, canal, ano, semanaIso])
+  @@index([clienteId, ano, semanaIso])
+}
+
+model AgregadoMidiaMensal {
+  id           String   @id @default(cuid())
+  clienteId    String
+  canal        String
+  ano          Int
+  mes          Int
+  investimento Decimal  @default(0) @db.Decimal(14, 2)
+  impressoes   Int      @default(0)
+  cliques      Int      @default(0)
+  leads        Int      @default(0)
+  conversoes   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cliente      Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@unique([clienteId, canal, ano, mes])
+  @@index([clienteId, ano, mes])
+}
+
+model Meta {
+  id            String   @id @default(cuid())
+  clienteId     String
+  canal         String?
+  tipoMeta      String
+  periodicidade String
+  ano           Int
+  mes           Int?
+  valorMeta     Decimal  @db.Decimal(14, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  cliente       Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@index([clienteId])
+}
+
+model PautaReuniao {
+  id        String   @id @default(cuid())
+  clienteId String
+  semanaIso Int
+  ano       Int
+  titulo    String
+  descricao String?
+  status    String   @default("ABERTA")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cliente   Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@index([clienteId, ano, semanaIso])
+}
+
+model GoogleAdsCriativo {
+  id             String   @id @default(cuid())
+  clienteId      String
+  contaId        String?
+  adResourceName String
+  campaignId     String?
+  campaignName   String?
+  adGroupId     String?
+  adGroupName   String?
+  headline1     String?
+  headline2     String?
+  description   String?
+  finalUrls      String?
+  data          DateTime @db.Date
+  impressoes    Int      @default(0)
+  cliques       Int      @default(0)
+  custoMicros   BigInt   @default(0)
+  conversoes    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  cliente       Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  conta         Conta?   @relation(fields: [contaId], references: [id])
+
+  @@unique([clienteId, adResourceName, data])
+  @@index([clienteId, data])
+}
+
+model MetaAdsCriativo {
+  id                String   @id @default(cuid())
+  clienteId         String
+  contaId           String?
+  data              DateTime @db.Date
+  adId              String
+  creativeId        String?
+  adName            String
+  effectiveStatus   String?
+  campaignObjective String?
+  mediaType         String
+  imageUrl          String?
+  imageUrlFull      String?
+  videoId           String?
+  videoSourceUrl    String?
+  videoPictureUrl   String?
+  videoEmbedHtml    String?  @db.Text
+  body              String?
+  title             String?
+  spend             Decimal  @default(0) @db.Decimal(14, 2)
+  impressions       Int      @default(0)
+  clicks            Int      @default(0)
+  ctr               Decimal? @db.Decimal(8, 4)
+  cpc               Decimal? @db.Decimal(14, 2)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  cliente           Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  conta             Conta?   @relation(fields: [contaId], references: [id])
+
+  @@unique([clienteId, adId, data])
+  @@index([clienteId, data])
+  @@index([clienteId, adId, data])
+}
+
+model FatoAnalyticsDiario {
+  id                     String   @id @default(cuid())
+  clienteId              String
+  contaId                String?
+  data                   DateTime @db.Date
+  sessions               Int      @default(0)
+  activeUsers            Int      @default(0)
+  engagedSessions        Int      @default(0)
+  engagementRate         Decimal  @default(0) @db.Decimal(8, 6)
+  bounceRate             Decimal  @default(0) @db.Decimal(8, 6)
+  averageSessionDuration Int      @default(0)
+  newUsers               Int      @default(0)
+  screenPageViews        Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  cliente                Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  conta                  Conta?   @relation(fields: [contaId], references: [id])
+
+  @@unique([clienteId, data])
+  @@index([clienteId, data])
+}
+
+model FatoAnalyticsPorCanal {
+  id           String   @id @default(cuid())
+  clienteId    String
+  data         DateTime @db.Date
+  canal        String
+  sessions     Int      @default(0)
+  activeUsers  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cliente      Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@unique([clienteId, data, canal])
+  @@index([clienteId, data])
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

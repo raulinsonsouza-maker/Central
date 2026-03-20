@@ -1,0 +1,462 @@
+"use client";
+
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Line,
+  ComposedChart,
+} from "recharts";
+import { DollarSign, Target, TrendingUp, Users, Zap, BarChart3 } from "lucide-react";
+
+const tooltipStyle = {
+  contentStyle: {
+    backgroundColor: "var(--card)",
+    border: "1px solid var(--border)",
+    borderRadius: "10px",
+    color: "var(--foreground)",
+    boxShadow: "0 8px 24px rgba(0,0,0,.35)",
+    padding: "10px 14px",
+  },
+  labelStyle: { color: "var(--foreground)", fontWeight: 600, marginBottom: 4 },
+  itemStyle: { color: "var(--foreground)", fontSize: 13 },
+};
+
+function KpiCard({
+  title,
+  value,
+  sub,
+  icon: Icon,
+  accentValue,
+}: {
+  title: string;
+  value: string;
+  sub: string;
+  icon: React.ElementType;
+  accentValue?: boolean;
+}) {
+  return (
+    <Card className="group relative overflow-hidden rounded-2xl border-[var(--border)] transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]">
+      <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-[0.05]" />
+      <CardContent className="flex items-start gap-4 p-5">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+            {title}
+          </p>
+          <p
+            className={`mt-1 text-2xl font-extrabold tabular-nums leading-none ${
+              accentValue ? "text-[var(--primary)]" : "text-[var(--foreground)]"
+            }`}
+          >
+            {value}
+          </p>
+          <p className="mt-1.5 text-[11px] text-[var(--muted-foreground)]">{sub}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div>
+      <h2 className="text-lg font-bold tracking-tight text-[var(--foreground)]">{title}</h2>
+      <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">{subtitle}</p>
+    </div>
+  );
+}
+
+type MetricRow = { investimento: number; leads: number; impressoes: number; cliques: number };
+
+type MetricDefinition = {
+  label: string;
+  description: string;
+  value: (s: MetricRow) => number;
+  format: (value: number) => string;
+};
+
+type DefaultPanelProps = {
+  resumo: {
+    investimento: number;
+    leads: number;
+    cpl: number;
+    cpm: number;
+    periodo?: string;
+  };
+  chartData: Record<string, string | number>[];
+  /** Nome da série de conversões/leads no gráfico (ex.: "Conversões" no Google). */
+  chartConversionKey?: string;
+  latestFiveSeries: (MetricRow & { periodo: string })[];
+  metricDefinitions: MetricDefinition[];
+  dateFilter: { label: string };
+  canal: string;
+  canalLabels: Record<string, string>;
+  financeiro?: {
+    meses?: { ano: number; mes: number; planejadoTotal: number; realizadoTotal: number }[];
+    totalPlanejado?: number;
+    totalRealizado?: number;
+  } | null;
+  formatCurrency: (value: number) => string;
+};
+
+export function DefaultPanel({
+  resumo,
+  chartData,
+  chartConversionKey = "Leads",
+  latestFiveSeries,
+  metricDefinitions,
+  dateFilter,
+  canal,
+  canalLabels,
+  financeiro,
+  formatCurrency,
+}: DefaultPanelProps) {
+  const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
+
+  return (
+    <>
+      {/* KPI cards */}
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          title={canal === "google" ? "Investimento Google" : "Investimento"}
+          value={formatCurrency(resumo.investimento)}
+          sub={`${resumo.periodo ?? ""} selecionados`}
+          icon={DollarSign}
+        />
+        <KpiCard
+          title={canal === "google" ? "Conversões (Google Ads)" : "Leads"}
+          value={resumo.leads.toLocaleString("pt-BR")}
+          sub={
+            canal === "google"
+              ? "Total do período (métrica principal do relatório de campanhas)"
+              : "Total do período"
+          }
+          icon={Users}
+        />
+        <KpiCard
+          title={canal === "google" ? "Custo / conversão" : "CPL"}
+          value={formatCurrency(resumo.cpl)}
+          sub={canal === "google" ? "Investimento ÷ conversões" : "Custo por lead"}
+          icon={Target}
+          accentValue
+        />
+        <KpiCard
+          title={canal === "google" ? "CPM Google" : "CPM"}
+          value={formatCurrency(resumo.cpm)}
+          sub="Custo por mil impressões"
+          icon={Zap}
+        />
+      </section>
+
+      {/* Performance chart */}
+      {chartData.length > 0 && (
+        <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
+          <CardHeader className="pb-2">
+            <div className="flex items-start justify-between">
+              <SectionHeader
+                title={canal === "google" ? "Performance Google" : "Volume geral de performance"}
+                subtitle={
+                  canal === "google"
+                    ? "Investimento e conversões por semana"
+                    : "Investimento e leads por semana"
+                }
+              />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+                <TrendingUp className="h-4 w-4" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartData}>
+                  <defs>
+                    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--muted-foreground)" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="var(--muted)" stopOpacity={0.8} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+                  <XAxis
+                    dataKey="periodo"
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) => {
+                      if (name === "Investimento" || name === "CPL") {
+                        return [formatCurrency(Number(value)), name];
+                      }
+                      return [Number(value).toLocaleString("pt-BR"), name];
+                    }}
+                    {...tooltipStyle}
+                  />
+                  <Legend
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ paddingTop: 12, fontSize: 12 }}
+                  />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="Investimento"
+                    fill="url(#barGrad)"
+                    radius={[6, 6, 0, 0]}
+                  />
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey={chartConversionKey}
+                    name={chartConversionKey}
+                    stroke="var(--primary)"
+                    strokeWidth={2.5}
+                    dot={{ fill: "var(--primary)", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
+                  />
+                  <Line yAxisId="right" dataKey="CPL" stroke="transparent" dot={false} activeDot={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Weekly breakdown table */}
+      {latestFiveSeries.length > 0 && (
+        <Card className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+          <CardHeader className="border-b border-[var(--border)]/60 px-6 pb-5 pt-6 sm:px-8">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
+                  <BarChart3 className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <h3 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)] sm:text-2xl">
+                      {canal === "google" ? "Resultado Google" : `Resultado ${canalLabels[canal] ?? canal}`}
+                      <span className="ml-2 bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">
+                        Semana a semana
+                      </span>
+                    </h3>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                      {dateFilter.label}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-[var(--muted-foreground)]">
+                    Visão comparativa com leitura rápida das principais métricas por semana.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[var(--border)] bg-white/[0.02] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                  {latestFiveSeries.length} semanas
+                </span>
+                {latestPeriod && (
+                  <span className="rounded-full border border-[var(--primary)]/25 bg-[var(--primary)]/12 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--foreground)]">
+                    Atual: {latestPeriod}
+                  </span>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-3 pb-4 pt-4 sm:px-5 sm:pb-5">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[860px] border-separate [border-spacing:0_10px]">
+                <thead>
+                  <tr>
+                    <th className="w-[220px] px-3 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                      Métrica
+                    </th>
+                    {latestFiveSeries.map((s: { periodo: string }, periodIdx: number) => {
+                      const isLatest = periodIdx === latestFiveSeries.length - 1;
+                      return (
+                        <th
+                          key={s.periodo}
+                          className={`px-4 text-center ${
+                            isLatest ? "text-[var(--foreground)]" : "text-[var(--muted-foreground)]"
+                          }`}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span
+                              className={`text-[10px] font-bold uppercase tracking-[0.2em] ${
+                                isLatest ? "text-[var(--primary)]" : "text-[var(--muted-foreground)]"
+                              }`}
+                            >
+                              {isLatest ? "Atual" : "Semana"}
+                            </span>
+                            <span className="text-sm font-semibold whitespace-nowrap">{s.periodo}</span>
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {metricDefinitions.map((metric, metricIdx) => (
+                    <tr key={metric.label} className="group">
+                      <td className="rounded-l-2xl bg-white/[0.03] px-4 py-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--foreground)]">
+                              {metric.label}
+                            </p>
+                            <p className="mt-1 text-[11px] text-[var(--muted-foreground)]">
+                              {metric.description}
+                            </p>
+                          </div>
+                          <span className="hidden h-6 w-[2px] rounded-full bg-[linear-gradient(180deg,var(--accent),var(--primary))] opacity-70 md:block" />
+                        </div>
+                      </td>
+                      {latestFiveSeries.map((s: MetricRow & { periodo: string }, periodIdx: number) => {
+                        const isLatest = periodIdx === latestFiveSeries.length - 1;
+                        return (
+                          <td
+                            key={`${metric.label}-${s.periodo}`}
+                            className={`px-4 py-4 text-center ${
+                              isLatest
+                                ? "bg-[linear-gradient(180deg,rgba(255,106,0,0.12),rgba(255,106,0,0.05))]"
+                                : metricIdx % 2 === 0
+                                  ? "bg-white/[0.03]"
+                                  : "bg-white/[0.015]"
+                            }`}
+                          >
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="text-sm font-bold tabular-nums text-[var(--foreground)]">
+                                {metric.format(metric.value(s))}
+                              </span>
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Financial tracking */}
+      {financeiro && financeiro.meses && financeiro.meses.length > 0 && (
+        <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
+          <CardHeader>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <SectionHeader
+                title="Acompanhamento financeiro · Plano x Real"
+                subtitle="Status de investimento no ano atual (planejado versus realizado em todos os canais)"
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-3 py-1.5 text-xs">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--muted-foreground)]/60" />
+                  <span className="text-[var(--muted-foreground)]">Orçado</span>
+                  <strong className="text-[var(--foreground)]">
+                    R${" "}
+                    {Number(financeiro.totalPlanejado ?? 0).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-lg border border-[var(--primary)]/20 bg-[var(--primary)]/5 px-3 py-1.5 text-xs">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--primary)]" />
+                  <span className="text-[var(--muted-foreground)]">Realizado</span>
+                  <strong className="text-[var(--primary)]">
+                    R${" "}
+                    {Number(financeiro.totalRealizado ?? 0).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart
+                  data={financeiro.meses.map(
+                    (m: { ano: number; mes: number; planejadoTotal: number; realizadoTotal: number }) => ({
+                      mes: new Date(m.ano, m.mes - 1, 1)
+                        .toLocaleString("pt-BR", { month: "short" })
+                        .toUpperCase(),
+                      Orcado: m.planejadoTotal,
+                      Realizado: m.realizadoTotal,
+                    })
+                  )}
+                >
+                  <defs>
+                    <linearGradient id="finBarGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--muted-foreground)" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="var(--muted)" stopOpacity={0.6} />
+                    </linearGradient>
+                    <linearGradient id="finRealGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.9} />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.6} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+                  <XAxis
+                    dataKey="mes"
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => formatCurrency(Number(value))}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) => [
+                      formatCurrency(Number(value)),
+                      name,
+                    ]}
+                    {...tooltipStyle}
+                  />
+                  <Legend
+                    iconType="circle"
+                    iconSize={8}
+                    wrapperStyle={{ paddingTop: 12, fontSize: 12 }}
+                  />
+                  <Bar dataKey="Orcado" fill="url(#finBarGrad)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="Realizado" fill="url(#finRealGrad)" radius={[6, 6, 0, 0]} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </>
+  );
+}

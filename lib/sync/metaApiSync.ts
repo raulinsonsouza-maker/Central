@@ -1,0 +1,180 @@
+import { fetchAccountInsights, fetchAdsWithCreatives } from "@/lib/meta/metaClient";
+import { mapMetaInsightToFatoPayload } from "@/lib/mappers/metaToDomain";
+import { upsertFatoMidia } from "@/lib/repositories/fatosMidiaRepository";
+import { upsertMetaAdsCriativo } from "@/lib/repositories/metaAdsCriativosRepository";
+import { findAllClientes } from "@/lib/repositories/clientesRepository";
+import { prisma } from "@/lib/db";
+import { getIntegrationsConfig } from "@/lib/config/integrations";
+
+const DEFAULT_DATE_FROM = "2026-01-01";
+
+function formatDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+export interface MetaSyncOptions {
+  dateFrom?: string;
+  dateTo?: string;
+  accountId?: string;
+  creativeDateFrom?: string;
+  creativeDateTo?: string;
+}
+
+export interface MetaSyncResult {
+  daysProcessed: number;
+  creativesProcessed: number;
+  error?: string;
+}
+
+/**
+ * Sync META channel data from Meta Marketing API into FatoMidiaDiario.
+ * Uses default date range from 2026-01-01 to today unless overridden.
+ */
+export async function syncMetaCliente(
+  clienteId: string,
+  options?: MetaSyncOptions
+): Promise<MetaSyncResult> {
+  const fromDb = await getIntegrationsConfig();
+  const token = fromDb.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
+  const defaultAccountId = fromDb.metaAdAccountId ?? process.env.META_AD_ACCOUNT_ID;
+
+  if (!token) {
+    return { daysProcessed: 0, creativesProcessed: 0, error: "META_ACCESS_TOKEN não configurado" };
+  }
+  const accountId = options?.accountId ?? defaultAccountId;
+  if (!accountId) {
+    return { daysProcessed: 0, creativesProcessed: 0, error: "META_AD_ACCOUNT_ID não configurado" };
+  }
+
+  const today = formatDate(new Date());
+  const dateFrom = options?.dateFrom ?? DEFAULT_DATE_FROM;
+  const dateTo = options?.dateTo ?? today;
+  const creativeDateFrom = options?.creativeDateFrom ?? options?.dateFrom ?? today;
+  const creativeDateTo = options?.creativeDateTo ?? options?.dateTo ?? today;
+
+  try {
+    const response = await fetchAccountInsights(accountId, token, dateFrom, dateTo);
+    const rows = response.data ?? [];
+    let contaId: string | null = null;
+
+    const conta = await prisma.conta.findFirst({
+      where: { clienteId, plataforma: "META", accountIdPlataforma: accountId },
+    });
+    if (conta) contaId = conta.id;
+
+    for (const row of rows) {
+      const payload = mapMetaInsightToFatoPayload(row);
+      await upsertFatoMidia(clienteId, payload.data, "META", {
+        impressoes: payload.impressoes,
+        cliques: payload.cliques,
+        leads: payload.leads,
+        conversoes: payload.conversoes,
+        onFacebookLeads: payload.onFacebookLeads,
+        websiteLeads: payload.websiteLeads,
+        messagingConversationsStarted: payload.messagingConversationsStarted,
+        contacts: payload.contacts,
+        purchases: payload.purchases,
+        investimento: payload.investimento,
+        cpl: payload.cpl,
+        costPerPurchase: payload.costPerPurchase,
+        websitePurchaseRoas: payload.websitePurchaseRoas,
+        websitePurchasesConversionValue: payload.websitePurchasesConversionValue,
+        alcance: payload.alcance,
+        checkoutIniciado: payload.checkoutIniciado,
+        contaId: contaId ?? undefined,
+      });
+    }
+
+    const creativeSnapshotDate = new Date(`${creativeDateTo}T00:00:00`);
+    const ads = await fetchAdsWithCreatives(accountId, token, {
+      dateFrom: creativeDateFrom,
+      dateTo: creativeDateTo,
+    });
+
+    for (const ad of ads) {
+      const creative = ad.adcreatives?.data?.[0];
+      const insight = ad.insights?.data?.[0];
+      if (!creative) continue;
+
+      await upsertMetaAdsCriativo(clienteId, {
+        data: creativeSnapshotDate,
+        adId: ad.id,
+        creativeId: creative.id,
+        adName: ad.name,
+        effectiveStatus: ad.effective_status ?? null,
+        campaignObjective: ad.adset?.campaign?.objective ?? null,
+        mediaType: creative.video_source_url || creative.video_id ? "VIDEO" : "IMAGE",
+        imageUrl: creative.image_url_full ?? creative.thumbnail_url ?? creative.image_url ?? null,
+        imageUrlFull: creative.image_url_full ?? null,
+        videoId: creative.video_id ?? null,
+        videoSourceUrl: creative.video_source_url ?? null,
+        videoPictureUrl: creative.video_picture_url ?? null,
+        videoEmbedHtml: (creative as { video_embed_html?: string }).video_embed_html ?? null,
+        body: creative.body ?? null,
+        title: creative.title ?? null,
+        spend: insight?.spend ? parseFloat(insight.spend) : 0,
+        impressions: insight?.impressions ? parseInt(insight.impressions, 10) : 0,
+        clicks: insight?.clicks ? parseInt(insight.clicks, 10) : 0,
+        ctr: insight?.ctr ? parseFloat(insight.ctr) : null,
+        cpc: insight?.cpc ? parseFloat(insight.cpc) : null,
+        contaId,
+      });
+    }
+
+    return { daysProcessed: rows.length, creativesProcessed: ads.length };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return { daysProcessed: 0, creativesProcessed: 0, error: message };
+  }
+}
+
+export interface MetaSyncAllResult {
+  clienteId: string;
+  daysProcessed: number;
+  creativesProcessed: number;
+  error?: string;
+}
+
+/**
+ * Sync META for all active clients. Uses Conta META when available, else META_AD_ACCOUNT_ID.
+ */
+export async function syncMetaTodosClientes(): Promise<MetaSyncAllResult[]> {
+  const fromDb = await getIntegrationsConfig();
+  const token = fromDb.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
+  const defaultAccountId = fromDb.metaAdAccountId ?? process.env.META_AD_ACCOUNT_ID;
+
+  if (!token) {
+    return [{ clienteId: "_", daysProcessed: 0, creativesProcessed: 0, error: "META_ACCESS_TOKEN não configurado" }];
+  }
+
+  const clientes = await findAllClientes(true);
+  const today = formatDate(new Date());
+  const results: MetaSyncAllResult[] = [];
+
+  for (const cliente of clientes) {
+    const conta = await prisma.conta.findFirst({
+      where: { clienteId: cliente.id, plataforma: "META" },
+    });
+    const accountId = conta?.accountIdPlataforma ?? defaultAccountId;
+    if (!accountId) {
+      results.push({ clienteId: cliente.id, daysProcessed: 0, creativesProcessed: 0, error: "Sem conta Meta configurada" });
+      continue;
+    }
+
+    const result = await syncMetaCliente(cliente.id, {
+      dateFrom: DEFAULT_DATE_FROM,
+      dateTo: today,
+      accountId,
+      creativeDateFrom: today,
+      creativeDateTo: today,
+    });
+    results.push({
+      clienteId: cliente.id,
+      daysProcessed: result.daysProcessed,
+      creativesProcessed: result.creativesProcessed,
+      error: result.error,
+    });
+  }
+
+  return results;
+}

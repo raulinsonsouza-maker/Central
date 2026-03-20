@@ -1,0 +1,163 @@
+import type { GoogleAdsCampaignRow, GoogleAdsAdCreativeRow } from "@/lib/googleAds/googleAdsClient";
+
+function parseNum(val: string | number | undefined | unknown): number {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === "number") return Number.isFinite(val) ? val : 0;
+  const n = parseFloat(String(val).trim().replace(/,/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+export interface GoogleAdsCampaignPayload {
+  data: Date;
+  impressoes: number;
+  cliques: number;
+  conversoes: number;
+  investimento: number;
+  alcance: number;
+}
+
+/**
+ * Mapeia uma linha de campanha GAQL para o payload do FatoMidiaDiario.
+ */
+export function mapCampaignRowToFatoPayload(row: GoogleAdsCampaignRow): GoogleAdsCampaignPayload {
+  const rowAny = row as Record<string, unknown>;
+  const metrics = (row.metrics ?? rowAny.metrics) as Record<string, unknown> | undefined;
+  const segments = (row.segments ?? rowAny.segments) as Record<string, unknown> | undefined;
+
+  const costMicros = metrics?.cost_micros ?? metrics?.costMicros;
+  const investimento = parseNum(costMicros) / 1_000_000;
+
+  const impressoes = parseNum(metrics?.impressions);
+  const cliques = parseNum(metrics?.clicks);
+  const conversoes =
+    parseNum(metrics?.conversions) || parseNum(metrics?.all_conversions) || parseNum(metrics?.allConversions);
+  const alcance = parseNum(metrics?.unique_users ?? (metrics as Record<string, unknown>)?.uniqueUsers);
+
+  const dateStr = segments?.date;
+  const data = dateStr ? new Date(String(dateStr) + "T12:00:00Z") : new Date();
+
+  return {
+    data,
+    impressoes,
+    cliques,
+    conversoes,
+    investimento,
+    alcance,
+  };
+}
+
+/**
+ * Agrega linhas de campanha por data (soma métricas de todas as campanhas do mesmo dia).
+ * Retorna um mapa data -> payload agregado.
+ */
+export function aggregateCampaignRowsByDate(
+  rows: GoogleAdsCampaignRow[]
+): Map<string, GoogleAdsCampaignPayload> {
+  const byDate = new Map<string, GoogleAdsCampaignPayload>();
+
+  for (const row of rows) {
+    const payload = mapCampaignRowToFatoPayload(row);
+    const key = payload.data.toISOString().slice(0, 10);
+
+    const existing = byDate.get(key);
+    if (existing) {
+      existing.impressoes += payload.impressoes;
+      existing.cliques += payload.cliques;
+      existing.conversoes += payload.conversoes;
+      existing.investimento += payload.investimento;
+      existing.alcance += payload.alcance;
+    } else {
+      byDate.set(key, { ...payload });
+    }
+  }
+
+  return byDate;
+}
+
+export interface GoogleAdsCriativoPayload {
+  adResourceName: string;
+  campaignId: string | null;
+  campaignName: string | null;
+  adGroupId: string | null;
+  adGroupName: string | null;
+  headline1: string | null;
+  headline2: string | null;
+  description: string | null;
+  finalUrls: string | null;
+  data: Date;
+  impressoes: number;
+  cliques: number;
+  custoMicros: bigint;
+  conversoes: number;
+}
+
+/**
+ * Mapeia uma linha de ad_group_ad GAQL para o payload do GoogleAdsCriativo.
+ */
+export function mapAdCreativeRowToPayload(row: GoogleAdsAdCreativeRow): GoogleAdsCriativoPayload {
+  const adGroupAd = (row.ad_group_ad ?? (row as Record<string, unknown>).ad_group_ad) as Record<string, unknown> | undefined;
+  const ad = adGroupAd?.ad as Record<string, unknown> | undefined;
+  const campaign = (row.campaign ?? (row as Record<string, unknown>).campaign) as Record<string, unknown> | undefined;
+  const adGroup = (row.ad_group ?? (row as Record<string, unknown>).ad_group) as Record<string, unknown> | undefined;
+  const segments = (row.segments ?? (row as Record<string, unknown>).segments) as Record<string, unknown> | undefined;
+  const metrics = (row.metrics ?? (row as Record<string, unknown>).metrics) as Record<string, unknown> | undefined;
+
+  const resourceName = String(adGroupAd?.resource_name ?? "");
+
+  const rsa = ad?.responsive_search_ad as { headlines?: Array<{ text?: string }>; descriptions?: Array<{ text?: string }> } | undefined;
+  const eta = ad?.expanded_text_ad as Record<string, unknown> | undefined;
+
+  let headline1: string | null = null;
+  let headline2: string | null = null;
+  let description: string | null = null;
+
+  if (rsa?.headlines?.length) {
+    headline1 = rsa.headlines[0]?.text ?? null;
+    headline2 = rsa.headlines[1]?.text ?? null;
+  }
+  if (rsa?.descriptions?.length) {
+    description = rsa.descriptions[0]?.text ?? null;
+  }
+  if (eta) {
+    headline1 = headline1 ?? (eta.headline_part1 as string) ?? null;
+    headline2 = headline2 ?? (eta.headline_part2 as string) ?? null;
+    description = description ?? (eta.description as string) ?? null;
+  }
+
+  const finalUrlsRaw = ad?.final_urls;
+  const finalUrls =
+    Array.isArray(finalUrlsRaw) ? JSON.stringify(finalUrlsRaw) : finalUrlsRaw ? String(finalUrlsRaw) : null;
+
+  const costMicros = metrics?.cost_micros ?? metrics?.costMicros ?? 0;
+  const custoMicros = BigInt(parseNum(costMicros));
+
+  const impressoes = parseNum(metrics?.impressions);
+  const cliques = parseNum(metrics?.clicks);
+  const conversoes =
+    parseNum(metrics?.conversions) || parseNum(metrics?.all_conversions) || parseNum(metrics?.allConversions);
+
+  const dateStr = segments?.date;
+  const data = dateStr ? new Date(String(dateStr) + "T12:00:00Z") : new Date();
+
+  const campaignId = campaign?.id != null ? String(campaign.id) : null;
+  const campaignName = campaign?.name != null ? String(campaign.name) : null;
+  const adGroupId = adGroup?.id != null ? String(adGroup.id) : null;
+  const adGroupName = adGroup?.name != null ? String(adGroup.name) : null;
+
+  return {
+    adResourceName: String(resourceName),
+    campaignId,
+    campaignName,
+    adGroupId,
+    adGroupName,
+    headline1,
+    headline2,
+    description,
+    finalUrls,
+    data,
+    impressoes,
+    cliques,
+    custoMicros,
+    conversoes,
+  };
+}
