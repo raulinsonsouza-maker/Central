@@ -20,11 +20,6 @@ import {
   Legend,
   ResponsiveContainer,
   ComposedChart,
-  BarChart,
-  PieChart,
-  Pie,
-  Cell,
-  LabelList,
 } from "recharts";
 import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X } from "lucide-react";
 import { upgradeFbCdnImageUrl } from "@/lib/utils";
