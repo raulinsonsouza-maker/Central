@@ -1,6 +1,7 @@
 import { fetchAdAccounts } from "@/lib/meta/metaClient";
 import { prisma } from "@/lib/db";
 import { PLATAFORMA_META, normalizeMetaAccountId, upsertContaPlataforma } from "@/lib/repositories/contasRepository";
+import { getIntegrationsConfig } from "@/lib/config/integrations";
 
 function slugFromName(name: string): string {
   return name
@@ -49,7 +50,8 @@ export interface ImportMetaResult {
  * Nunca cria duplicados.
  */
 export async function importMetaClientes(): Promise<ImportMetaResult[]> {
-  const token = process.env.META_ACCESS_TOKEN;
+  const fromDb = await getIntegrationsConfig();
+  const token = fromDb.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
   if (!token) {
     return [{ accountId: "_", nome: "_", action: "skipped", error: "META_ACCESS_TOKEN não configurado" }];
   }
