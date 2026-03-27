@@ -26,7 +26,7 @@ import {
   Cell,
   LabelList,
 } from "recharts";
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, Images, MousePointerClick, DollarSign, TrendingUp } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X } from "lucide-react";
 import { upgradeFbCdnImageUrl } from "@/lib/utils";
 
 /* ─── data fetchers (unchanged) ─── */
@@ -1403,6 +1403,217 @@ function MetaCriativosSpendDistribution({
   );
 }
 
+function CriativoPreview({
+  creative,
+  creativeId,
+  adId,
+  alt,
+  mode,
+  priority = false,
+  adFormat = "MOBILE_FEED_STANDARD",
+  useFallback = false,
+}: {
+  creative: MetaAdCreative | undefined;
+  creativeId?: string;
+  adId?: string;
+  alt: string;
+  mode: "featured" | "card";
+  priority?: boolean;
+  adFormat?: "MOBILE_FEED_STANDARD";
+  useFallback?: boolean;
+}) {
+  const [imgError, setImgError] = React.useState(false);
+  const [previewIframeBody, setPreviewIframeBody] = React.useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = React.useState(false);
+  const [previewFailed, setPreviewFailed] = React.useState(false);
+  const [metaPreview, setMetaPreview] = React.useState<{ src: string; w: number; h: number } | null>(null);
+
+  const previewId = creativeId ?? adId;
+  const shouldFetchMetaPreview = mode === "featured" && previewId && !useFallback;
+
+  React.useEffect(() => {
+    if (!shouldFetchMetaPreview) {
+      setPreviewIframeBody(null);
+      setMetaPreview(null);
+      setPreviewFailed(false);
+      return;
+    }
+    setPreviewLoading(true);
+    setPreviewFailed(false);
+    const params = new URLSearchParams({ adFormat });
+    if (creativeId) params.set("creativeId", creativeId);
+    else if (adId) params.set("adId", adId);
+    fetch(`/api/meta/preview?${params.toString()}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Preview indisponível");
+        return res.json();
+      })
+      .then((data: { body?: string }) => {
+        if (data?.body) setPreviewIframeBody(data.body);
+        else setPreviewFailed(true);
+      })
+      .catch(() => setPreviewFailed(true))
+      .finally(() => setPreviewLoading(false));
+  }, [shouldFetchMetaPreview, adFormat, creativeId, adId]);
+
+  React.useEffect(() => {
+    if (mode !== "featured" || useFallback || !previewIframeBody || previewFailed) return;
+    try {
+      const doc = new DOMParser().parseFromString(previewIframeBody, "text/html");
+      const iframe = doc.querySelector("iframe");
+      const src = iframe?.getAttribute("src") ?? "";
+      const w = parseInt(iframe?.getAttribute("width") ?? "0", 10) || 274;
+      const h = parseInt(iframe?.getAttribute("height") ?? "0", 10) || 213;
+      if (src) setMetaPreview({ src, w, h });
+      else setMetaPreview(null);
+    } catch {
+      setMetaPreview(null);
+    }
+  }, [mode, useFallback, previewIframeBody, previewFailed]);
+
+  const isVideo = !!(creative?.video_source_url || creative?.video_embed_html || creative?.video_id);
+  const rawImgUrl =
+    creative?.image_url_full ||
+    creative?.image_url ||
+    creative?.video_picture_url ||
+    creative?.thumbnail_url;
+  const imgUrl = upgradeFbCdnImageUrl(rawImgUrl) || rawImgUrl;
+  const rawPosterUrl = creative?.video_picture_url || creative?.thumbnail_url;
+  const posterUrl = upgradeFbCdnImageUrl(rawPosterUrl) || rawPosterUrl;
+  const containerClass =
+    mode === "featured"
+      ? "flex items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--muted)]/20"
+      : "flex h-56 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--muted)]/10 p-3";
+
+  const Placeholder = ({ message = "Preview indisponível" }: { message?: string }) => (
+    <div className={`${containerClass} flex-col gap-2 text-center text-[var(--muted-foreground)]`}>
+      <BarChart3 className="h-8 w-8 opacity-50" />
+      <span className="text-xs">{message}</span>
+    </div>
+  );
+
+  if (mode === "featured" && !useFallback && metaPreview && !previewFailed) {
+    const scale = 360 / metaPreview.w;
+    const iframeH = Math.round(metaPreview.h / scale) + 210;
+    const displayH = Math.round(iframeH * scale);
+    return (
+      <div
+        className="mx-auto overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl"
+        style={{ width: 360, height: displayH }}
+      >
+        <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: metaPreview.w, height: iframeH }}>
+          <iframe
+            title="Prévia do anúncio (Meta)"
+            src={metaPreview.src}
+            scrolling="no"
+            style={{ border: "none", display: "block", width: metaPreview.w, height: iframeH }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "featured" && !useFallback && previewLoading) {
+    return (
+      <div className={`${containerClass} flex-col gap-2`}>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
+        <span className="text-xs text-[var(--muted-foreground)]">Carregando prévia do Meta…</span>
+      </div>
+    );
+  }
+
+  if (mode === "featured" && isVideo && creative?.video_source_url) {
+    return (
+      <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
+        <video
+          src={creative.video_source_url}
+          controls
+          playsInline
+          preload="metadata"
+          poster={posterUrl}
+          className="h-auto w-full object-contain"
+          style={{ maxHeight: "70vh" }}
+        >
+          Seu navegador não suporta vídeo.
+        </video>
+      </div>
+    );
+  }
+
+  if (mode === "featured" && isVideo && creative?.video_embed_html) {
+    return (
+      <div className={`${containerClass} overflow-hidden bg-black`}>
+        <div className="aspect-video w-full max-w-2xl" dangerouslySetInnerHTML={{ __html: creative.video_embed_html }} />
+      </div>
+    );
+  }
+
+  if ((imgUrl || posterUrl) && !imgError) {
+    const mediaUrl = imgUrl || posterUrl;
+    if (mediaUrl) {
+      return mode === "featured" ? (
+        <div className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mediaUrl}
+            alt={alt}
+            loading={priority ? "eager" : "lazy"}
+            referrerPolicy="no-referrer"
+            className="h-auto w-full object-contain"
+            style={{ maxHeight: "70vh" }}
+            onError={() => setImgError(true)}
+          />
+          {isVideo && (
+            <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
+                <Play className="h-3 w-3 fill-current" />
+                {creative?.video_source_url || creative?.video_embed_html ? "Vídeo com player" : "Thumbnail"}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={`relative overflow-hidden ${containerClass}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={mediaUrl}
+            alt={alt}
+            loading={priority ? "eager" : "lazy"}
+            referrerPolicy="no-referrer"
+            className="max-h-[72vh] h-full w-full rounded-xl object-contain"
+            onError={() => setImgError(true)}
+          />
+          {isVideo && (
+            <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
+                <Play className="h-3 w-3 fill-current" />
+                {creative?.video_source_url || creative?.video_embed_html ? "Vídeo com player" : "Thumbnail"}
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    }
+  }
+
+  if (isVideo && creative?.video_source_url) {
+    return (
+      <div className={`relative overflow-hidden ${containerClass}`}>
+        <video src={creative.video_source_url} preload="metadata" muted playsInline className="h-full w-full object-contain" />
+        <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
+            <Play className="h-3 w-3 fill-current" />
+            Vídeo
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isVideo) return <Placeholder message="Vídeo sem thumbnail disponível" />;
+  return <Placeholder />;
+}
+
 function MetaCriativosGrid({
   ads,
   formatCurrency,
@@ -1445,17 +1656,13 @@ function MetaCriativosGrid({
       });
   }, [ads]);
 
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [modalAdId, setModalAdId] = React.useState<string | null>(null);
+  const [modalFallback, setModalFallback] = React.useState(false);
 
   React.useEffect(() => {
-    if (!sorted.length) {
-      setSelectedId(null);
-      return;
-    }
-    setSelectedId((current) => (current && sorted.some((item) => item.ad.id === current) ? current : sorted[0].ad.id));
-  }, [sorted]);
+    setModalFallback(false);
+  }, [modalAdId]);
 
-  const selected = sorted.find((item) => item.ad.id === selectedId) ?? sorted[0];
   const topCtr = React.useMemo(
     () =>
       [...sorted].sort((a, b) => {
@@ -1468,525 +1675,334 @@ function MetaCriativosGrid({
   const totalImpressions = sorted.reduce((acc, item) => acc + item.impressions, 0);
   const totalClicks = sorted.reduce((acc, item) => acc + item.clicks, 0);
   const averageCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  const averageCpc = totalClicks > 0 ? totalSpend / totalClicks : 0;
 
   const previewFormat = "MOBILE_FEED_STANDARD" as const;
-  const [useFallbackPreview, setUseFallbackPreview] = React.useState(false);
 
-  React.useEffect(() => {
-    setUseFallbackPreview(false);
-  }, [selectedId]);
-
-  function CriativoPreview({
-    creative,
-    creativeId,
-    adId,
-    alt,
-    mode,
-    priority = false,
-    adFormat = "MOBILE_FEED_STANDARD",
-    useFallback = false,
-  }: {
-    creative: MetaAdCreative | undefined;
-    creativeId?: string;
-    adId?: string;
-    alt: string;
-    mode: "featured" | "card";
-    priority?: boolean;
-    adFormat?: "MOBILE_FEED_STANDARD";
-    useFallback?: boolean;
-  }) {
-    const [imgError, setImgError] = React.useState(false);
-    const [previewIframeBody, setPreviewIframeBody] = React.useState<string | null>(null);
-    const [previewLoading, setPreviewLoading] = React.useState(false);
-    const [previewFailed, setPreviewFailed] = React.useState(false);
-    const [metaPreview, setMetaPreview] = React.useState<{ src: string; w: number; h: number } | null>(null);
-
-    const previewId = creativeId ?? adId;
-    const shouldFetchMetaPreview = mode === "featured" && previewId && !useFallback;
-
-    React.useEffect(() => {
-      if (!shouldFetchMetaPreview) {
-        setPreviewIframeBody(null);
-        setMetaPreview(null);
-        setPreviewFailed(false);
-        return;
-      }
-      setPreviewLoading(true);
-      setPreviewFailed(false);
-      const params = new URLSearchParams({ adFormat });
-      if (creativeId) params.set("creativeId", creativeId);
-      else if (adId) params.set("adId", adId);
-      fetch(`/api/meta/preview?${params.toString()}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Preview indisponível");
-          return res.json();
-        })
-        .then((data: { body?: string }) => {
-          if (data?.body) setPreviewIframeBody(data.body);
-          else setPreviewFailed(true);
-        })
-        .catch(() => setPreviewFailed(true))
-        .finally(() => setPreviewLoading(false));
-    }, [shouldFetchMetaPreview, adFormat, creativeId, adId]);
-
-    React.useEffect(() => {
-      if (mode !== "featured" || useFallback || !previewIframeBody || previewFailed) return;
-      try {
-        const doc = new DOMParser().parseFromString(previewIframeBody, "text/html");
-        const iframe = doc.querySelector("iframe");
-        const src = iframe?.getAttribute("src") ?? "";
-        const w = parseInt(iframe?.getAttribute("width") ?? "0", 10) || 274;
-        const h = parseInt(iframe?.getAttribute("height") ?? "0", 10) || 213;
-        if (src) setMetaPreview({ src, w, h });
-        else setMetaPreview(null);
-      } catch {
-        setMetaPreview(null);
-      }
-    }, [mode, useFallback, previewIframeBody, previewFailed]);
-
-    const isVideo = !!(creative?.video_source_url || creative?.video_embed_html || creative?.video_id);
-    const rawImgUrl =
-      creative?.image_url_full ||
-      creative?.image_url ||
-      creative?.video_picture_url ||
-      creative?.thumbnail_url;
-    const imgUrl = upgradeFbCdnImageUrl(rawImgUrl) || rawImgUrl;
-    const rawPosterUrl = creative?.video_picture_url || creative?.thumbnail_url;
-    const posterUrl = upgradeFbCdnImageUrl(rawPosterUrl) || rawPosterUrl;
-    const containerClass =
-      mode === "featured"
-        ? "flex items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--muted)]/20"
-        : "flex h-56 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--muted)]/10 p-3";
-
-    const Placeholder = ({ message = "Preview indisponível" }: { message?: string }) => (
-      <div
-        className={`${containerClass} flex-col gap-2 text-center text-[var(--muted-foreground)]`}
-      >
-        <BarChart3 className="h-8 w-8 opacity-50" />
-        <span className="text-xs">{message}</span>
-      </div>
-    );
-
-    if (mode === "featured" && !useFallback && metaPreview && !previewFailed) {
-      // A prévia do Meta retorna dimensões do embed (ex: 274×213) que não
-      // incluem o cabeçalho, texto e barra de engajamento do post simulado.
-      // O conteúdo real renderizado é tipicamente 2-3× mais alto.
-      // Calculamos a escala para caber em 360px de largura e adicionamos
-      // margem generosa para o chrome do post (~300px).
-      const scale = 360 / metaPreview.w;
-      const iframeH = Math.round(metaPreview.h / scale) + 210;
-      const displayH = Math.round(iframeH * scale);
-      return (
-        <div
-          className="mx-auto overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl"
-          style={{ width: 360, height: displayH }}
-        >
-          <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: metaPreview.w, height: iframeH }}>
-            <iframe
-              title="Prévia do anúncio (Meta)"
-              src={metaPreview.src}
-              scrolling="no"
-              style={{
-                border: "none",
-                display: "block",
-                width: metaPreview.w,
-                height: iframeH,
-              }}
-            />
-          </div>
-        </div>
-      );
-    }
-
-    if (mode === "featured" && !useFallback && previewLoading) {
-      return (
-        <div className={`${containerClass} flex-col gap-2`}>
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
-          <span className="text-xs text-[var(--muted-foreground)]">Carregando prévia do Meta…</span>
-        </div>
-      );
-    }
-
-    if (mode === "featured" && isVideo && creative?.video_source_url) {
-      return (
-        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
-          <video
-            src={creative.video_source_url}
-            controls
-            playsInline
-            preload="metadata"
-            poster={posterUrl}
-            className="h-auto w-full object-contain"
-            style={{ maxHeight: "70vh" }}
-          >
-            Seu navegador não suporta vídeo.
-          </video>
-        </div>
-      );
-    }
-
-    if (mode === "featured" && isVideo && creative?.video_embed_html) {
-      return (
-        <div className={`${containerClass} overflow-hidden bg-black`}>
-          <div
-            className="aspect-video w-full max-w-2xl"
-            dangerouslySetInnerHTML={{ __html: creative.video_embed_html }}
-          />
-        </div>
-      );
-    }
-
-    if ((imgUrl || posterUrl) && !imgError) {
-      const mediaUrl = imgUrl || posterUrl;
-      if (mediaUrl) {
-        const wrapper =
-          mode === "featured" ? (
-            <div className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={mediaUrl}
-                alt={alt}
-                loading={priority ? "eager" : "lazy"}
-                referrerPolicy="no-referrer"
-                className="h-auto w-full object-contain"
-                style={{ maxHeight: "70vh" }}
-                onError={() => setImgError(true)}
-              />
-              {isVideo && (
-                <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
-                    <Play className="h-3 w-3 fill-current" />
-                    {creative?.video_source_url || creative?.video_embed_html ? "Vídeo com player" : "Thumbnail"}
-                  </span>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className={`relative overflow-hidden ${containerClass}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={mediaUrl}
-                alt={alt}
-                loading={priority ? "eager" : "lazy"}
-                referrerPolicy="no-referrer"
-                className="max-h-[72vh] h-full w-full rounded-xl object-contain"
-                onError={() => setImgError(true)}
-              />
-              {isVideo && (
-                <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
-                    <Play className="h-3 w-3 fill-current" />
-                    {creative?.video_source_url || creative?.video_embed_html ? "Vídeo com player" : "Thumbnail"}
-                  </span>
-                </div>
-              )}
-            </div>
-          );
-        return wrapper;
-      }
-    }
-
-    if (isVideo && creative?.video_source_url) {
-      return (
-        <div className={`relative overflow-hidden ${containerClass}`}>
-          <video
-            src={creative.video_source_url}
-            preload="metadata"
-            muted
-            playsInline
-            className="h-full w-full object-contain"
-          />
-          <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-center">
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/90">
-              <Play className="h-3 w-3 fill-current" />
-              Vídeo
-            </span>
-          </div>
-        </div>
-      );
-    }
-
-    if (isVideo) return <Placeholder message="Vídeo sem thumbnail disponível" />;
-    return <Placeholder />;
+  if (!sorted.length) {
+    return <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Nenhum criativo encontrado.</p>;
   }
 
-  if (!selected) {
-    return <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Nenhum criativo selecionado.</p>;
-  }
+  // Score computation
+  const maxCtr = Math.max(...sorted.map((d) => d.ctr), 0.001);
+  const minCtr = Math.min(...sorted.map((d) => d.ctr));
+  const ctrRange = maxCtr - minCtr || 1;
+  const cpcValues = sorted.filter((d) => d.cpc > 0).map((d) => d.cpc);
+  const maxCpc = cpcValues.length ? Math.max(...cpcValues) : 1;
+  const minCpc = cpcValues.length ? Math.min(...cpcValues) : 0;
+  const cpcRange = maxCpc - minCpc || 1;
+  const isOne = sorted.length === 1;
+  const scoredItems = sorted.map((item) => {
+    const ctrScore = isOne ? 1 : (item.ctr - minCtr) / ctrRange;
+    const cpcScore = item.cpc > 0 && !isOne ? (maxCpc - item.cpc) / cpcRange : 0.5;
+    const score = Math.min(2, parseFloat((ctrScore * 1.4 + cpcScore * 0.6).toFixed(2)));
+    const spShare = totalSpend > 0 ? (item.spend / totalSpend) * 100 : 0;
+    const status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" =
+      score >= 1.4 ? "ESCALAR" : score >= 0.8 ? "OTIMIZAR" : "PAUSAR";
+    const alerts: string[] = [];
+    if (item.ctr < averageCtr * 0.75) alerts.push("CTR baixo");
+    if (averageCpc > 0 && item.cpc > averageCpc * 1.4) alerts.push("CPC alto");
+    if (spShare > 45) alerts.push("Verba concentrada");
+    else if (spShare < 5 && sorted.length > 3) alerts.push("Pouca verba");
+    return { ...item, score, status, alerts: alerts.slice(0, 2), spShare };
+  }).sort((a, b) => b.score - a.score);
 
-  // Computed analysis values
-  const spendShare = totalSpend > 0 ? (selected.spend / totalSpend) * 100 : 0;
-  const ctrRanked = [...sorted].sort((a, b) => b.ctr - a.ctr);
-  const ctrRank = ctrRanked.findIndex((item) => item.ad.id === selected.ad.id) + 1;
-  const isTop = ctrRank === 1 && sorted.length > 1;
-  const isAboveCtr = selected.ctr >= averageCtr;
-  const isFarBelowCtr = selected.ctr < averageCtr * 0.7;
-  const isHighShare = spendShare >= 25;
-  const ctrDiff = selected.ctr - averageCtr;
-  const maxCtrVal = Math.max(...sorted.map((d) => d.ctr), 0.01);
+  const countEscalar = scoredItems.filter((i) => i.status === "ESCALAR").length;
+  const countOtimizar = scoredItems.filter((i) => i.status === "OTIMIZAR").length;
+  const countPausar = scoredItems.filter((i) => i.status === "PAUSAR").length;
+  const pausarSpend = scoredItems.filter((i) => i.status === "PAUSAR").reduce((acc, i) => acc + i.spend, 0);
+  const pctPausar = totalSpend > 0 ? Math.round((pausarSpend / totalSpend) * 100) : 0;
 
-  let statusLabel = "Na média";
-  let statusClasses = "text-[var(--muted-foreground)] bg-[var(--muted)]/20 border-[var(--border)]";
-  if (isTop) { statusLabel = "Top performer"; statusClasses = "text-amber-500 bg-amber-500/10 border-amber-500/30"; }
-  else if (isAboveCtr) { statusLabel = "Acima da média"; statusClasses = "text-green-500 bg-green-500/10 border-green-500/30"; }
-  else if (isFarBelowCtr) { statusLabel = "Baixo desempenho"; statusClasses = "text-red-500 bg-red-500/10 border-red-500/30"; }
+  const decisionInsight =
+    pctPausar > 30 ? `${pctPausar}% da verba está em criativos de baixa performance.`
+    : countEscalar === 0 ? `Nenhum criativo com performance forte. Considere novos testes.`
+    : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade dos criativos está escalável.`
+    : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com maior score.`;
 
-  let insight = "";
-  if (isTop && isHighShare) insight = `Melhor CTR com ${spendShare.toFixed(0)}% do orçamento. Continue investindo neste criativo.`;
-  else if (isTop) insight = `Melhor CTR do conjunto, mas recebe apenas ${spendShare.toFixed(0)}% da verba. Considere aumentar o investimento.`;
-  else if (isAboveCtr && isHighShare) insight = `CTR acima da média com boa participação no orçamento. Conjunto bem equilibrado.`;
-  else if (isAboveCtr) insight = `CTR acima da média. Pode receber mais investimento para escalar os resultados.`;
-  else if (isFarBelowCtr && isHighShare) insight = `CTR baixo com ${spendShare.toFixed(0)}% do orçamento. Redistribua a verba para criativos mais eficientes.`;
-  else if (isFarBelowCtr) insight = `CTR abaixo do esperado. Revise o criativo antes de investir mais.`;
-  else insight = `Performance dentro da média. Monitore por mais tempo antes de tomar decisões.`;
+  const escalarNames = scoredItems.filter((i) => i.status === "ESCALAR").map((i) => i.ad.name);
+  const pausarNames = scoredItems.filter((i) => i.status === "PAUSAR").map((i) => i.ad.name);
+  const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
+
+  const statusConfig = {
+    ESCALAR: { label: "Escalar", color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/30", bar: "bg-green-500" },
+    OTIMIZAR: { label: "Otimizar", color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/30", bar: "bg-amber-500" },
+    PAUSAR: { label: "Pausar", color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/30", bar: "bg-red-500" },
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
 
-      {/* Barra de resumo compacta */}
+      {/* 1. Barra de resumo */}
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-3">
-          <div className="flex items-center gap-2">
-            <Images className="h-3.5 w-3.5 text-[var(--primary)]" />
-            <span className="text-xs font-bold text-[var(--foreground)]">{sorted.length}</span>
-            <span className="text-xs text-[var(--muted-foreground)]">criativos · {periodLabel.toLowerCase()}</span>
-          </div>
-          <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-[var(--muted-foreground)]">Investimento</span>
             <span className="text-xs font-bold text-[var(--foreground)]">{formatCurrency(totalSpend)}</span>
           </div>
           <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">{totalImpressions.toLocaleString("pt-BR")} impressões</span>
+            <span className="text-xs text-[var(--muted-foreground)]">CTR médio</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{averageCtr.toFixed(2)}%</span>
+          </div>
+          <div className="h-3.5 w-px bg-[var(--border)]" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[var(--muted-foreground)]">CPC médio</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{averageCpc > 0 ? formatCurrency(averageCpc) : "—"}</span>
           </div>
           <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="ml-auto flex items-center gap-2">
             <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
-            <span className="text-xs text-[var(--muted-foreground)]">Melhor CTR:</span>
+            <span className="text-xs text-[var(--muted-foreground)]">Melhor:</span>
             <span className="text-xs font-bold text-[var(--primary)]">{topCtr?.ctr.toFixed(2)}%</span>
             <span className="hidden text-xs text-[var(--muted-foreground)] xl:inline">· {topCtr?.ad.name}</span>
           </div>
         </div>
       </div>
 
-      {/* Grade principal: 3 + 6 + 3 */}
-      <div className="mx-auto grid max-w-[1280px] items-start gap-5 px-6 xl:grid-cols-12">
-
-        {/* Coluna esquerda: lista de criativos */}
-        <div className="order-2 xl:order-1 xl:col-span-3 xl:sticky xl:top-24">
-          <div className="mb-3 flex items-center gap-2">
-            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Criativos</h3>
-            <span className="ml-auto text-[10px] text-[var(--muted-foreground)]">{sorted.length} peças</span>
+      {/* 2. Decision Bar */}
+      <div className="mx-auto max-w-[1280px] px-6">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-5">
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {([
+              { count: countEscalar, label: "Escalar", dot: "🟢", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
+              { count: countOtimizar, label: "Otimizar", dot: "🟡", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
+              { count: countPausar, label: "Pausar", dot: "🔴", color: "text-red-500", bg: "bg-red-500/10 border-red-500/20" },
+            ] as const).map((s) => (
+              <div key={s.label} className={`flex items-center gap-3 rounded-xl border px-5 py-3 ${s.bg}`}>
+                <span className="text-lg leading-none">{s.dot}</span>
+                <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
+                <span className={`text-sm font-semibold ${s.color}`}>{s.label}</span>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-col gap-2" style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
-            {sorted.map((item) => {
-              const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
-              const imgUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
-              const isActive = selected?.ad.id === item.ad.id;
-              return (
-                <button
-                  key={item.ad.id}
-                  type="button"
-                  onClick={() => setSelectedId(item.ad.id)}
-                  className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
-                    isActive
-                      ? "border-[var(--primary)] bg-[var(--primary)]/10 shadow-sm shadow-[var(--primary)]/10"
-                      : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40"
-                  }`}
-                >
-                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
-                    {imgUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={imgUrl} alt={item.ad.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        <BarChart3 className="h-4 w-4 text-[var(--muted-foreground)]" />
+          <p className="mt-4 text-center text-xs text-[var(--muted-foreground)]">{decisionInsight}</p>
+        </div>
+      </div>
+
+      {/* 3. Tabela de criativos */}
+      <div className="mx-auto max-w-[1280px] px-6">
+        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-[var(--border)] bg-[var(--muted)]/10">
+                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Spend</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPC</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Score</th>
+                <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
+                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Alertas</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border)]/40">
+              {scoredItems.map((item) => {
+                const cfg = statusConfig[item.status];
+                const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
+                const thumbUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
+                return (
+                  <tr
+                    key={item.ad.id}
+                    className="cursor-pointer transition-colors hover:bg-[var(--muted)]/15"
+                    onClick={() => setModalAdId(item.ad.id)}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
+                          {thumbUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={thumbUrl} alt={item.ad.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <BarChart3 className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="max-w-[180px] truncate font-medium text-[var(--foreground)]">{item.ad.name}</span>
                       </div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.ad.name}</p>
-                    <div className="mt-0.5 flex items-center gap-1.5">
-                      <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]">{formatCurrency(item.spend)}</span>
-                      <span className="text-[var(--border)]">·</span>
-                      <span className={`text-[10px] tabular-nums font-medium ${item.ctr >= averageCtr ? "text-green-500" : "text-[var(--muted-foreground)]"}`}>
-                        {item.ctr.toFixed(2)}%
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
+                    <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.clicks > 0 ? formatCurrency(item.cpc) : "—"}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`tabular-nums font-bold ${cfg.color}`}>{item.score.toFixed(1)}</span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                        {cfg.label}
                       </span>
-                    </div>
-                  </div>
-                </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {item.alerts.length === 0 ? (
+                          <span className="text-[var(--muted-foreground)]/40">—</span>
+                        ) : item.alerts.map((a) => (
+                          <span key={a} className="inline-flex items-center gap-0.5 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500">
+                            ⚠ {a}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 4. Barra de distribuição de verba */}
+      <div className="mx-auto max-w-[1280px] px-6">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Distribuição de verba</p>
+          <div className="flex h-8 overflow-hidden rounded-lg">
+            {scoredItems.map((item, i) => {
+              const cfg = statusConfig[item.status];
+              return (
+                <div
+                  key={item.ad.id}
+                  className={`relative cursor-pointer transition-all hover:brightness-110 ${cfg.bar}`}
+                  style={{ width: `${item.spShare}%`, marginLeft: i > 0 ? "2px" : "0" }}
+                  title={`${item.ad.name}: ${formatCurrency(item.spend)} (${item.spShare.toFixed(1)}%)`}
+                  onClick={() => setModalAdId(item.ad.id)}
+                />
+              );
+            })}
+          </div>
+          <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+            {scoredItems.map((item) => {
+              const cfg = statusConfig[item.status];
+              return (
+                <span key={item.ad.id} className="flex items-center gap-1.5 text-[10px] text-[var(--muted-foreground)]">
+                  <span className={`inline-block h-2 w-2 shrink-0 rounded-sm ${cfg.bar}`} />
+                  {item.ad.name} {item.spShare.toFixed(0)}%
+                </span>
               );
             })}
           </div>
         </div>
-
-        {/* Coluna central: prévia */}
-        <div className="order-1 xl:order-2 xl:col-span-6">
-          <div className="mb-3 flex items-center gap-3">
-            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Prévia do anúncio</h3>
-            <div className="ml-auto flex rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-0.5">
-              {(["video", "image"] as const).map((type) => {
-                const isVid = type === "video";
-                const isActive = (isVid && selected.mediaType === "video") || (!isVid && selected.mediaType === "image");
-                return (
-                  <span key={type} className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${isActive ? "bg-[var(--primary)] text-[var(--primary-foreground)]" : "text-[var(--muted-foreground)]"}`}>
-                    {isVid ? "Vídeo" : "Imagem"}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center">
-            {useFallbackPreview && (
-              <p className="mb-3 text-center text-[10px] text-[var(--muted-foreground)]">
-                Exibindo mídia alternativa.{" "}
-                <button type="button" onClick={() => setUseFallbackPreview(false)} className="font-medium text-[var(--primary)] underline underline-offset-2 hover:no-underline">
-                  Voltar para prévia Meta
-                </button>
-              </p>
-            )}
-            <CriativoPreview
-              creative={selected.creative}
-              creativeId={selected.creative?.id}
-              adId={selected.ad.id}
-              alt={selected.ad.name}
-              mode="featured"
-              priority
-              adFormat={previewFormat}
-              useFallback={useFallbackPreview}
-            />
-          </div>
-
-          {selected.primaryText && (
-            <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Texto do anúncio</p>
-              <p className="text-xs leading-5 text-[var(--foreground)] line-clamp-3">{selected.primaryText}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Coluna direita: painel unificado de análise */}
-        <div className="order-3 xl:col-span-3 xl:sticky xl:top-24">
-          <div className="mb-3 flex items-center gap-2">
-            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-            <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Análise</p>
-          </div>
-
-          <div className="divide-y divide-[var(--border)]/60 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-
-            {/* 1. Status + nome */}
-            <div className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-[var(--foreground)]">{selected.ad.name}</p>
-                  <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                    {selected.mediaType === "video" ? "Vídeo" : "Imagem"} · #{ctrRank} de {sorted.length} em CTR
-                  </p>
-                </div>
-                <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
-                  {statusLabel}
-                </span>
-              </div>
-            </div>
-
-            {/* 2. Métricas */}
-            <div className="p-4">
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                {[
-                  { label: "Investimento", value: formatCurrency(selected.spend), hi: false },
-                  { label: "CTR", value: `${selected.ctr.toFixed(2)}%`, hi: true },
-                  { label: "CPC", value: selected.clicks > 0 ? formatCurrency(selected.spend / selected.clicks) : "—", hi: false },
-                ].map((m) => (
-                  <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-2.5 text-center">
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                    <p className={`mt-1 text-sm font-bold tabular-nums ${m.hi ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: "Impressões", value: selected.impressions.toLocaleString("pt-BR") },
-                  { label: "CPM", value: selected.impressions > 0 ? formatCurrency((selected.spend / selected.impressions) * 1000) : "—" },
-                ].map((m) => (
-                  <div key={m.label} className="rounded-lg border border-[var(--border)]/50 bg-[var(--background)]/40 px-2.5 py-2 text-center">
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                    <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-[var(--foreground)]">{m.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 3. Posição no conjunto */}
-            <div className="p-4 space-y-3">
-              <div>
-                <div className="mb-1.5 flex justify-between text-[10px]">
-                  <span className="text-[var(--muted-foreground)]">CTR vs conjunto</span>
-                  <span className={`font-semibold tabular-nums ${isAboveCtr ? "text-green-500" : isFarBelowCtr ? "text-red-500" : "text-amber-500"}`}>
-                    {ctrDiff > 0 ? "+" : ""}{ctrDiff.toFixed(2)}%
-                  </span>
-                </div>
-                <div className="relative h-2 overflow-hidden rounded-full bg-[var(--muted)]/30">
-                  <div className="absolute inset-y-0 left-0 rounded-full bg-[var(--muted-foreground)]/25" style={{ width: `${Math.min(100, (averageCtr / maxCtrVal) * 100)}%` }} />
-                  <div
-                    className={`absolute inset-y-0 left-0 rounded-full transition-all ${isAboveCtr ? "bg-green-500" : isFarBelowCtr ? "bg-red-500" : "bg-amber-500"}`}
-                    style={{ width: `${Math.min(100, (selected.ctr / maxCtrVal) * 100)}%` }}
-                  />
-                </div>
-                <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">Média: {averageCtr.toFixed(2)}% · Seu: {selected.ctr.toFixed(2)}%</p>
-              </div>
-              <div>
-                <div className="mb-1.5 flex justify-between text-[10px]">
-                  <span className="text-[var(--muted-foreground)]">Share do orçamento</span>
-                  <span className="font-semibold tabular-nums text-[var(--foreground)]">{spendShare.toFixed(1)}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[var(--muted)]/30">
-                  <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${Math.min(100, spendShare)}%` }} />
-                </div>
-                <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">{formatCurrency(selected.spend)} de {formatCurrency(totalSpend)}</p>
-              </div>
-            </div>
-
-            {/* 4. Recomendação */}
-            <div className="p-4">
-              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--primary)]">Recomendação</p>
-              <p className="text-xs leading-[1.6] text-[var(--muted-foreground)]">{insight}</p>
-            </div>
-
-            {/* 5. Ranking compacto */}
-            <div className="p-4">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Ranking CTR</p>
-              <div className="space-y-2">
-                {ctrRanked.slice(0, 7).map((item, i) => {
-                  const isSel = item.ad.id === selected.ad.id;
-                  return (
-                    <div key={item.ad.id} className="flex items-center gap-2">
-                      <span className={`w-4 shrink-0 text-[10px] tabular-nums ${isSel ? "font-bold text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>{i + 1}</span>
-                      <span className={`w-14 shrink-0 truncate text-[10px] ${isSel ? "font-semibold text-[var(--foreground)]" : "text-[var(--muted-foreground)]"}`} title={item.ad.name}>
-                        {item.ad.name}
-                      </span>
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--muted)]/30">
-                        <div
-                          className={`h-full rounded-full transition-all ${isSel ? "bg-[var(--primary)]" : "bg-[var(--muted-foreground)]/45"}`}
-                          style={{ width: `${Math.min(100, (item.ctr / maxCtrVal) * 100)}%` }}
-                        />
-                      </div>
-                      <span className={`w-10 shrink-0 text-right text-[10px] tabular-nums ${isSel ? "font-bold text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>
-                        {item.ctr.toFixed(2)}%
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-          </div>
-        </div>
-
       </div>
+
+      {/* 5. Ações recomendadas */}
+      {(escalarNames.length > 0 || pausarNames.length > 0) && (
+        <div className="mx-auto max-w-[1280px] px-6">
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Ações recomendadas</p>
+            <div className="space-y-1.5">
+              {escalarNames.length > 0 && (
+                <p className="text-xs">
+                  <span className="font-semibold text-green-500">Escalar: </span>
+                  <span className="text-[var(--foreground)]">{escalarNames.join(", ")}</span>
+                </p>
+              )}
+              {pausarNames.length > 0 && (
+                <p className="text-xs">
+                  <span className="font-semibold text-red-500">Pausar: </span>
+                  <span className="text-[var(--foreground)]">{pausarNames.join(", ")}</span>
+                </p>
+              )}
+              {pausarNames.length > 0 && escalarNames.length > 0 && (
+                <p className="text-xs">
+                  <span className="font-semibold text-[var(--muted-foreground)]">Ajuste: </span>
+                  <span className="text-[var(--muted-foreground)]">Redistribuir verba dos criativos pausados para os top performers</span>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de criativo */}
+      {modalItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setModalAdId(null); }}
+          onKeyDown={(e) => { if (e.key === "Escape") setModalAdId(null); }}
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+        >
+          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl">
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] px-5 py-4">
+              <div>
+                <p className="font-bold text-[var(--foreground)]">{modalItem.ad.name}</p>
+                <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                  {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"} · Score {modalItem.score.toFixed(1)}
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusConfig[modalItem.status].color} ${statusConfig[modalItem.status].bg} ${statusConfig[modalItem.status].border}`}>
+                  {statusConfig[modalItem.status].label}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setModalAdId(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
+                  aria-label="Fechar"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-1 gap-6 overflow-y-auto p-5">
+              <div className="shrink-0">
+                {modalFallback && (
+                  <p className="mb-2 text-center text-[10px] text-[var(--muted-foreground)]">
+                    Mídia alternativa.{" "}
+                    <button type="button" onClick={() => setModalFallback(false)} className="font-medium text-[var(--primary)] underline underline-offset-2">
+                      Prévia Meta
+                    </button>
+                  </p>
+                )}
+                <CriativoPreview
+                  creative={modalItem.creative}
+                  creativeId={modalItem.creative?.id}
+                  adId={modalItem.ad.id}
+                  alt={modalItem.ad.name}
+                  mode="featured"
+                  priority
+                  adFormat={previewFormat}
+                  useFallback={modalFallback}
+                />
+              </div>
+
+              <div className="flex min-w-0 flex-1 flex-col gap-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Investimento", value: formatCurrency(modalItem.spend), hi: false },
+                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%`, hi: true },
+                    { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—", hi: false },
+                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR"), hi: false },
+                    { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency((modalItem.spend / modalItem.impressions) * 1000) : "—", hi: false },
+                    { label: "Cliques", value: modalItem.clicks.toLocaleString("pt-BR"), hi: false },
+                  ].map((m) => (
+                    <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-3 text-center">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                      <p className={`mt-1 text-sm font-bold tabular-nums ${m.hi ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
+                    </div>
+                  ))}
+                </div>
+                {modalItem.primaryText && (
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-4">
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Texto do anúncio</p>
+                    <p className="text-sm leading-relaxed text-[var(--foreground)]">{modalItem.primaryText}</p>
+                  </div>
+                )}
+                {modalItem.alerts.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {modalItem.alerts.map((a) => (
+                      <span key={a} className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-500">
+                        ⚠ {a}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
