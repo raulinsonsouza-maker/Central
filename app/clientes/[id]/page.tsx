@@ -1131,84 +1131,93 @@ function MetaCriativosComparisonPanel({
   maxCtr: number;
 }) {
   const spendShare = totalSpend > 0 ? (selected.spend / totalSpend) * 100 : 0;
-  const ctrVsMedia =
-    selected.ctr > averageCtr ? "acima" : selected.ctr < averageCtr ? "abaixo" : "média";
-  const ctrRank =
-    [...sorted]
-      .sort((a, b) => b.ctr - a.ctr)
-      .findIndex((item) => item.ad.id === selected.ad.id) + 1;
+  const ctrRank = [...sorted].sort((a, b) => b.ctr - a.ctr).findIndex((item) => item.ad.id === selected.ad.id) + 1;
+  const isAbove = selected.ctr >= averageCtr;
+  const isFarBelow = selected.ctr < averageCtr * 0.7;
+  const isTop = ctrRank === 1;
+  const isHighShare = spendShare >= 25;
+  const ctrDiff = selected.ctr - averageCtr;
+
+  let statusLabel = "Na média";
+  let statusClasses = "text-[var(--muted-foreground)] bg-[var(--muted)]/20 border-[var(--border)]";
+  if (isTop && sorted.length > 1) {
+    statusLabel = "Top performer";
+    statusClasses = "text-amber-500 bg-amber-500/10 border-amber-500/30";
+  } else if (isAbove) {
+    statusLabel = "Acima da média";
+    statusClasses = "text-green-500 bg-green-500/10 border-green-500/30";
+  } else if (isFarBelow) {
+    statusLabel = "Baixo desempenho";
+    statusClasses = "text-red-500 bg-red-500/10 border-red-500/30";
+  }
+
+  let insight = "";
+  if (isTop && isHighShare) insight = `Melhor CTR com ${spendShare.toFixed(0)}% do orçamento. Excelente alocação — continue investindo.`;
+  else if (isTop && !isHighShare) insight = `Melhor CTR do conjunto, mas recebe apenas ${spendShare.toFixed(0)}% da verba. Considere aumentar o investimento.`;
+  else if (isAbove && isHighShare) insight = `CTR acima da média com boa participação no orçamento. Conjunto bem alocado.`;
+  else if (isAbove && !isHighShare) insight = `CTR acima da média. Tem espaço para receber mais investimento e escalar resultados.`;
+  else if (isFarBelow && isHighShare) insight = `CTR baixo com ${spendShare.toFixed(0)}% do orçamento. Redistribua a verba para criativos mais eficientes.`;
+  else if (isFarBelow) insight = `CTR abaixo do esperado. Revise o criativo ou o público antes de aumentar o investimento.`;
+  else insight = `Performance dentro da média. Monitore por mais tempo para uma análise conclusiva.`;
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)]/70 p-5">
-      <div className="flex min-h-[28px] items-center gap-2">
-        <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-        <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-          Comparação com o conjunto
-        </p>
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)]/70 p-5 space-y-4">
+      <div className="flex min-h-[28px] items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Posição no conjunto</p>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
+          {statusLabel}
+        </span>
       </div>
-      <div className="mt-5 space-y-5">
+
+      <div className="space-y-3">
         <div>
-          <div className="mb-1.5 flex justify-between text-xs">
-            <span className="text-[var(--muted-foreground)]">CTR vs média</span>
-            <span
-              className={`font-semibold ${
-                ctrVsMedia === "acima"
-                  ? "text-green-600 dark:text-green-400"
-                  : ctrVsMedia === "abaixo"
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-[var(--muted-foreground)]"
-              }`}
-            >
-              {ctrVsMedia === "acima" ? "Acima da média" : ctrVsMedia === "abaixo" ? "Abaixo da média" : "Na média"}
+          <div className="mb-1.5 flex justify-between text-[10px]">
+            <span className="text-[var(--muted-foreground)]">CTR — #{ctrRank} de {sorted.length}</span>
+            <span className={`font-semibold tabular-nums ${isAbove ? "text-green-500" : isFarBelow ? "text-red-500" : "text-amber-500"}`}>
+              {selected.ctr.toFixed(2)}%
+              {ctrDiff !== 0 && (
+                <span className="ml-1 font-normal opacity-70">
+                  ({ctrDiff > 0 ? "+" : ""}{ctrDiff.toFixed(2)}%)
+                </span>
+              )}
             </span>
           </div>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <div className="mb-0.5 flex justify-between text-[10px] text-[var(--muted-foreground)]">
-                <span>Média</span>
-                <span>{averageCtr.toFixed(2)}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-[var(--muted)]/50">
-                <div
-                  className="h-full rounded-full bg-[var(--muted-foreground)]/40"
-                  style={{ width: `${Math.min(100, (averageCtr / Math.max(maxCtr, 0.01)) * 100)}%` }}
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="mb-0.5 flex justify-between text-[10px] text-[var(--muted-foreground)]">
-                <span>Seu criativo</span>
-                <span>{selected.ctr.toFixed(2)}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-[var(--muted)]/50">
-                <div
-                  className="h-full rounded-full bg-[var(--primary)]"
-                  style={{
-                    width: `${Math.min(100, (selected.ctr / Math.max(maxCtr, 0.01)) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
+          <div className="relative h-2 overflow-hidden rounded-full bg-[var(--muted)]/40">
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-[var(--muted-foreground)]/25"
+              style={{ width: `${Math.min(100, (averageCtr / Math.max(maxCtr, 0.01)) * 100)}%` }}
+            />
+            <div
+              className={`absolute inset-y-0 left-0 rounded-full transition-all ${isAbove ? "bg-green-500" : isFarBelow ? "bg-red-500" : "bg-amber-500"}`}
+              style={{ width: `${Math.min(100, (selected.ctr / Math.max(maxCtr, 0.01)) * 100)}%` }}
+            />
           </div>
-          <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">
-            Posição no ranking CTR: #{ctrRank} de {sorted.length}
-          </p>
+          <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">Média do conjunto: {averageCtr.toFixed(2)}%</p>
         </div>
+
         <div>
-          <div className="mb-1.5 flex justify-between text-xs">
-            <span className="text-[var(--muted-foreground)]">Share do investimento</span>
-            <span className="font-semibold text-[var(--foreground)]">{spendShare.toFixed(1)}%</span>
+          <div className="mb-1.5 flex justify-between text-[10px]">
+            <span className="text-[var(--muted-foreground)]">Share de orçamento</span>
+            <span className="font-semibold tabular-nums text-[var(--foreground)]">{spendShare.toFixed(1)}%</span>
           </div>
-          <div className="h-2.5 overflow-hidden rounded-full bg-white">
+          <div className="h-2 overflow-hidden rounded-full bg-[var(--muted)]/40">
             <div
               className="h-full rounded-full bg-[var(--primary)] transition-all"
               style={{ width: `${Math.min(100, spendShare)}%` }}
             />
           </div>
           <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">
-            {formatCurrency(selected.spend)} de {formatCurrency(totalSpend)} total
+            {formatCurrency(selected.spend)} de {formatCurrency(totalSpend)}
           </p>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--primary)]">Insight</p>
+        <p className="text-xs leading-[1.6] text-[var(--muted-foreground)]">{insight}</p>
       </div>
     </div>
   );
@@ -1253,25 +1262,28 @@ function MetaCriativosRankingChart({
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)]/70 p-5">
-      <div className="flex min-h-[28px] items-center gap-2">
-        <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-        <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-          Ranking de CTR
-        </p>
+      <div className="flex min-h-[28px] items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+            Ranking de eficiência
+          </p>
+        </div>
+        <span className="text-[10px] text-[var(--muted-foreground)]">CTR por criativo</span>
       </div>
-      <div className="mt-5 h-52">
+      <div className="mt-4 h-44">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={ctrRanking}
             layout="vertical"
-            margin={{ top: 8, right: 48, bottom: 8, left: 4 }}
+            margin={{ top: 4, right: 44, bottom: 4, left: 4 }}
             barCategoryGap="20%"
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.3} horizontal={false} />
             <XAxis
               type="number"
               stroke="var(--muted-foreground)"
-              fontSize={11}
+              fontSize={10}
               tickFormatter={(v) => `${v}%`}
               domain={[0, domainMax]}
               tick={{ fill: "var(--muted-foreground)" }}
@@ -1280,8 +1292,8 @@ function MetaCriativosRankingChart({
               type="category"
               dataKey="name"
               stroke="var(--muted-foreground)"
-              fontSize={11}
-              width={100}
+              fontSize={10}
+              width={90}
               tickLine={false}
               axisLine={false}
               tick={{ fill: "var(--foreground)" }}
@@ -1291,20 +1303,19 @@ function MetaCriativosRankingChart({
               labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName ?? ""}
               {...metaCriativosTooltipStyle}
             />
-            <Bar dataKey="ctr" radius={[0, 6, 6, 0]} maxBarSize={24}>
+            <Bar dataKey="ctr" radius={[0, 5, 5, 0]} maxBarSize={18}>
               <LabelList
                 dataKey="ctr"
                 position="right"
                 formatter={(v: number) => `${v.toFixed(2)}%`}
                 fill="var(--muted-foreground)"
-                fontSize={11}
+                fontSize={10}
               />
               {ctrRanking.map((entry, index) => (
                 <Cell
                   key={entry.fullName}
                   fill={entry.isSelected ? "var(--primary)" : RANKING_COLORS[index % RANKING_COLORS.length]}
-                  stroke={entry.isSelected ? "var(--primary)" : "transparent"}
-                  strokeWidth={entry.isSelected ? 2 : 0}
+                  opacity={entry.isSelected ? 1 : 0.65}
                 />
               ))}
             </Bar>
@@ -1563,7 +1574,7 @@ function MetaCriativosGrid({
       // Calculamos a escala para caber em 360px de largura e adicionamos
       // margem generosa para o chrome do post (~300px).
       const scale = 360 / metaPreview.w;
-      const iframeH = Math.round(metaPreview.h / scale) + 350;
+      const iframeH = Math.round(metaPreview.h / scale) + 210;
       const displayH = Math.round(iframeH * scale);
       return (
         <div
@@ -1915,42 +1926,46 @@ function MetaCriativosGrid({
             <div className="xl:sticky xl:top-24 space-y-5">
               {/* Criativo em foco + métricas principais */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)]/70 p-5">
-                <div className="flex min-h-[28px] items-center gap-2">
-                  <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                    Dados do criativo
-                  </p>
-                </div>
-                <h3 className="mt-4 line-clamp-2 text-lg font-bold text-[var(--foreground)]">{selected.ad.name}</h3>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="flex min-h-[28px] items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Dados do criativo</p>
+                  </div>
                   <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
                     {selected.mediaType === "video" ? "Vídeo" : "Imagem"}
                   </span>
-                  {selected.mediaType === "video" && (selected.creative?.video_source_url || selected.creative?.video_embed_html) && (
-                    <span className="rounded-full bg-[var(--primary)]/10 px-2.5 py-0.5 text-[10px] font-medium text-[var(--primary)]">
-                      Player disponível
-                    </span>
-                  )}
                 </div>
+                <h3 className="mt-3 line-clamp-1 text-sm font-bold text-[var(--foreground)]">{selected.ad.name}</h3>
                 {selected.primaryText ? (
-                  <p className="mt-4 line-clamp-3 text-xs leading-5 text-[var(--muted-foreground)]">
+                  <p className="mt-1.5 line-clamp-2 text-[11px] leading-5 text-[var(--muted-foreground)]">
                     {selected.primaryText}
                   </p>
                 ) : null}
 
-                {/* Métricas principais */}
-                <div className="mt-5 grid grid-cols-2 gap-3">
+                {/* Métricas principais — 3 cards em linha */}
+                <div className="mt-4 grid grid-cols-3 gap-2">
                   {[
                     { label: "Investimento", value: formatCurrency(selected.spend) },
-                    { label: "CTR", value: `${selected.ctr.toFixed(2)}%` },
-                    { label: "Impressões", value: selected.impressions.toLocaleString("pt-BR") },
-                    { label: "Cliques", value: selected.clicks.toLocaleString("pt-BR") },
-                    { label: "CPC", value: selected.clicks > 0 ? formatCurrency(selected.spend / selected.clicks) : formatCurrency(0) },
-                    { label: "CPM", value: selected.impressions > 0 ? formatCurrency((selected.spend / selected.impressions) * 1000) : formatCurrency(0) },
+                    { label: "CTR", value: `${selected.ctr.toFixed(2)}%`, highlight: true },
+                    { label: "CPC", value: selected.clicks > 0 ? formatCurrency(selected.spend / selected.clicks) : "—" },
                   ].map((m) => (
-                    <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                      <p className="mt-1 text-sm font-bold tabular-nums text-[var(--foreground)]">{m.value}</p>
+                    <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-center">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                      <p className={`mt-1 text-sm font-bold tabular-nums ${m.highlight ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Métricas secundárias — linha compacta */}
+                <div className="mt-2 flex gap-2">
+                  {[
+                    { label: "Impressões", value: selected.impressions.toLocaleString("pt-BR") },
+                    { label: "CPM", value: selected.impressions > 0 ? formatCurrency((selected.spend / selected.impressions) * 1000) : "—" },
+                    { label: "Cliques", value: selected.clicks.toLocaleString("pt-BR") },
+                  ].map((m) => (
+                    <div key={m.label} className="flex-1 rounded-lg border border-[var(--border)]/60 bg-[var(--muted)]/10 px-2 py-2 text-center">
+                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                      <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-[var(--foreground)]">{m.value}</p>
                     </div>
                   ))}
                 </div>
