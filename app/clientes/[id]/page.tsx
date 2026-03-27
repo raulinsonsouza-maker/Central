@@ -1302,6 +1302,12 @@ function MetaCriativosGrid({
   formatCurrency: (v: number) => string;
 }) {
   const sorted = React.useMemo(() => {
+    const nameCounts: Record<string, number> = {};
+    for (const ad of ads) {
+      const k = ad.name.toLowerCase().trim();
+      nameCounts[k] = (nameCounts[k] || 0) + 1;
+    }
+    const nameVersion: Record<string, number> = {};
     return ads
       .map((ad) => {
         const creative = ad.adcreatives?.data?.[0];
@@ -1323,6 +1329,11 @@ function MetaCriativosGrid({
         const onFbLeads = getAction("onsite_conversion.lead_grouped");
         const websiteLeads = getAction("offsite_conversion.fb_pixel_lead") || getAction("website_lead");
         const leads = leadCount || onFbLeads || websiteLeads;
+        const nameKey = ad.name.toLowerCase().trim();
+        const displayName =
+          nameCounts[nameKey] > 1
+            ? (() => { nameVersion[nameKey] = (nameVersion[nameKey] || 0) + 1; return `${ad.name} — v${nameVersion[nameKey]}`; })()
+            : ad.name;
         return {
           ad,
           creative,
@@ -1335,6 +1346,7 @@ function MetaCriativosGrid({
           leads,
           mediaType,
           primaryText: creative?.body || creative?.title || "",
+          displayName,
         };
       })
       .sort((a, b) => {
@@ -1378,7 +1390,7 @@ function MetaCriativosGrid({
     return <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Nenhum criativo encontrado.</p>;
   }
 
-  // Score computation
+  // Score computation — fórmula: CTR 60% + CPC inverso 20% + Conversão (leads) 20%
   const maxCtr = Math.max(...sorted.map((d) => d.ctr), 0.001);
   const minCtr = Math.min(...sorted.map((d) => d.ctr));
   const ctrRange = maxCtr - minCtr || 1;
@@ -1387,20 +1399,42 @@ function MetaCriativosGrid({
   const minCpc = cpcValues.length ? Math.min(...cpcValues) : 0;
   const cpcRange = maxCpc - minCpc || 1;
   const isOne = sorted.length === 1;
-  const scoredItems = sorted.map((item) => {
-    const ctrScore = isOne ? 1 : (item.ctr - minCtr) / ctrRange;
-    const cpcScore = item.cpc > 0 && !isOne ? (maxCpc - item.cpc) / cpcRange : 0.5;
-    const score = Math.min(2, parseFloat((ctrScore * 1.2 + cpcScore * 0.8).toFixed(2)));
-    const spShare = totalSpend > 0 ? (item.spend / totalSpend) * 100 : 0;
-    const status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" =
-      score >= 1.4 ? "ESCALAR" : score >= 0.8 ? "OTIMIZAR" : "PAUSAR";
-    const alerts: string[] = [];
-    if (item.ctr < averageCtr * 0.75) alerts.push("CTR baixo");
-    if (averageCpc > 0 && item.cpc > averageCpc * 1.4) alerts.push("CPC alto");
-    if (spShare > 45) alerts.push("Verba concentrada");
-    else if (spShare < 5) alerts.push("Pouca verba");
-    return { ...item, score, status, alerts: alerts.slice(0, 2), spShare };
-  }).sort((a, b) => b.score - a.score);
+  const maxLeads = Math.max(...sorted.map((d) => d.leads), 1);
+  const hasAnyLeads = sorted.some((d) => d.leads > 0);
+
+  const scoredItems = sorted
+    .map((item) => {
+      const ctrScore = isOne ? 1 : (item.ctr - minCtr) / ctrRange;
+      const cpcScore = item.cpc > 0 && !isOne ? (maxCpc - item.cpc) / cpcRange : 0.5;
+      const convFactor = hasAnyLeads ? item.leads / maxLeads : 0;
+      const rawScore = ctrScore * 0.6 + cpcScore * 0.2 + convFactor * 0.2;
+      const score = Math.min(2, parseFloat((rawScore * 2).toFixed(2)));
+      const spShare = totalSpend > 0 ? (item.spend / totalSpend) * 100 : 0;
+
+      let status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" =
+        score >= 1.4 ? "ESCALAR" : score >= 0.8 ? "OTIMIZAR" : "PAUSAR";
+
+      // Override: criativo com leads E CTR acima da média nunca pode ser Pausar
+      if (item.leads > 0 && item.ctr >= averageCtr && status === "PAUSAR") {
+        status = "OTIMIZAR";
+      }
+
+      const alerts: string[] = [];
+      if (item.ctr < averageCtr * 0.75) alerts.push("CTR baixo");
+      if (averageCpc > 0 && item.cpc > averageCpc * 1.4) alerts.push("CPC alto");
+      if (spShare > 45) alerts.push("Verba concentrada");
+      else if (spShare < 10 && item.ctr > averageCtr) alerts.push("Oportunidade: aumentar verba");
+      // spShare < 10 E CTR ruim → sem alerta (evita ruído)
+
+      return { ...item, score, status, alerts: alerts.slice(0, 2), spShare };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  // Garante sempre um Escalar: o top performer com CTR acima da média ou com leads
+  if (scoredItems.length > 0 && scoredItems.every((i) => i.status !== "ESCALAR")) {
+    const best = scoredItems.find((i) => i.ctr >= averageCtr || i.leads > 0) ?? scoredItems[0];
+    best.status = "ESCALAR";
+  }
 
   const countEscalar = scoredItems.filter((i) => i.status === "ESCALAR").length;
   const countOtimizar = scoredItems.filter((i) => i.status === "OTIMIZAR").length;
@@ -1414,8 +1448,8 @@ function MetaCriativosGrid({
     : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade dos criativos está escalável.`
     : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com maior score.`;
 
-  const escalarNames = scoredItems.filter((i) => i.status === "ESCALAR").map((i) => i.ad.name);
-  const pausarNames = scoredItems.filter((i) => i.status === "PAUSAR").map((i) => i.ad.name);
+  const escalarNames = scoredItems.filter((i) => i.status === "ESCALAR").map((i) => i.displayName);
+  const pausarNames = scoredItems.filter((i) => i.status === "PAUSAR").map((i) => i.displayName);
   const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
 
   const statusConfig = {
@@ -1449,7 +1483,7 @@ function MetaCriativosGrid({
             <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
             <span className="text-xs text-[var(--muted-foreground)]">Melhor:</span>
             <span className="text-xs font-bold text-[var(--primary)]">{topCtr?.ctr.toFixed(2)}%</span>
-            <span className="hidden text-xs text-[var(--muted-foreground)] sm:inline">· {topCtr?.ad.name}</span>
+            <span className="hidden text-xs text-[var(--muted-foreground)] sm:inline">· {topCtr?.displayName}</span>
           </div>
         </div>
       </div>
@@ -1507,14 +1541,14 @@ function MetaCriativosGrid({
                         <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
                           {thumbUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={thumbUrl} alt={item.ad.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                            <img src={thumbUrl} alt={item.displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
                               <BarChart3 className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
                             </div>
                           )}
                         </div>
-                        <span className="max-w-[180px] truncate font-medium text-[var(--foreground)]">{item.ad.name}</span>
+                        <span className="max-w-[180px] truncate font-medium text-[var(--foreground)]">{item.displayName}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
@@ -1566,8 +1600,8 @@ function MetaCriativosGrid({
                   className="flex cursor-pointer items-center gap-3 group"
                   onClick={() => setModalAdId(item.ad.id)}
                 >
-                  <span className="w-32 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors" title={item.ad.name}>
-                    {item.ad.name}
+                  <span className="w-32 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors" title={item.displayName}>
+                    {item.displayName}
                   </span>
                   <div className="relative flex-1 h-5 overflow-hidden rounded bg-[var(--muted)]/20">
                     <div
@@ -1623,7 +1657,7 @@ function MetaCriativosGrid({
           <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl">
             <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] px-5 py-4">
               <div>
-                <p className="font-bold text-[var(--foreground)]">{modalItem.ad.name}</p>
+                <p className="font-bold text-[var(--foreground)]">{modalItem.displayName}</p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
                   {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"} · Score {modalItem.score.toFixed(1)}{modalItem.leads > 0 ? ` · ${modalItem.leads} leads` : ""}
                 </p>
@@ -1657,7 +1691,7 @@ function MetaCriativosGrid({
                   creative={modalItem.creative}
                   creativeId={modalItem.creative?.id}
                   adId={modalItem.ad.id}
-                  alt={modalItem.ad.name}
+                  alt={modalItem.displayName}
                   mode="featured"
                   priority
                   adFormat={previewFormat}
