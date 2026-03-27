@@ -30,7 +30,7 @@ async function runSync(request: NextRequest, clienteId: string | undefined, date
         error: result.error,
       });
     }
-    const results = await syncMetaTodosClientes();
+    const results = await syncMetaTodosClientes({ dateFrom, dateTo });
     return NextResponse.json({ ok: true, results });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);

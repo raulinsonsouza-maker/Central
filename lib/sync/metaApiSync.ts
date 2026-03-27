@@ -138,7 +138,7 @@ export interface MetaSyncAllResult {
 /**
  * Sync META for all active clients. Uses Conta META when available, else META_AD_ACCOUNT_ID.
  */
-export async function syncMetaTodosClientes(): Promise<MetaSyncAllResult[]> {
+export async function syncMetaTodosClientes(options?: { dateFrom?: string; dateTo?: string }): Promise<MetaSyncAllResult[]> {
   const fromDb = await getIntegrationsConfig();
   const token = fromDb.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
   const defaultAccountId = fromDb.metaAdAccountId ?? process.env.META_AD_ACCOUNT_ID;
@@ -149,6 +149,8 @@ export async function syncMetaTodosClientes(): Promise<MetaSyncAllResult[]> {
 
   const clientes = await findAllClientes(true);
   const today = formatDate(new Date());
+  const dateFrom = options?.dateFrom ?? DEFAULT_DATE_FROM;
+  const dateTo = options?.dateTo ?? today;
   const results: MetaSyncAllResult[] = [];
 
   for (const cliente of clientes) {
@@ -162,11 +164,11 @@ export async function syncMetaTodosClientes(): Promise<MetaSyncAllResult[]> {
     }
 
     const result = await syncMetaCliente(cliente.id, {
-      dateFrom: DEFAULT_DATE_FROM,
-      dateTo: today,
+      dateFrom,
+      dateTo,
       accountId,
-      creativeDateFrom: today,
-      creativeDateTo: today,
+      creativeDateFrom: dateFrom,
+      creativeDateTo: dateTo,
     });
     results.push({
       clienteId: cliente.id,
