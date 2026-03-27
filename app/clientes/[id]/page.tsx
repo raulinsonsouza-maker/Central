@@ -1557,18 +1557,32 @@ function MetaCriativosGrid({
     );
 
     if (mode === "featured" && !useFallback && metaPreview && !previewFailed) {
+      // A prévia do Meta retorna dimensões do embed (ex: 274×213) que não
+      // incluem o cabeçalho, texto e barra de engajamento do post simulado.
+      // O conteúdo real renderizado é tipicamente 2-3× mais alto.
+      // Calculamos a escala para caber em 360px de largura e adicionamos
+      // margem generosa para o chrome do post (~300px).
+      const scale = 360 / metaPreview.w;
+      const iframeH = Math.round(metaPreview.h / scale) + 350;
+      const displayH = Math.round(iframeH * scale);
       return (
-        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
-          <iframe
-            title="Prévia do anúncio (Meta)"
-            src={metaPreview.src}
-            className="block w-full"
-            scrolling="no"
-            style={{
-              border: "none",
-              aspectRatio: `${metaPreview.w} / ${metaPreview.h}`,
-            }}
-          />
+        <div
+          className="mx-auto overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl"
+          style={{ width: 360, height: displayH }}
+        >
+          <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: metaPreview.w, height: iframeH }}>
+            <iframe
+              title="Prévia do anúncio (Meta)"
+              src={metaPreview.src}
+              scrolling="no"
+              style={{
+                border: "none",
+                display: "block",
+                width: metaPreview.w,
+                height: iframeH,
+              }}
+            />
+          </div>
         </div>
       );
     }
