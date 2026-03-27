@@ -1636,6 +1636,13 @@ function MetaCriativosGrid({
         const cpc = clicks > 0 ? spend / clicks : cpcFromApi;
         const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
         const mediaType = creative?.video_source_url || creative?.video_embed_html || creative?.video_id ? "video" : "image";
+        const actions = insight?.actions ?? [];
+        const leads =
+          parseInt(
+            (actions.find((a) => a.action_type === "lead") ??
+              actions.find((a) => a.action_type === "onsite_conversion.lead_grouped"))?.value ?? "0",
+            10
+          ) || 0;
         return {
           ad,
           creative,
@@ -1645,6 +1652,7 @@ function MetaCriativosGrid({
           ctr,
           cpc,
           cpm,
+          leads,
           mediaType,
           primaryText: creative?.body || creative?.title || "",
         };
@@ -1762,14 +1770,14 @@ function MetaCriativosGrid({
       {/* 2. Decision Bar */}
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-5">
-          <div className="flex flex-wrap items-center justify-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-5">
             {([
-              { count: countEscalar, label: "Escalar", dot: "🟢", color: "text-green-500", bg: "bg-green-500/10 border-green-500/20" },
-              { count: countOtimizar, label: "Otimizar", dot: "🟡", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
-              { count: countPausar, label: "Pausar", dot: "🔴", color: "text-red-500", bg: "bg-red-500/10 border-red-500/20" },
+              { count: countEscalar, label: "Escalar", dot: "bg-green-500", color: "text-green-500", bg: "bg-green-500/8 border-green-500/20" },
+              { count: countOtimizar, label: "Otimizar", dot: "bg-amber-500", color: "text-amber-500", bg: "bg-amber-500/8 border-amber-500/20" },
+              { count: countPausar, label: "Pausar", dot: "bg-red-500", color: "text-red-500", bg: "bg-red-500/8 border-red-500/20" },
             ] as const).map((s) => (
-              <div key={s.label} className={`flex items-center gap-3 rounded-xl border px-5 py-3 ${s.bg}`}>
-                <span className="text-lg leading-none">{s.dot}</span>
+              <div key={s.label} className={`flex items-center gap-3 rounded-xl border px-6 py-3 ${s.bg}`}>
+                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.dot}`} />
                 <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
                 <span className={`text-sm font-semibold ${s.color}`}>{s.label}</span>
               </div>
@@ -1786,7 +1794,8 @@ function MetaCriativosGrid({
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--muted)]/10">
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Spend</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Investimento</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Leads</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPC</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Score</th>
@@ -1821,6 +1830,9 @@ function MetaCriativosGrid({
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
+                      {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
+                    </td>
                     <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.clicks > 0 ? formatCurrency(item.cpc) : "—"}</td>
                     <td className="px-4 py-3 text-right">
@@ -1836,8 +1848,8 @@ function MetaCriativosGrid({
                         {item.alerts.length === 0 ? (
                           <span className="text-[var(--muted-foreground)]/40">—</span>
                         ) : item.alerts.map((a) => (
-                          <span key={a} className="inline-flex items-center gap-0.5 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-500">
-                            ⚠ {a}
+                          <span key={a} className="inline-flex items-center rounded border border-[var(--border)] bg-[var(--muted)]/30 px-1.5 py-0.5 text-[10px] font-medium text-[var(--muted-foreground)]">
+                            {a}
                           </span>
                         ))}
                       </div>
@@ -1850,32 +1862,31 @@ function MetaCriativosGrid({
         </div>
       </div>
 
-      {/* 4. Barra de distribuição de verba */}
+      {/* 4. Distribuição de verba */}
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Distribuição de verba</p>
-          <div className="flex h-8 overflow-hidden rounded-lg">
-            {scoredItems.map((item, i) => {
+          <div className="space-y-2.5">
+            {[...scoredItems].sort((a, b) => b.spend - a.spend).map((item) => {
               const cfg = statusConfig[item.status];
               return (
                 <div
                   key={item.ad.id}
-                  className={`relative cursor-pointer transition-all hover:brightness-110 ${cfg.bar}`}
-                  style={{ width: `${item.spShare}%`, marginLeft: i > 0 ? "2px" : "0" }}
-                  title={`${item.ad.name}: ${formatCurrency(item.spend)} (${item.spShare.toFixed(1)}%)`}
+                  className="flex cursor-pointer items-center gap-3 group"
                   onClick={() => setModalAdId(item.ad.id)}
-                />
-              );
-            })}
-          </div>
-          <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
-            {scoredItems.map((item) => {
-              const cfg = statusConfig[item.status];
-              return (
-                <span key={item.ad.id} className="flex items-center gap-1.5 text-[10px] text-[var(--muted-foreground)]">
-                  <span className={`inline-block h-2 w-2 shrink-0 rounded-sm ${cfg.bar}`} />
-                  {item.ad.name} {item.spShare.toFixed(0)}%
-                </span>
+                >
+                  <span className="w-32 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors" title={item.ad.name}>
+                    {item.ad.name}
+                  </span>
+                  <div className="relative flex-1 h-5 overflow-hidden rounded bg-[var(--muted)]/20">
+                    <div
+                      className={`h-full rounded transition-all ${cfg.bar} opacity-80 group-hover:opacity-100`}
+                      style={{ width: `${item.spShare}%` }}
+                    />
+                  </div>
+                  <span className="w-20 shrink-0 text-right text-[10px] tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</span>
+                  <span className="w-8 shrink-0 text-right text-[10px] tabular-nums text-[var(--muted-foreground)]">{item.spShare.toFixed(0)}%</span>
+                </div>
               );
             })}
           </div>
@@ -1970,9 +1981,9 @@ function MetaCriativosGrid({
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Investimento", value: formatCurrency(modalItem.spend), hi: false },
-                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%`, hi: true },
+                    { label: "Leads", value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—", hi: modalItem.leads > 0 },
+                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%`, hi: false },
                     { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—", hi: false },
-                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR"), hi: false },
                     { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency((modalItem.spend / modalItem.impressions) * 1000) : "—", hi: false },
                     { label: "Cliques", value: modalItem.clicks.toLocaleString("pt-BR"), hi: false },
                   ].map((m) => (
@@ -1991,8 +2002,8 @@ function MetaCriativosGrid({
                 {modalItem.alerts.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {modalItem.alerts.map((a) => (
-                      <span key={a} className="inline-flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-500">
-                        ⚠ {a}
+                      <span key={a} className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)]">
+                        {a}
                       </span>
                     ))}
                   </div>
