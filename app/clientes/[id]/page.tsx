@@ -1447,7 +1447,7 @@ function MetaCriativosGrid({
             <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
             <span className="text-xs text-[var(--muted-foreground)]">Melhor:</span>
             <span className="text-xs font-bold text-[var(--primary)]">{topCtr?.ctr.toFixed(2)}%</span>
-            <span className="hidden text-xs text-[var(--muted-foreground)] xl:inline">· {topCtr?.ad.name}</span>
+            <span className="hidden text-xs text-[var(--muted-foreground)] sm:inline">· {topCtr?.ad.name}</span>
           </div>
         </div>
       </div>
@@ -1547,7 +1547,7 @@ function MetaCriativosGrid({
         </div>
       </div>
 
-      {/* 4. Distribuição de verba */}
+      {/* 4. Distribuição de verba — barras horizontais por criativo (UX aprovado pelo cliente; diverge do segmento único original) */}
       <div className="mx-auto max-w-[1280px] px-6">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Distribuição de verba</p>
