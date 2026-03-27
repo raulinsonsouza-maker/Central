@@ -1080,9 +1080,8 @@ type MetaAdItem = {
   id: string;
   name: string;
   adcreatives?: { data: MetaAdCreative[] };
-  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; ctr?: string; cpc?: string }> };
+  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; ctr?: string; cpc?: string; actions?: Array<{ action_type: string; value: string }> }> };
 };
-
 
 function CriativoPreview({
   creative,
