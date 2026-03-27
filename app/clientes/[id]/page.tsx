@@ -1080,7 +1080,7 @@ type MetaAdItem = {
   id: string;
   name: string;
   adcreatives?: { data: MetaAdCreative[] };
-  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; ctr?: string; cpc?: string; actions?: Array<{ action_type: string; value: string }> }> };
+  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; inline_link_clicks?: string; ctr?: string; cpc?: string; actions?: Array<{ action_type: string; value: string }> }> };
 };
 
 function CriativoPreview({
@@ -1308,19 +1308,21 @@ function MetaCriativosGrid({
         const insight = ad.insights?.data?.[0];
         const spend = insight?.spend ? parseFloat(insight.spend) : 0;
         const impressions = insight?.impressions ? parseInt(insight.impressions, 10) : 0;
-        const clicks = insight?.clicks ? parseInt(insight.clicks, 10) : 0;
+        const linkClicks = insight?.inline_link_clicks ? parseInt(insight.inline_link_clicks, 10) : 0;
+        const allClicks = insight?.clicks ? parseInt(insight.clicks, 10) : 0;
+        const clicks = linkClicks || allClicks;
         const ctr = insight?.ctr ? parseFloat(insight.ctr) : impressions > 0 ? (clicks / impressions) * 100 : 0;
         const cpcFromApi = insight?.cpc ? parseFloat(insight.cpc) : 0;
         const cpc = clicks > 0 ? spend / clicks : cpcFromApi;
         const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
         const mediaType = creative?.video_source_url || creative?.video_embed_html || creative?.video_id ? "video" : "image";
         const actions = insight?.actions ?? [];
-        const leads =
-          parseInt(
-            (actions.find((a) => a.action_type === "lead") ??
-              actions.find((a) => a.action_type === "onsite_conversion.lead_grouped"))?.value ?? "0",
-            10
-          ) || 0;
+        const getAction = (type: string) =>
+          parseInt(actions.find((a) => a.action_type === type)?.value ?? "0", 10) || 0;
+        const leadCount = getAction("lead");
+        const onFbLeads = getAction("onsite_conversion.lead_grouped");
+        const websiteLeads = getAction("offsite_conversion.fb_pixel_lead") || getAction("website_lead");
+        const leads = leadCount || onFbLeads || websiteLeads;
         return {
           ad,
           creative,
@@ -1481,6 +1483,7 @@ function MetaCriativosGrid({
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Investimento</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Leads</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPC</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Score</th>
@@ -1517,6 +1520,9 @@ function MetaCriativosGrid({
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
                       {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
+                      {item.clicks > 0 ? item.clicks.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
                     </td>
                     <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.clicks > 0 ? formatCurrency(item.cpc) : "—"}</td>

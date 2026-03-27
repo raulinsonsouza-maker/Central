@@ -476,8 +476,8 @@ export async function fetchAdsWithCreatives(
       ? `insights.time_range(${JSON.stringify({
           since: options.dateFrom,
           until: options.dateTo,
-        })}){spend,impressions,clicks,ctr,cpc}`
-      : "insights{spend,impressions,clicks,ctr,cpc}";
+        })}){spend,impressions,clicks,inline_link_clicks,ctr,cpc,actions}`
+      : "insights{spend,impressions,clicks,inline_link_clicks,ctr,cpc,actions}";
   const fields =
     `id,name,effective_status,adset{campaign{objective}},adcreatives{id,object_story_id,thumbnail_url,image_hash,video_id,body,title,object_story_spec,asset_feed_spec{videos{video_id,thumbnail_url},images{hash,url}}},${insightsField}`;
   const filtering = JSON.stringify([
