@@ -1714,281 +1714,279 @@ function MetaCriativosGrid({
     return <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Nenhum criativo selecionado.</p>;
   }
 
+  // Computed analysis values
+  const spendShare = totalSpend > 0 ? (selected.spend / totalSpend) * 100 : 0;
+  const ctrRanked = [...sorted].sort((a, b) => b.ctr - a.ctr);
+  const ctrRank = ctrRanked.findIndex((item) => item.ad.id === selected.ad.id) + 1;
+  const isTop = ctrRank === 1 && sorted.length > 1;
+  const isAboveCtr = selected.ctr >= averageCtr;
+  const isFarBelowCtr = selected.ctr < averageCtr * 0.7;
+  const isHighShare = spendShare >= 25;
+  const ctrDiff = selected.ctr - averageCtr;
+  const maxCtrVal = Math.max(...sorted.map((d) => d.ctr), 0.01);
+
+  let statusLabel = "Na média";
+  let statusClasses = "text-[var(--muted-foreground)] bg-[var(--muted)]/20 border-[var(--border)]";
+  if (isTop) { statusLabel = "Top performer"; statusClasses = "text-amber-500 bg-amber-500/10 border-amber-500/30"; }
+  else if (isAboveCtr) { statusLabel = "Acima da média"; statusClasses = "text-green-500 bg-green-500/10 border-green-500/30"; }
+  else if (isFarBelowCtr) { statusLabel = "Baixo desempenho"; statusClasses = "text-red-500 bg-red-500/10 border-red-500/30"; }
+
+  let insight = "";
+  if (isTop && isHighShare) insight = `Melhor CTR com ${spendShare.toFixed(0)}% do orçamento. Continue investindo neste criativo.`;
+  else if (isTop) insight = `Melhor CTR do conjunto, mas recebe apenas ${spendShare.toFixed(0)}% da verba. Considere aumentar o investimento.`;
+  else if (isAboveCtr && isHighShare) insight = `CTR acima da média com boa participação no orçamento. Conjunto bem equilibrado.`;
+  else if (isAboveCtr) insight = `CTR acima da média. Pode receber mais investimento para escalar os resultados.`;
+  else if (isFarBelowCtr && isHighShare) insight = `CTR baixo com ${spendShare.toFixed(0)}% do orçamento. Redistribua a verba para criativos mais eficientes.`;
+  else if (isFarBelowCtr) insight = `CTR abaixo do esperado. Revise o criativo antes de investir mais.`;
+  else insight = `Performance dentro da média. Monitore por mais tempo antes de tomar decisões.`;
+
   return (
-    <div className="space-y-8">
-      {/* Cards de resumo no topo */}
-      <div className="mx-auto grid max-w-[1280px] gap-4 px-6 md:grid-cols-2 xl:grid-cols-4">
-        {[
-          { label: "Criativos ativos", value: sorted.length, sub: `Peças no período ${periodLabel.toLowerCase()}`, icon: Images },
-          { label: "Total de cliques", value: totalClicks.toLocaleString("pt-BR"), sub: "Cliques no conjunto", icon: MousePointerClick },
-          { label: "Investimento total", value: formatCurrency(totalSpend), sub: `${totalImpressions.toLocaleString("pt-BR")} impressões`, icon: DollarSign },
-          { label: "Melhor CTR", value: topCtr ? `${topCtr.ctr.toFixed(2)}%` : "0,00%", sub: topCtr?.ad.name ?? "—", icon: TrendingUp, highlight: true },
-        ].map((card) => (
-          <div
-            key={card.label}
-            className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 pr-14 transition-colors hover:border-[var(--primary)]/30"
-          >
-            <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[var(--primary)] opacity-[0.08] blur-3xl" />
-            <div className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
-              <card.icon className="h-5 w-5" />
-            </div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">{card.label}</p>
-            <p className={`mt-2 text-2xl font-bold tabular-nums ${card.highlight ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{card.value}</p>
-            <p className="mt-1 text-[11px] text-[var(--muted-foreground)]">{card.sub}</p>
+    <div className="space-y-4">
+
+      {/* Barra de resumo compacta */}
+      <div className="mx-auto max-w-[1280px] px-6">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-3">
+          <div className="flex items-center gap-2">
+            <Images className="h-3.5 w-3.5 text-[var(--primary)]" />
+            <span className="text-xs font-bold text-[var(--foreground)]">{sorted.length}</span>
+            <span className="text-xs text-[var(--muted-foreground)]">criativos · {periodLabel.toLowerCase()}</span>
           </div>
-        ))}
+          <div className="h-3.5 w-px bg-[var(--border)]" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[var(--muted-foreground)]">Investimento</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{formatCurrency(totalSpend)}</span>
+          </div>
+          <div className="h-3.5 w-px bg-[var(--border)]" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[var(--muted-foreground)]">{totalImpressions.toLocaleString("pt-BR")} impressões</span>
+          </div>
+          <div className="h-3.5 w-px bg-[var(--border)]" />
+          <div className="ml-auto flex items-center gap-2">
+            <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
+            <span className="text-xs text-[var(--muted-foreground)]">Melhor CTR:</span>
+            <span className="text-xs font-bold text-[var(--primary)]">{topCtr?.ctr.toFixed(2)}%</span>
+            <span className="hidden text-xs text-[var(--muted-foreground)] xl:inline">· {topCtr?.ad.name}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="mx-auto grid max-w-[1280px] items-stretch gap-6 px-6 xl:grid-cols-12">
-          {/* Coluna esquerda: Biblioteca de criativos */}
-          <div className="order-2 xl:order-1 xl:col-span-3 flex min-h-0 flex-col overflow-hidden">
-            <div className="xl:sticky xl:top-24 flex min-h-0 flex-col space-y-3 xl:max-h-[calc(100vh-200px)]">
-              <div className="flex min-h-[28px] shrink-0 items-center gap-2">
-                <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                  Biblioteca de criativos
-                </h3>
+      {/* Grade principal: 3 + 6 + 3 */}
+      <div className="mx-auto grid max-w-[1280px] items-start gap-5 px-6 xl:grid-cols-12">
+
+        {/* Coluna esquerda: lista de criativos */}
+        <div className="order-2 xl:order-1 xl:col-span-3 xl:sticky xl:top-24">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Criativos</h3>
+            <span className="ml-auto text-[10px] text-[var(--muted-foreground)]">{sorted.length} peças</span>
+          </div>
+          <div className="flex flex-col gap-2" style={{ maxHeight: "calc(100vh - 300px)", overflowY: "auto" }}>
+            {sorted.map((item) => {
+              const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
+              const imgUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
+              const isActive = selected?.ad.id === item.ad.id;
+              return (
+                <button
+                  key={item.ad.id}
+                  type="button"
+                  onClick={() => setSelectedId(item.ad.id)}
+                  className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
+                    isActive
+                      ? "border-[var(--primary)] bg-[var(--primary)]/10 shadow-sm shadow-[var(--primary)]/10"
+                      : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40"
+                  }`}
+                >
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
+                    {imgUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={imgUrl} alt={item.ad.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <BarChart3 className="h-4 w-4 text-[var(--muted-foreground)]" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.ad.name}</p>
+                    <div className="mt-0.5 flex items-center gap-1.5">
+                      <span className="text-[10px] tabular-nums text-[var(--muted-foreground)]">{formatCurrency(item.spend)}</span>
+                      <span className="text-[var(--border)]">·</span>
+                      <span className={`text-[10px] tabular-nums font-medium ${item.ctr >= averageCtr ? "text-green-500" : "text-[var(--muted-foreground)]"}`}>
+                        {item.ctr.toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Coluna central: prévia */}
+        <div className="order-1 xl:order-2 xl:col-span-6">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Prévia do anúncio</h3>
+            <div className="ml-auto flex rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-0.5">
+              {(["video", "image"] as const).map((type) => {
+                const isVid = type === "video";
+                const isActive = (isVid && selected.mediaType === "video") || (!isVid && selected.mediaType === "image");
+                return (
+                  <span key={type} className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${isActive ? "bg-[var(--primary)] text-[var(--primary-foreground)]" : "text-[var(--muted-foreground)]"}`}>
+                    {isVid ? "Vídeo" : "Imagem"}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center">
+            {useFallbackPreview && (
+              <p className="mb-3 text-center text-[10px] text-[var(--muted-foreground)]">
+                Exibindo mídia alternativa.{" "}
+                <button type="button" onClick={() => setUseFallbackPreview(false)} className="font-medium text-[var(--primary)] underline underline-offset-2 hover:no-underline">
+                  Voltar para prévia Meta
+                </button>
+              </p>
+            )}
+            <CriativoPreview
+              creative={selected.creative}
+              creativeId={selected.creative?.id}
+              adId={selected.ad.id}
+              alt={selected.ad.name}
+              mode="featured"
+              priority
+              adFormat={previewFormat}
+              useFallback={useFallbackPreview}
+            />
+          </div>
+
+          {selected.primaryText && (
+            <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Texto do anúncio</p>
+              <p className="text-xs leading-5 text-[var(--foreground)] line-clamp-3">{selected.primaryText}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Coluna direita: painel unificado de análise */}
+        <div className="order-3 xl:col-span-3 xl:sticky xl:top-24">
+          <div className="mb-3 flex items-center gap-2">
+            <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Análise</p>
+          </div>
+
+          <div className="divide-y divide-[var(--border)]/60 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+
+            {/* 1. Status + nome */}
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-[var(--foreground)]">{selected.ad.name}</p>
+                  <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                    {selected.mediaType === "video" ? "Vídeo" : "Imagem"} · #{ctrRank} de {sorted.length} em CTR
+                  </p>
+                </div>
+                <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusClasses}`}>
+                  {statusLabel}
+                </span>
               </div>
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-auto pb-2 xl:flex xl:flex-col xl:gap-2 xl:overflow-x-visible">
-                {sorted.map((item) => (
-                  <button
-                    key={item.ad.id}
-                    type="button"
-                    onClick={() => setSelectedId(item.ad.id)}
-                    className={`flex shrink-0 items-center gap-3 rounded-xl border px-4 py-3 text-left transition xl:w-full xl:flex-row ${
-                      selected?.ad.id === item.ad.id
-                        ? "border-[var(--primary)] bg-[var(--primary)]/10 shadow-md shadow-[var(--primary)]/10"
-                        : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40"
-                    }`}
-                  >
-                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
-                      {(() => {
-                        const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
-                        const imgUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
-                        return imgUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={imgUrl}
-                            alt={item.ad.name}
-                            className="h-full w-full object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center">
-                            <BarChart3 className="h-5 w-5 text-[var(--muted-foreground)]" />
-                          </div>
-                        );
-                      })()}
-                    </div>
-                    <div className="min-w-0 flex-1 xl:min-w-0">
-                      <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.ad.name}</p>
-                      <p className="mt-0.5 text-[10px] tabular-nums text-[var(--muted-foreground)]">
-                        {formatCurrency(item.spend)} · {item.ctr.toFixed(2)}%
-                      </p>
-                    </div>
-                  </button>
+            </div>
+
+            {/* 2. Métricas */}
+            <div className="p-4">
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                {[
+                  { label: "Investimento", value: formatCurrency(selected.spend), hi: false },
+                  { label: "CTR", value: `${selected.ctr.toFixed(2)}%`, hi: true },
+                  { label: "CPC", value: selected.clicks > 0 ? formatCurrency(selected.spend / selected.clicks) : "—", hi: false },
+                ].map((m) => (
+                  <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-2.5 text-center">
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                    <p className={`mt-1 text-sm font-bold tabular-nums ${m.hi ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Impressões", value: selected.impressions.toLocaleString("pt-BR") },
+                  { label: "CPM", value: selected.impressions > 0 ? formatCurrency((selected.spend / selected.impressions) * 1000) : "—" },
+                ].map((m) => (
+                  <div key={m.label} className="rounded-lg border border-[var(--border)]/50 bg-[var(--background)]/40 px-2.5 py-2 text-center">
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                    <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-[var(--foreground)]">{m.value}</p>
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Preview do criativo */}
-          <div className="order-1 xl:order-2 xl:col-span-5 space-y-4">
-            <div className="flex min-h-[28px] items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                  Visualização de criativo
-                </h3>
+            {/* 3. Posição no conjunto */}
+            <div className="p-4 space-y-3">
+              <div>
+                <div className="mb-1.5 flex justify-between text-[10px]">
+                  <span className="text-[var(--muted-foreground)]">CTR vs conjunto</span>
+                  <span className={`font-semibold tabular-nums ${isAboveCtr ? "text-green-500" : isFarBelowCtr ? "text-red-500" : "text-amber-500"}`}>
+                    {ctrDiff > 0 ? "+" : ""}{ctrDiff.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="relative h-2 overflow-hidden rounded-full bg-[var(--muted)]/30">
+                  <div className="absolute inset-y-0 left-0 rounded-full bg-[var(--muted-foreground)]/25" style={{ width: `${Math.min(100, (averageCtr / maxCtrVal) * 100)}%` }} />
+                  <div
+                    className={`absolute inset-y-0 left-0 rounded-full transition-all ${isAboveCtr ? "bg-green-500" : isFarBelowCtr ? "bg-red-500" : "bg-amber-500"}`}
+                    style={{ width: `${Math.min(100, (selected.ctr / maxCtrVal) * 100)}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">Média: {averageCtr.toFixed(2)}% · Seu: {selected.ctr.toFixed(2)}%</p>
               </div>
-              <div className="flex rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-0.5">
-                {(["video", "image"] as const).map((type) => {
-                  const isVideo = type === "video";
-                  const isActive =
-                    (isVideo && selected.mediaType === "video") || (!isVideo && selected.mediaType === "image");
+              <div>
+                <div className="mb-1.5 flex justify-between text-[10px]">
+                  <span className="text-[var(--muted-foreground)]">Share do orçamento</span>
+                  <span className="font-semibold tabular-nums text-[var(--foreground)]">{spendShare.toFixed(1)}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-[var(--muted)]/30">
+                  <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${Math.min(100, spendShare)}%` }} />
+                </div>
+                <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">{formatCurrency(selected.spend)} de {formatCurrency(totalSpend)}</p>
+              </div>
+            </div>
+
+            {/* 4. Recomendação */}
+            <div className="p-4">
+              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--primary)]">Recomendação</p>
+              <p className="text-xs leading-[1.6] text-[var(--muted-foreground)]">{insight}</p>
+            </div>
+
+            {/* 5. Ranking compacto */}
+            <div className="p-4">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Ranking CTR</p>
+              <div className="space-y-2">
+                {ctrRanked.slice(0, 7).map((item, i) => {
+                  const isSel = item.ad.id === selected.ad.id;
                   return (
-                    <span
-                      key={type}
-                      className={`rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
-                        isActive
-                          ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                          : "text-[var(--muted-foreground)]"
-                      }`}
-                    >
-                      {isVideo ? "Vídeo" : "Imagem"}
-                    </span>
+                    <div key={item.ad.id} className="flex items-center gap-2">
+                      <span className={`w-4 shrink-0 text-[10px] tabular-nums ${isSel ? "font-bold text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>{i + 1}</span>
+                      <span className={`w-14 shrink-0 truncate text-[10px] ${isSel ? "font-semibold text-[var(--foreground)]" : "text-[var(--muted-foreground)]"}`} title={item.ad.name}>
+                        {item.ad.name}
+                      </span>
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--muted)]/30">
+                        <div
+                          className={`h-full rounded-full transition-all ${isSel ? "bg-[var(--primary)]" : "bg-[var(--muted-foreground)]/45"}`}
+                          style={{ width: `${Math.min(100, (item.ctr / maxCtrVal) * 100)}%` }}
+                        />
+                      </div>
+                      <span className={`w-10 shrink-0 text-right text-[10px] tabular-nums ${isSel ? "font-bold text-[var(--primary)]" : "text-[var(--muted-foreground)]"}`}>
+                        {item.ctr.toFixed(2)}%
+                      </span>
+                    </div>
                   );
                 })}
               </div>
             </div>
-            <div className="flex flex-col items-center gap-4">
-              {useFallbackPreview && (
-                <p className="text-center text-[10px] text-[var(--muted-foreground)]">
-                  Exibindo mídia alternativa.{" "}
-                  <button
-                    type="button"
-                    onClick={() => setUseFallbackPreview(false)}
-                    className="font-medium text-[var(--primary)] underline underline-offset-2 hover:no-underline"
-                  >
-                    Voltar para prévia Meta
-                  </button>
-                </p>
-              )}
-              <CriativoPreview
-                creative={selected.creative}
-                creativeId={selected.creative?.id}
-                adId={selected.ad.id}
-                alt={selected.ad.name}
-                mode="featured"
-                priority
-                adFormat={previewFormat}
-                useFallback={useFallbackPreview}
-              />
-            </div>
-          </div>
 
-          {/* Visão geral do conjunto em 8 colunas para ocupar melhor o espaço */}
-          <div className="order-3 xl:order-4 xl:col-span-8 rounded-2xl border border-[var(--border)] bg-[var(--background)]/60 p-6">
-            <div className="mb-5 flex min-h-[28px] items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                  Visão geral do conjunto
-                </p>
-              </div>
-              <span className="rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
-                {periodLabel.toLowerCase()}
-              </span>
-            </div>
-
-            <div className="grid items-stretch gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="flex min-h-[320px] flex-col">
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <MetaCriativosSpendDistribution
-                    sorted={sorted}
-                    selectedId={selected.ad.id}
-                    formatCurrency={formatCurrency}
-                  />
-                </div>
-              </div>
-
-              <div className="flex min-h-[320px] flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
-                <div className="flex min-h-[28px] items-center gap-2">
-                  <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                  <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
-                    Insights rápidos
-                  </p>
-                </div>
-                <div className="mt-4 grid flex-1 gap-3 content-start">
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)]/15 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      CPC médio do conjunto
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--foreground)]">
-                      <strong className="tabular-nums text-[var(--primary)]">
-                        {totalClicks > 0 ? formatCurrency(totalSpend / totalClicks) : formatCurrency(0)}
-                      </strong>{" "}
-                      <span className="text-[var(--muted-foreground)]">por clique</span>
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)]/15 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      CPM médio do conjunto
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--foreground)]">
-                      <strong className="tabular-nums text-[var(--primary)]">
-                        {totalImpressions > 0 ? formatCurrency((totalSpend / totalImpressions) * 1000) : formatCurrency(0)}
-                      </strong>{" "}
-                      <span className="text-[var(--muted-foreground)]">por mil impressões</span>
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)]/15 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                      Maior investimento
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--foreground)]">
-                      <strong className="line-clamp-1">{sorted[0]?.ad.name ?? "—"}</strong>
-                    </p>
-                    <p className="mt-0.5 text-[11px] tabular-nums text-[var(--muted-foreground)]">
-                      {sorted[0] ? formatCurrency(sorted[0].spend) : "—"}
-                    </p>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Dados do criativo - métricas e análise */}
-          <div className="order-4 xl:order-3 xl:col-span-4 xl:row-span-2 space-y-5">
-            <div className="xl:sticky xl:top-24 space-y-5">
-              {/* Criativo em foco + métricas principais */}
-              <div className="rounded-2xl border border-[var(--border)] bg-[var(--background)]/70 p-5">
-                <div className="flex min-h-[28px] items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-1 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">Dados do criativo</p>
-                  </div>
-                  <span className="rounded-full border border-[var(--border)] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
-                    {selected.mediaType === "video" ? "Vídeo" : "Imagem"}
-                  </span>
-                </div>
-                <h3 className="mt-3 line-clamp-1 text-sm font-bold text-[var(--foreground)]">{selected.ad.name}</h3>
-                {selected.primaryText ? (
-                  <p className="mt-1.5 line-clamp-2 text-[11px] leading-5 text-[var(--muted-foreground)]">
-                    {selected.primaryText}
-                  </p>
-                ) : null}
-
-                {/* Métricas principais — 3 cards em linha */}
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {[
-                    { label: "Investimento", value: formatCurrency(selected.spend) },
-                    { label: "CTR", value: `${selected.ctr.toFixed(2)}%`, highlight: true },
-                    { label: "CPC", value: selected.clicks > 0 ? formatCurrency(selected.spend / selected.clicks) : "—" },
-                  ].map((m) => (
-                    <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-3 text-center">
-                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                      <p className={`mt-1 text-sm font-bold tabular-nums ${m.highlight ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Métricas secundárias — linha compacta */}
-                <div className="mt-2 flex gap-2">
-                  {[
-                    { label: "Impressões", value: selected.impressions.toLocaleString("pt-BR") },
-                    { label: "CPM", value: selected.impressions > 0 ? formatCurrency((selected.spend / selected.impressions) * 1000) : "—" },
-                    { label: "Cliques", value: selected.clicks.toLocaleString("pt-BR") },
-                  ].map((m) => (
-                    <div key={m.label} className="flex-1 rounded-lg border border-[var(--border)]/60 bg-[var(--muted)]/10 px-2 py-2 text-center">
-                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                      <p className="mt-0.5 text-[11px] font-semibold tabular-nums text-[var(--foreground)]">{m.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Comparação com o conjunto */}
-              <MetaCriativosComparisonPanel
-                selected={selected}
-                sorted={sorted}
-                averageCtr={averageCtr}
-                totalSpend={totalSpend}
-                formatCurrency={formatCurrency}
-                maxCtr={Math.max(topCtr?.ctr ?? 0, 0.01)}
-              />
-
-              {/* Ranking de criativos */}
-              <MetaCriativosRankingChart
-                sorted={sorted}
-                selectedId={selected.ad.id}
-              />
-            </div>
           </div>
         </div>
+
+      </div>
     </div>
   );
 }
