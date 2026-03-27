@@ -44,6 +44,7 @@ export interface MetaInsightRow {
   spend?: string;
   impressions?: string;
   clicks?: string;
+  inline_link_clicks?: string;
   reach?: string;
   ctr?: string;
   cpc?: string;
@@ -170,21 +171,31 @@ export async function fetchAccountInsights(
   const params = new URLSearchParams({
     access_token: token,
     level: "account",
-    fields:
-      "spend,impressions,clicks,reach,ctr,cpc,actions,action_values",
+    fields: "spend,impressions,clicks,inline_link_clicks,reach,ctr,cpc,actions,action_values",
     time_increment: "1",
+    limit: "100",
     "time_range": JSON.stringify({ since: dateFrom, until: dateTo }),
   });
-  const url = `${GRAPH_BASE}/${actId}/insights?${params.toString()}`;
-  const res = await fetch(url);
-  const data = (await res.json()) as MetaInsightsResponse;
-  if (!res.ok) {
-    throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+
+  const all: MetaInsightRow[] = [];
+  let url: string | null = `${GRAPH_BASE}/${actId}/insights?${params.toString()}`;
+
+  while (url) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaInsightsResponse;
+    if (!res.ok) {
+      throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+    }
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+    if (data.data?.length) {
+      all.push(...data.data);
+    }
+    url = data.paging?.next ?? null;
   }
-  if (data.error) {
-    throw new Error(data.error.message);
-  }
-  return data;
+
+  return { data: all };
 }
 
 async function fetchAdImagesByHash(
