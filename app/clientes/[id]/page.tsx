@@ -1558,12 +1558,12 @@ function MetaCriativosGrid({
 
     if (mode === "featured" && !useFallback && metaPreview && !previewFailed) {
       return (
-        <div className="mx-auto w-full max-w-[360px] overflow-y-auto overflow-x-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
+        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
           <iframe
             title="Prévia do anúncio (Meta)"
             src={metaPreview.src}
             className="block w-full"
-            scrolling="yes"
+            scrolling="no"
             style={{
               border: "none",
               aspectRatio: `${metaPreview.w} / ${metaPreview.h}`,
@@ -1584,7 +1584,7 @@ function MetaCriativosGrid({
 
     if (mode === "featured" && isVideo && creative?.video_source_url) {
       return (
-        <div className="mx-auto w-full max-w-[360px] max-h-[640px] overflow-y-auto overflow-x-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e]">
+        <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
           <video
             src={creative.video_source_url}
             controls
@@ -1592,6 +1592,7 @@ function MetaCriativosGrid({
             preload="metadata"
             poster={posterUrl}
             className="h-auto w-full object-contain"
+            style={{ maxHeight: "70vh" }}
           >
             Seu navegador não suporta vídeo.
           </video>
@@ -1615,7 +1616,7 @@ function MetaCriativosGrid({
       if (mediaUrl) {
         const wrapper =
           mode === "featured" ? (
-            <div className="relative mx-auto w-full max-w-[360px] max-h-[640px] overflow-y-auto overflow-x-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e]">
+            <div className="relative mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border-[8px] border-[#2c2c2e] bg-[#2c2c2e] shadow-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={mediaUrl}
@@ -1623,6 +1624,7 @@ function MetaCriativosGrid({
                 loading={priority ? "eager" : "lazy"}
                 referrerPolicy="no-referrer"
                 className="h-auto w-full object-contain"
+                style={{ maxHeight: "70vh" }}
                 onError={() => setImgError(true)}
               />
               {isVideo && (
