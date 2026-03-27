@@ -1671,6 +1671,13 @@ function MetaCriativosGrid({
     setModalFallback(false);
   }, [modalAdId]);
 
+  React.useEffect(() => {
+    if (!modalAdId) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setModalAdId(null); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [modalAdId]);
+
   const topCtr = React.useMemo(
     () =>
       [...sorted].sort((a, b) => {
@@ -1703,7 +1710,7 @@ function MetaCriativosGrid({
   const scoredItems = sorted.map((item) => {
     const ctrScore = isOne ? 1 : (item.ctr - minCtr) / ctrRange;
     const cpcScore = item.cpc > 0 && !isOne ? (maxCpc - item.cpc) / cpcRange : 0.5;
-    const score = Math.min(2, parseFloat((ctrScore * 1.4 + cpcScore * 0.6).toFixed(2)));
+    const score = Math.min(2, parseFloat((ctrScore * 1.2 + cpcScore * 0.8).toFixed(2)));
     const spShare = totalSpend > 0 ? (item.spend / totalSpend) * 100 : 0;
     const status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" =
       score >= 1.4 ? "ESCALAR" : score >= 0.8 ? "OTIMIZAR" : "PAUSAR";
@@ -1711,7 +1718,7 @@ function MetaCriativosGrid({
     if (item.ctr < averageCtr * 0.75) alerts.push("CTR baixo");
     if (averageCpc > 0 && item.cpc > averageCpc * 1.4) alerts.push("CPC alto");
     if (spShare > 45) alerts.push("Verba concentrada");
-    else if (spShare < 5 && sorted.length > 3) alerts.push("Pouca verba");
+    else if (spShare < 5) alerts.push("Pouca verba");
     return { ...item, score, status, alerts: alerts.slice(0, 2), spShare };
   }).sort((a, b) => b.score - a.score);
 
@@ -1927,7 +1934,6 @@ function MetaCriativosGrid({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={(e) => { if (e.target === e.currentTarget) setModalAdId(null); }}
-          onKeyDown={(e) => { if (e.key === "Escape") setModalAdId(null); }}
           role="dialog"
           aria-modal="true"
           tabIndex={-1}
@@ -1937,7 +1943,7 @@ function MetaCriativosGrid({
               <div>
                 <p className="font-bold text-[var(--foreground)]">{modalItem.ad.name}</p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                  {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"} · Score {modalItem.score.toFixed(1)}
+                  {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"} · Score {modalItem.score.toFixed(1)}{modalItem.leads > 0 ? ` · ${modalItem.leads} leads` : ""}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -1981,9 +1987,9 @@ function MetaCriativosGrid({
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Investimento", value: formatCurrency(modalItem.spend), hi: false },
-                    { label: "Leads", value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—", hi: modalItem.leads > 0 },
                     { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%`, hi: false },
                     { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—", hi: false },
+                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR"), hi: false },
                     { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency((modalItem.spend / modalItem.impressions) * 1000) : "—", hi: false },
                     { label: "Cliques", value: modalItem.clicks.toLocaleString("pt-BR"), hi: false },
                   ].map((m) => (
