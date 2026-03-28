@@ -324,15 +324,32 @@ export default function ClienteDetailPage() {
   const id = params.id as string;
   const [canal, setCanal] = React.useState<"geral" | "meta" | "google">("geral");
   const [subView, setSubView] = React.useState<"dados" | "criativos">("dados");
-  const [presetPeriodo, setPresetPeriodo] = React.useState<PresetPeriodo>("90d");
-  const [customInicio, setCustomInicio] = React.useState("");
-  const [customFim, setCustomFim] = React.useState("");
+  const [presetPeriodo, setPresetPeriodo] = React.useState<PresetPeriodo>(() => {
+    if (typeof window === "undefined") return "mesAtual";
+    return (localStorage.getItem("inout-date-preset") as PresetPeriodo) ?? "mesAtual";
+  });
+  const [customInicio, setCustomInicio] = React.useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("inout-date-custom-inicio") ?? "";
+  });
+  const [customFim, setCustomFim] = React.useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("inout-date-custom-fim") ?? "";
+  });
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [visibleMonth, setVisibleMonth] = React.useState(() => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth() - 1, 1);
   });
   const filterRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    localStorage.setItem("inout-date-preset", presetPeriodo);
+    if (presetPeriodo === "custom") {
+      localStorage.setItem("inout-date-custom-inicio", customInicio);
+      localStorage.setItem("inout-date-custom-fim", customFim);
+    }
+  }, [presetPeriodo, customInicio, customFim]);
 
   const dateFilter = React.useMemo(
     () => getDateFilterFromPreset(presetPeriodo, customInicio, customFim),
@@ -362,10 +379,12 @@ export default function ClienteDetailPage() {
   const startSelected = fromDateInputValue(customInicio);
   const endSelected = fromDateInputValue(customFim);
 
-  const topRangeLabel =
+  const topRangeLabelFull =
     presetPeriodo === "custom" && customInicio && customFim
       ? `Personalizado: ${formatDatePt(customInicio)} a ${formatDatePt(customFim)}`
       : `${dateFilter.label}: ${formatDatePt(dateFilter.dataInicio)} a ${formatDatePt(dateFilter.dataFim)}`;
+
+  const topRangeLabelShort = dateFilter.label;
 
   const handleDayClick = (day: Date) => {
     const clicked = toDateInputValue(day);
@@ -633,81 +652,86 @@ function formatPercentage(value: number) {
       </section>
 
       {/* ── Date filter + sub-aba Criativos / Análise de dados (Meta/Google) ── */}
-      <div className="flex flex-wrap items-center gap-3" ref={filterRef}>
-        {/* Saldo chip — esquerda, só em Meta/Google */}
-        {canal !== "geral" && (() => {
-          const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
-          const plataforma = canal === "meta" ? "META" : "Google Ads";
-          const value = saldo?.saldo;
-          const isLoading = saldo === undefined;
-          const isCritical = value != null && value < 100;
-          const isWarning = value != null && value >= 100 && value < 200;
+      <div className="flex flex-col gap-2" ref={filterRef}>
+        {/* Linha 1: Saldo chip (esquerda) + Filtro de data (direita) */}
+        <div className="flex items-center gap-2">
+          {/* Saldo chip — só em Meta/Google */}
+          {canal !== "geral" && (() => {
+            const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
+            const plataforma = canal === "meta" ? "META" : "Google";
+            const value = saldo?.saldo;
+            const isLoading = saldo === undefined;
+            const isCritical = value != null && value < 100;
+            const isWarning = value != null && value >= 100 && value < 200;
 
-          const containerClass = isCritical
-            ? "border-red-500/40 bg-red-500/8 text-red-400"
-            : isWarning
-              ? "border-amber-400/40 bg-amber-400/8 text-amber-400"
-              : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]";
+            const containerClass = isCritical
+              ? "border-red-500/40 bg-red-500/8 text-red-400"
+              : isWarning
+                ? "border-amber-400/40 bg-amber-400/8 text-amber-400"
+                : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]";
 
-          const labelClass = isCritical
-            ? "text-red-400/70"
-            : isWarning
-              ? "text-amber-400/70"
-              : "text-[var(--muted-foreground)]";
+            const labelClass = isCritical
+              ? "text-red-400/70"
+              : isWarning
+                ? "text-amber-400/70"
+                : "text-[var(--muted-foreground)]";
 
-          return (
-            <div className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-all ${containerClass}`}>
-              <Wallet className={`h-4 w-4 shrink-0 ${isCritical ? "text-red-400" : isWarning ? "text-amber-400" : "text-[var(--primary)]"}`} />
-              <div className="flex flex-col leading-tight">
-                <span className={`text-[10px] font-semibold uppercase tracking-widest ${labelClass}`}>
-                  Saldo {plataforma}
-                </span>
-                {isLoading ? (
-                  <span className="text-xs animate-pulse text-[var(--muted-foreground)]">carregando…</span>
-                ) : value != null ? (
-                  <span className="text-sm font-bold tabular-nums">{formatCurrency(value)}</span>
-                ) : (
-                  <span className="text-xs text-[var(--muted-foreground)]">não disponível</span>
+            return (
+              <div className={`flex items-center gap-2 rounded-xl border px-3 py-2 transition-all sm:gap-3 sm:px-4 sm:py-2.5 ${containerClass}`}>
+                <Wallet className={`h-4 w-4 shrink-0 ${isCritical ? "text-red-400" : isWarning ? "text-amber-400" : "text-[var(--primary)]"}`} />
+                <div className="flex flex-col leading-tight">
+                  <span className={`text-[9px] font-semibold uppercase tracking-widest sm:text-[10px] ${labelClass}`}>
+                    Saldo {plataforma}
+                  </span>
+                  {isLoading ? (
+                    <span className="text-xs animate-pulse text-[var(--muted-foreground)]">carregando…</span>
+                  ) : value != null ? (
+                    <span className="text-sm font-bold tabular-nums">{formatCurrency(value)}</span>
+                  ) : (
+                    <span className="text-xs text-[var(--muted-foreground)]">—</span>
+                  )}
+                </div>
+                {(isCritical || isWarning) && (
+                  <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${isCritical ? "text-red-400" : "text-amber-400"}`} />
                 )}
               </div>
-              {(isCritical || isWarning) && (
-                <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${isCritical ? "text-red-400" : "text-amber-400"}`} />
-              )}
-            </div>
-          );
-        })()}
+            );
+          })()}
 
-        {/* Filtro de data + subviews — direita */}
-        <div className="ml-auto flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
-          <button
-            onClick={() => setFilterOpen((v) => !v)}
-            className="inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-xs transition-all hover:bg-[var(--muted)]/60 sm:text-sm"
-          >
-            <CalendarDays className="h-4 w-4 shrink-0 text-[var(--primary)]" />
-            <span className="min-w-0 truncate text-[var(--foreground)] max-w-[200px] md:max-w-[320px]">
-              {topRangeLabel}
-            </span>
-            <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 text-[var(--muted-foreground)]" />
-          </button>
-
-          {(canal === "meta" || canal === "google") && (
-            <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-1">
-              {(["dados", "criativos"] as const).map((view) => (
-                <button
-                  key={view}
-                  onClick={() => setSubView(view)}
-                  className={`rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                    subView === view
-                      ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
-                      : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]/60 hover:text-[var(--foreground)]"
-                  }`}
-                >
-                  {view === "dados" ? "Análise de dados" : `Criativos ${canal === "meta" ? "META" : "Google"}`}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Filtro de data — direita */}
+          <div className="ml-auto">
+            <button
+              onClick={() => setFilterOpen((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-3 py-2.5 text-xs transition-all hover:bg-[var(--muted)]/60 sm:gap-2.5 sm:px-4"
+            >
+              <CalendarDays className="h-4 w-4 shrink-0 text-[var(--primary)]" />
+              <span className="min-w-0 truncate text-[var(--foreground)]">
+                <span className="sm:hidden">{topRangeLabelShort}</span>
+                <span className="hidden sm:inline max-w-[280px] truncate">{topRangeLabelFull}</span>
+              </span>
+              <SlidersHorizontal className="h-3.5 w-3.5 shrink-0 text-[var(--muted-foreground)]" />
+            </button>
+          </div>
         </div>
+
+        {/* Linha 2: Toggle Análise / Criativos — só em Meta e Google */}
+        {(canal === "meta" || canal === "google") && (
+          <div className="flex items-center gap-1 self-end rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
+            {(["dados", "criativos"] as const).map((view) => (
+              <button
+                key={view}
+                onClick={() => setSubView(view)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-all sm:px-4 sm:py-2 ${
+                  subView === view
+                    ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
+                    : "text-[var(--muted-foreground)] hover:bg-[var(--muted)]/60 hover:text-[var(--foreground)]"
+                }`}
+              >
+                {view === "dados" ? "Análise" : `Criativos`}
+              </button>
+            ))}
+          </div>
+        )}
 
         {filterOpen && (
           <div className="absolute right-4 top-28 z-40 w-[min(920px,100%-2rem)] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-2xl shadow-black/40">

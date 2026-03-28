@@ -17,17 +17,19 @@ export async function GET(
 
   const plataforma = canal === "meta" ? "META" : "GOOGLE";
 
-  const conta = await prisma.conta.findFirst({
-    where: { clienteId: id, plataforma },
-  });
-
-  if (!conta?.accountIdPlataforma) {
-    return NextResponse.json({ saldo: null, motivo: "Conta não configurada" });
-  }
-
-  const config = await getIntegrationsConfig();
+  const [conta, cliente] = await Promise.all([
+    prisma.conta.findFirst({ where: { clienteId: id, plataforma } }),
+    prisma.cliente.findUnique({
+      where: { id },
+      select: { orcamentoMidiaGoogleMensal: true, orcamentoMidiaMetaMensal: true },
+    }),
+  ]);
 
   if (canal === "meta") {
+    if (!conta?.accountIdPlataforma) {
+      return NextResponse.json({ saldo: null, motivo: "Conta não configurada" });
+    }
+    const config = await getIntegrationsConfig();
     const token = config.metaAccessToken;
     if (!token) {
       return NextResponse.json({ saldo: null, motivo: "Token Meta não configurado" });
@@ -48,25 +50,59 @@ export async function GET(
   }
 
   if (canal === "google") {
-    try {
-      const budget = await fetchAccountBudget(
-        conta.accountIdPlataforma,
-        conta.googleAdsLoginCustomerId
-      );
-      if (!budget) {
-        return NextResponse.json({ saldo: null, motivo: "Sem budget configurado" });
+    const orcamento = cliente?.orcamentoMidiaGoogleMensal ?? null;
+
+    // Calcula gasto do mês atual no DB
+    const now = new Date();
+    const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+    const mesFim = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const gastoMes = await prisma.fatoMidiaDiario.aggregate({
+      _sum: { investimento: true },
+      where: {
+        clienteId: id,
+        canal: "GOOGLE",
+        data: { gte: mesInicio, lte: mesFim },
+      },
+    });
+    const investido = Number(gastoMes._sum.investimento ?? 0);
+
+    // Tenta buscar budget via API do Google Ads (só se conta configurada)
+    if (conta?.accountIdPlataforma) {
+      try {
+        const budget = await fetchAccountBudget(
+          conta.accountIdPlataforma,
+          conta.googleAdsLoginCustomerId
+        );
+        if (budget && (budget.approvedSpendingLimit ?? 0) > 0) {
+          return NextResponse.json({
+            saldo: budget.remaining,
+            totalAprovado: budget.approvedSpendingLimit,
+            utilizado: budget.amountServed,
+            moeda: budget.currency,
+            fonte: "account_budget",
+          });
+        }
+      } catch {
+        // sem account_budget — usa fallback abaixo
       }
+    }
+
+    // Fallback: orçamento mensal do cliente - investimento do mês atual
+    if (orcamento != null && orcamento > 0) {
+      const remaining = Math.max(0, orcamento - investido);
       return NextResponse.json({
-        saldo: budget.remaining,
-        totalAprovado: budget.approvedSpendingLimit,
-        utilizado: budget.amountServed,
-        moeda: budget.currency,
-      });
-    } catch (e) {
-      return NextResponse.json({
-        saldo: null,
-        motivo: e instanceof Error ? e.message : "Erro ao buscar saldo Google",
+        saldo: remaining,
+        totalAprovado: orcamento,
+        utilizado: investido,
+        moeda: "BRL",
+        fonte: "orcamento_mensal",
       });
     }
+
+    return NextResponse.json({
+      saldo: null,
+      motivo: "Configure o orçamento mensal do Google no cadastro do cliente",
+    });
   }
 }
