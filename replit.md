@@ -46,3 +46,35 @@ Uses Replit's built-in PostgreSQL. Schema managed via Prisma.
 - `GOOGLE_PRIVATE_KEY` - Google Sheets service account private key
 - `SYNC_CRON_TOKEN` - Token for protecting sync endpoints
 - `ADMIN_SECRET` - Token for admin area protection
+
+## Design System (InOut Standard)
+
+### Section Headers
+Orange accent bar before section titles:
+```tsx
+<div className="flex items-start gap-3">
+  <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+  <div>
+    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">Sublabel</p>
+    <h2 className="text-xl font-extrabold tracking-tight text-[var(--foreground)]">Title</h2>
+  </div>
+</div>
+```
+
+### KPI Cards
+Cards with orange hover glow effect:
+```tsx
+<div className="group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]">
+  <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-[0.05]" />
+  ...
+</div>
+```
+
+### Primary Color
+`#ff6a00` (Inout Orange) accessed via `var(--primary)`.
+
+### Responsive Patterns
+- Tables: always `overflow-x-auto` wrapper + `min-w-[NNNpx]` on the table
+- Modals: `flex-col md:flex-row` for stacking on mobile
+- Channel tabs: `px-3 py-2 sm:px-4` for smaller touch targets on mobile
+- Decision strip: `grid-cols-2 sm:grid-cols-4` with `divide-x divide-y divide-[var(--border)] sm:divide-y-0`

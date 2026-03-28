@@ -597,7 +597,7 @@ function formatPercentage(value: number) {
           Central de clientes
         </Link>
 
-        <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--primary)]">
               <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
@@ -619,7 +619,7 @@ function formatPercentage(value: number) {
                   setCanal(c);
                   setSubView("dados");
                 }}
-                className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+                className={`rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all sm:px-4 ${
                   canal === c
                     ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
                     : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
@@ -866,30 +866,27 @@ function formatPercentage(value: number) {
 
       {/* ── Criativos / Anúncios (Meta) ── */}
       {canal === "meta" && subView === "criativos" && (
-        <div className="space-y-8">
-          <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
-            <CardHeader className="pb-2">
-              <SectionHeader title="Criativos META" />
-            </CardHeader>
-            <CardContent>
-              {metaAdsLoading ? (
-                <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Carregando anúncios META…</p>
-              ) : metaAdsError ? (
-                <p className="py-8 text-center text-sm text-[var(--accent)]">
-                  {metaAdsError instanceof Error ? metaAdsError.message : "Erro ao carregar anúncios META."}
-                </p>
-              ) : metaAdsData?.data?.length ? (
-                <MetaCriativosGrid
-                  ads={metaAdsData.data}
-                  formatCurrency={formatCurrency}
-                />
-              ) : (
-                <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
-                  Nenhum anúncio META ativo encontrado.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          {metaAdsLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm text-[var(--muted-foreground)]">Carregando anúncios META…</p>
+            </div>
+          ) : metaAdsError ? (
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/6 px-6 py-8 text-center">
+              <p className="text-sm text-red-400">
+                {metaAdsError instanceof Error ? metaAdsError.message : "Erro ao carregar anúncios META."}
+              </p>
+            </div>
+          ) : metaAdsData?.data?.length ? (
+            <MetaCriativosGrid
+              ads={metaAdsData.data}
+              formatCurrency={formatCurrency}
+            />
+          ) : (
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm text-[var(--muted-foreground)]">Nenhum anúncio META ativo encontrado.</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -1601,64 +1598,92 @@ function MetaCriativosGrid({
   return (
     <div className="space-y-5">
 
-      {/* 1. Barra de resumo */}
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">Investimento</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{formatCurrency(totalSpend)}</span>
-          </div>
-          <div className="h-3.5 w-px bg-[var(--border)]" />
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">Leads</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? totalLeads.toLocaleString("pt-BR") : "—"}</span>
-          </div>
-          <div className="h-3.5 w-px bg-[var(--border)]" />
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">CPL Alvo</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? formatCurrency(cplAlvo) : "—"}</span>
-          </div>
-          <div className="h-3.5 w-px bg-[var(--border)]" />
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">CPL Limite</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? formatCurrency(cplLimite) : "—"}</span>
-          </div>
-          <div className="h-3.5 w-px bg-[var(--border)]" />
-          <div className="ml-auto flex items-center gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
-            <span className="text-xs text-[var(--muted-foreground)]">CPL médio:</span>
-            <span className="text-xs font-bold text-[var(--primary)]">{avgCpl ? formatCurrency(avgCpl) : "—"}</span>
-          </div>
+      {/* ── Section header InOut style ── */}
+      <div className="flex items-start gap-3">
+        <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">Análise de Criativos</p>
+          <h2 className="text-xl font-extrabold tracking-tight text-[var(--foreground)]">Criativos META</h2>
         </div>
       </div>
 
-      {/* 2. Decision Bar */}
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-5">
-          <div className="flex flex-wrap items-center justify-center gap-5">
-            {([
-              { count: countEscalar,   label: "Escalar",      dot: "bg-green-500", color: "text-green-500", bg: "bg-green-500/8 border-green-500/20"  },
-              { count: countOtimizar,  label: "Otimizar",     dot: "bg-amber-500", color: "text-amber-500", bg: "bg-amber-500/8 border-amber-500/20"  },
-              { count: countValidando, label: "Em Validação", dot: "bg-blue-400",  color: "text-blue-400",  bg: "bg-blue-500/8 border-blue-500/20"    },
-              { count: countPausar,    label: "Pausar",       dot: "bg-red-500",   color: "text-red-500",   bg: "bg-red-500/8 border-red-500/20"      },
-            ] as const).map((s) => (
-              <div key={s.label} className={`flex items-center gap-3 rounded-xl border px-6 py-3 ${s.bg}`}>
-                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.dot}`} />
-                <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
-                <span className={`text-sm font-semibold ${s.color}`}>{s.label}</span>
-              </div>
-            ))}
+      {/* 1. KPI tiles */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {([
+          {
+            label: "Investimento",
+            value: formatCurrency(totalSpend),
+            accent: false,
+          },
+          {
+            label: "Total de Leads",
+            value: totalLeads > 0 ? totalLeads.toLocaleString("pt-BR") : "—",
+            accent: true,
+          },
+          {
+            label: "CPL Alvo",
+            value: totalLeads > 0 ? formatCurrency(cplAlvo) : "—",
+            accent: false,
+          },
+          {
+            label: "CPL Médio",
+            value: avgCpl ? formatCurrency(avgCpl) : "—",
+            valueColor: avgCpl
+              ? avgCpl <= cplAlvo
+                ? "text-green-500"
+                : avgCpl < cplLimite
+                  ? "text-amber-500"
+                  : "text-red-400"
+              : "text-[var(--muted-foreground)]",
+            accent: false,
+          },
+        ] as const).map((kpi) => (
+          <div
+            key={kpi.label}
+            className="group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]"
+          >
+            <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-[0.05]" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{kpi.label}</p>
+            <p className={`mt-1.5 text-2xl font-extrabold tabular-nums leading-none ${"valueColor" in kpi && kpi.valueColor ? kpi.valueColor : kpi.accent ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
+              {kpi.value}
+            </p>
           </div>
-          <p className="mt-4 text-center text-xs text-[var(--muted-foreground)]">{decisionInsight}</p>
+        ))}
+      </div>
+
+      {/* 2. Decision strip */}
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+        <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border)] sm:grid-cols-4 sm:divide-y-0">
+          {([
+            { count: countEscalar,   label: "Escalar",      dot: "bg-green-500",  color: "text-green-500",  border: "border-green-500/20"  },
+            { count: countOtimizar,  label: "Otimizar",     dot: "bg-amber-500",  color: "text-amber-500",  border: "border-amber-500/20"  },
+            { count: countValidando, label: "Em Validação", dot: "bg-blue-400",   color: "text-blue-400",   border: "border-blue-500/20"   },
+            { count: countPausar,    label: "Pausar",       dot: "bg-red-500",    color: "text-red-500",    border: "border-red-500/20"    },
+          ] as const).map((s) => (
+            <div key={s.label} className="flex flex-col items-center gap-1 px-5 py-4">
+              <div className="flex items-center gap-2">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`} />
+                <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
+              </div>
+              <span className={`text-[11px] font-semibold ${s.color}`}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-[var(--border)] px-5 py-3">
+          <p className="text-center text-xs text-[var(--muted-foreground)]">{decisionInsight}</p>
         </div>
       </div>
 
       {/* 3. Tabela de criativos */}
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-          <table className="w-full text-left text-xs">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+        <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
+          <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Performance por criativo</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] text-left text-xs">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[var(--muted)]/10">
+              <tr className="border-b border-[var(--border)] bg-[var(--muted)]/8">
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Impr.</th>
@@ -1684,7 +1709,7 @@ function MetaCriativosGrid({
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-[var(--muted)]/30">
+                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-[var(--muted)]/30">
                           {thumbUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={thumbUrl} alt={item.displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
@@ -1693,8 +1718,13 @@ function MetaCriativosGrid({
                               <BarChart3 className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
                             </div>
                           )}
+                          {item.mediaType === "video" && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="h-3 w-3 text-white drop-shadow" />
+                            </div>
+                          )}
                         </div>
-                        <span className="max-w-[180px] truncate font-medium text-[var(--foreground)]">{item.displayName}</span>
+                        <span className="max-w-[160px] truncate font-medium text-[var(--foreground)]">{item.displayName}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
@@ -1704,12 +1734,12 @@ function MetaCriativosGrid({
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
                       {item.clicks > 0 ? item.clicks.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
-                      {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
+                    <td className="px-4 py-3 text-right tabular-nums font-semibold text-[var(--foreground)]">
+                      {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="font-normal text-[var(--muted-foreground)]/40">—</span>}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {item.leads > 0 ? (
-                        <span className={`font-semibold ${item.cpl <= cplAlvo ? "text-green-500" : item.cpl < cplLimite ? "text-amber-500" : "text-red-400"}`}>
+                        <span className={`font-bold ${item.cpl <= cplAlvo ? "text-green-500" : item.cpl < cplLimite ? "text-amber-500" : "text-red-400"}`}>
                           {formatCurrency(item.cpl)}
                         </span>
                       ) : (
@@ -1725,7 +1755,8 @@ function MetaCriativosGrid({
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${item.status === "ESCALAR" ? "bg-green-500" : item.status === "OTIMIZAR" ? "bg-amber-500" : item.status === "PAUSAR" ? "bg-red-500" : "bg-blue-400"}`} />
                         {cfg.label}
                       </span>
                     </td>
@@ -1734,7 +1765,7 @@ function MetaCriativosGrid({
                         {item.alerts.length === 0 ? (
                           <span className="text-[var(--muted-foreground)]/40">—</span>
                         ) : item.alerts.map((a) => (
-                          <span key={a} className="inline-flex items-center rounded border border-amber-500/30 bg-amber-500/8 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
+                          <span key={a} className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/8 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
                             {a}
                           </span>
                         ))}
@@ -1748,34 +1779,38 @@ function MetaCriativosGrid({
         </div>
       </div>
 
-      {/* 4. Distribuição de verba — barras horizontais por criativo (UX aprovado pelo cliente; diverge do segmento único original) */}
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Distribuição de verba</p>
-          <div className="space-y-2.5">
-            {[...scoredItems].sort((a, b) => b.spend - a.spend).map((item) => {
-              const cfg = statusConfig[item.status];
-              return (
-                <div
-                  key={item.ad.id}
-                  className="flex cursor-pointer items-center gap-3 group"
-                  onClick={() => setModalAdId(item.ad.id)}
+      {/* 4. Distribuição de verba */}
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+        <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
+          <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Distribuição de Verba</p>
+        </div>
+        <div className="space-y-2.5 p-4">
+          {[...scoredItems].sort((a, b) => b.spend - a.spend).map((item) => {
+            const cfg = statusConfig[item.status];
+            return (
+              <div
+                key={item.ad.id}
+                className="group flex cursor-pointer items-center gap-3"
+                onClick={() => setModalAdId(item.ad.id)}
+              >
+                <span
+                  className="w-20 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] transition-colors group-hover:text-[var(--foreground)] sm:w-32"
+                  title={item.displayName}
                 >
-                  <span className="w-32 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors" title={item.displayName}>
-                    {item.displayName}
-                  </span>
-                  <div className="relative flex-1 h-5 overflow-hidden rounded bg-[var(--muted)]/20">
-                    <div
-                      className={`h-full rounded transition-all ${cfg.bar} opacity-80 group-hover:opacity-100`}
-                      style={{ width: `${item.spShare}%` }}
-                    />
-                  </div>
-                  <span className="w-20 shrink-0 text-right text-[10px] tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</span>
-                  <span className="w-8 shrink-0 text-right text-[10px] tabular-nums text-[var(--muted-foreground)]">{item.spShare.toFixed(0)}%</span>
+                  {item.displayName}
+                </span>
+                <div className="relative h-4 flex-1 overflow-hidden rounded-full bg-[var(--muted)]/20">
+                  <div
+                    className={`h-full rounded-full transition-all ${cfg.bar} opacity-75 group-hover:opacity-100`}
+                    style={{ width: `${item.spShare}%` }}
+                  />
                 </div>
-              );
-            })}
-          </div>
+                <span className="w-16 shrink-0 text-right text-[10px] tabular-nums text-[var(--foreground)] sm:w-20">{formatCurrency(item.spend)}</span>
+                <span className="w-7 shrink-0 text-right text-[10px] tabular-nums text-[var(--muted-foreground)]">{item.spShare.toFixed(0)}%</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -1788,11 +1823,11 @@ function MetaCriativosGrid({
         const hasPlan = acaoEscalar.length > 0 || acaoPausar.length > 0 || acaoOtimizar.length > 0;
         if (!hasPlan) return null;
         return (
-          <div className="mx-auto max-w-[1280px] px-6">
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden">
-              <div className="px-5 py-3 border-b border-[var(--border)]">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Plano de ação</p>
-              </div>
+          <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
+            <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
+              <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Plano de Ação</p>
+            </div>
               <div className="p-5 space-y-4">
 
                 {/* Escalar */}
@@ -1894,7 +1929,6 @@ function MetaCriativosGrid({
 
               </div>
             </div>
-          </div>
         );
       })()}
 
@@ -1930,8 +1964,8 @@ function MetaCriativosGrid({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-1 gap-6 overflow-y-auto p-5">
-              <div className="shrink-0">
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 md:flex-row md:gap-6">
+              <div className="shrink-0 flex justify-center md:block">
                 {modalFallback && (
                   <p className="mb-2 text-center text-[10px] text-[var(--muted-foreground)]">
                     Mídia alternativa.{" "}
