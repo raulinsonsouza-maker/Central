@@ -1146,7 +1146,7 @@ type MetaAdItem = {
   id: string;
   name: string;
   adcreatives?: { data: MetaAdCreative[] };
-  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; inline_link_clicks?: string; ctr?: string; cpc?: string; actions?: Array<{ action_type: string; value: string }> }> };
+  insights?: { data: Array<{ spend?: string; impressions?: string; clicks?: string; inline_link_clicks?: string; ctr?: string; cpc?: string; frequency?: string; actions?: Array<{ action_type: string; value: string }>; video_p100_watched_actions?: Array<{ action_type: string; value: string }> }> };
 };
 
 function CriativoPreview({
@@ -1395,6 +1395,14 @@ function MetaCriativosGrid({
         const onFbLeads = getAction("onsite_conversion.lead_grouped");
         const websiteLeads = getAction("offsite_conversion.fb_pixel_lead") || getAction("website_lead");
         const leads = leadCount || onFbLeads || websiteLeads;
+        const video3sViews = getAction("video_view");
+        const video100Views = parseInt(
+          insight?.video_p100_watched_actions?.[0]?.value ?? "0", 10
+        ) || 0;
+        const frequency = insight?.frequency ? parseFloat(insight.frequency) : 0;
+        const cr = clicks > 0 ? (leads / clicks) * 100 : 0;
+        const hookRate = impressions > 0 && video3sViews > 0 ? (video3sViews / impressions) * 100 : 0;
+        const holdRate = video3sViews > 0 && video100Views > 0 ? (video100Views / video3sViews) * 100 : 0;
         const nameKey = ad.name.toLowerCase().trim();
         const displayName =
           nameCounts[nameKey] > 1
@@ -1410,6 +1418,12 @@ function MetaCriativosGrid({
           cpc,
           cpm,
           leads,
+          video3sViews,
+          video100Views,
+          frequency,
+          cr,
+          hookRate,
+          holdRate,
           mediaType,
           primaryText: creative?.body || creative?.title || "",
           displayName,
@@ -1448,7 +1462,6 @@ function MetaCriativosGrid({
   const totalImpressions = sorted.reduce((acc, item) => acc + item.impressions, 0);
   const totalClicks = sorted.reduce((acc, item) => acc + item.clicks, 0);
   const averageCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-  const averageCpc = totalClicks > 0 ? totalSpend / totalClicks : 0;
 
   const previewFormat = "MOBILE_FEED_STANDARD" as const;
 
@@ -1456,72 +1469,112 @@ function MetaCriativosGrid({
     return <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">Nenhum criativo encontrado.</p>;
   }
 
-  // Score computation — fórmula: CTR 60% + CPC inverso 20% + Conversão (leads) 20%
-  const maxCtr = Math.max(...sorted.map((d) => d.ctr), 0.001);
-  const minCtr = Math.min(...sorted.map((d) => d.ctr));
-  const ctrRange = maxCtr - minCtr || 1;
-  const cpcValues = sorted.filter((d) => d.cpc > 0).map((d) => d.cpc);
-  const maxCpc = cpcValues.length ? Math.max(...cpcValues) : 1;
-  const minCpc = cpcValues.length ? Math.min(...cpcValues) : 0;
-  const cpcRange = maxCpc - minCpc || 1;
-  const isOne = sorted.length === 1;
-  const maxLeads = Math.max(...sorted.map((d) => d.leads), 1);
-  const hasAnyLeads = sorted.some((d) => d.leads > 0);
+  // ── Motor de decisão baseado em CPL ──────────────────────────────────────────
+  const totalLeads = sorted.reduce((acc, d) => acc + d.leads, 0);
+  const avgCpm = totalImpressions > 0 ? (totalSpend / totalImpressions) * 1000 : 0;
+
+  // CPL Alvo = média ponderada por investimento entre criativos com leads
+  // Se não houver leads ainda, usamos um teto estimado baseado no gasto médio
+  const cplAlvo: number = (() => {
+    const withLeads = sorted.filter((d) => d.leads > 0);
+    if (withLeads.length === 0) return totalSpend / sorted.length || 100;
+    const totalSpendWithLeads = withLeads.reduce((a, d) => a + d.spend, 0);
+    const totalLeadsWithLeads = withLeads.reduce((a, d) => a + d.leads, 0);
+    return totalSpendWithLeads / totalLeadsWithLeads;
+  })();
+  const cplLimite = cplAlvo * 1.5;
 
   const scoredItems = sorted
     .map((item) => {
-      const ctrScore = isOne ? 1 : (item.ctr - minCtr) / ctrRange;
-      const cpcScore = item.cpc > 0 && !isOne ? (maxCpc - item.cpc) / cpcRange : 0.5;
-      const convFactor = hasAnyLeads ? item.leads / maxLeads : 0;
-      const rawScore = ctrScore * 0.6 + cpcScore * 0.2 + convFactor * 0.2;
-      const score = Math.min(2, parseFloat((rawScore * 2).toFixed(2)));
+      const cpl = item.leads > 0 ? item.spend / item.leads : Infinity;
       const spShare = totalSpend > 0 ? (item.spend / totalSpend) * 100 : 0;
 
-      let status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" =
-        score >= 1.4 ? "ESCALAR" : score >= 0.8 ? "OTIMIZAR" : "PAUSAR";
-
-      // Override: criativo com leads E CTR acima da média nunca pode ser Pausar
-      if (item.leads > 0 && item.ctr >= averageCtr && status === "PAUSAR") {
+      // ── Status por CPL + significância estatística ────────────────────────
+      let status: "ESCALAR" | "OTIMIZAR" | "PAUSAR" | "VALIDANDO";
+      if (item.leads === 0 && item.spend < cplAlvo) {
+        status = "VALIDANDO";
+      } else if (item.leads === 0 && item.spend >= cplLimite) {
+        status = "PAUSAR";
+      } else if (item.leads > 0 && cpl <= cplAlvo) {
+        status = "ESCALAR";
+      } else if (item.leads > 0 && cpl < cplLimite) {
         status = "OTIMIZAR";
+      } else if (item.leads > 0 && cpl >= cplLimite) {
+        status = "PAUSAR";
+      } else {
+        status = "VALIDANDO";
       }
 
+      // ── Alertas inteligentes ──────────────────────────────────────────────
       const alerts: string[] = [];
-      if (item.ctr < averageCtr * 0.75) alerts.push("CTR baixo");
-      if (averageCpc > 0 && item.cpc > averageCpc * 1.4) alerts.push("CPC alto");
-      if (spShare > 45) alerts.push("Verba concentrada");
-      else if (spShare < 10 && item.ctr > averageCtr) alerts.push("Oportunidade: aumentar verba");
-      // spShare < 10 E CTR ruim → sem alerta (evita ruído)
 
-      return { ...item, score, status, alerts: alerts.slice(0, 2), spShare };
+      // Universal — Falso Positivo (clickbait)
+      if (item.ctr > 1.5 && item.cr < 5 && item.leads > 0 && cpl > cplAlvo) {
+        alerts.push("Clickbait: cliques não convertem na LP");
+      }
+      // Universal — Leilão Hostil
+      if (avgCpm > 0 && item.cpm > avgCpm * 1.5) {
+        alerts.push("CPM alto: público disputado ou feedback negativo");
+      }
+      // Universal — Verba concentrada
+      if (spShare > 45) {
+        alerts.push("Verba concentrada neste criativo");
+      }
+      // Universal — Oportunidade de escala
+      if (spShare < 10 && (status === "ESCALAR" || status === "VALIDANDO") && item.ctr >= averageCtr) {
+        alerts.push("Oportunidade: aumentar verba");
+      }
+
+      // Vídeo — Hook fraco
+      if (item.mediaType === "video" && item.hookRate > 0 && item.hookRate < 25 && cpl > cplLimite) {
+        alerts.push("Hook fraco: refaça os primeiros 3s");
+      }
+      // Vídeo — Conteúdo maçante (bom hook, baixa retenção)
+      if (item.mediaType === "video" && item.hookRate >= 25 && item.holdRate > 0 && item.holdRate < 10 && cpl > cplLimite) {
+        alerts.push("Retenção baixa: roteiro perde ritmo no meio");
+      }
+      // Imagem — Cegueira de banner
+      if (item.mediaType === "image" && item.ctr < 0.6 && item.impressions > 2000 && cpl > cplLimite) {
+        alerts.push("Arte ignorável: sem thumbstop no scroll");
+      }
+
+      // Score auxiliar (mantém ordenação visual)
+      const cplScore = cpl === Infinity ? 0 : Math.max(0, 1 - cpl / (cplLimite * 2));
+      const ctrNorm = averageCtr > 0 ? Math.min(1, item.ctr / (averageCtr * 2)) : 0;
+      const score = parseFloat((cplScore * 1.4 + ctrNorm * 0.6).toFixed(2));
+
+      return { ...item, cpl, score, status, alerts: alerts.slice(0, 3), spShare };
     })
-    .sort((a, b) => b.score - a.score);
-
-  // Garante sempre um Escalar: o top performer com CTR acima da média ou com leads
-  if (scoredItems.length > 0 && scoredItems.every((i) => i.status !== "ESCALAR")) {
-    const best = scoredItems.find((i) => i.ctr >= averageCtr || i.leads > 0) ?? scoredItems[0];
-    best.status = "ESCALAR";
-  }
+    .sort((a, b) => {
+      const order = { ESCALAR: 0, OTIMIZAR: 1, VALIDANDO: 2, PAUSAR: 3 };
+      if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+      return b.score - a.score;
+    });
 
   const countEscalar = scoredItems.filter((i) => i.status === "ESCALAR").length;
   const countOtimizar = scoredItems.filter((i) => i.status === "OTIMIZAR").length;
   const countPausar = scoredItems.filter((i) => i.status === "PAUSAR").length;
+  const countValidando = scoredItems.filter((i) => i.status === "VALIDANDO").length;
   const pausarSpend = scoredItems.filter((i) => i.status === "PAUSAR").reduce((acc, i) => acc + i.spend, 0);
   const pctPausar = totalSpend > 0 ? Math.round((pausarSpend / totalSpend) * 100) : 0;
+  const avgCpl = totalLeads > 0 ? totalSpend / totalLeads : null;
 
   const decisionInsight =
-    pctPausar > 30 ? `${pctPausar}% da verba está em criativos de baixa performance.`
-    : countEscalar === 0 ? `Nenhum criativo com performance forte. Considere novos testes.`
-    : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade dos criativos está escalável.`
-    : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com maior score.`;
+    pctPausar > 30 ? `${pctPausar}% da verba em criativos que não trazem resultado.`
+    : countValidando === sorted.length ? `Todos os criativos ainda em validação — aguarde mais dados.`
+    : countEscalar === 0 && countValidando === 0 ? `Nenhum criativo escalável. Refine a oferta ou crie novas artes.`
+    : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade está escalável.`
+    : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com CPL abaixo da meta.`;
 
   const escalarNames = scoredItems.filter((i) => i.status === "ESCALAR").map((i) => i.displayName);
   const pausarNames = scoredItems.filter((i) => i.status === "PAUSAR").map((i) => i.displayName);
   const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
 
   const statusConfig = {
-    ESCALAR: { label: "Escalar", color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/30", bar: "bg-green-500" },
-    OTIMIZAR: { label: "Otimizar", color: "text-amber-500", bg: "bg-amber-500/10", border: "border-amber-500/30", bar: "bg-amber-500" },
-    PAUSAR: { label: "Pausar", color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/30", bar: "bg-red-500" },
+    ESCALAR:   { label: "Escalar",      color: "text-green-500",  bg: "bg-green-500/10",  border: "border-green-500/30",  bar: "bg-green-500"  },
+    OTIMIZAR:  { label: "Otimizar",     color: "text-amber-500",  bg: "bg-amber-500/10",  border: "border-amber-500/30",  bar: "bg-amber-500"  },
+    PAUSAR:    { label: "Pausar",       color: "text-red-500",    bg: "bg-red-500/10",    border: "border-red-500/30",    bar: "bg-red-500"    },
+    VALIDANDO: { label: "Em Validação", color: "text-blue-400",   bg: "bg-blue-500/10",   border: "border-blue-500/30",   bar: "bg-blue-400"   },
   };
 
   return (
@@ -1536,20 +1589,24 @@ function MetaCriativosGrid({
           </div>
           <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">CTR médio</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{averageCtr.toFixed(2)}%</span>
+            <span className="text-xs text-[var(--muted-foreground)]">Leads</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? totalLeads.toLocaleString("pt-BR") : "—"}</span>
           </div>
           <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--muted-foreground)]">CPC médio</span>
-            <span className="text-xs font-bold text-[var(--foreground)]">{averageCpc > 0 ? formatCurrency(averageCpc) : "—"}</span>
+            <span className="text-xs text-[var(--muted-foreground)]">CPL Alvo</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? formatCurrency(cplAlvo) : "—"}</span>
+          </div>
+          <div className="h-3.5 w-px bg-[var(--border)]" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[var(--muted-foreground)]">CPL Limite</span>
+            <span className="text-xs font-bold text-[var(--foreground)]">{totalLeads > 0 ? formatCurrency(cplLimite) : "—"}</span>
           </div>
           <div className="h-3.5 w-px bg-[var(--border)]" />
           <div className="ml-auto flex items-center gap-2">
             <TrendingUp className="h-3.5 w-3.5 text-[var(--primary)]" />
-            <span className="text-xs text-[var(--muted-foreground)]">Melhor:</span>
-            <span className="text-xs font-bold text-[var(--primary)]">{topCtr?.ctr.toFixed(2)}%</span>
-            <span className="hidden text-xs text-[var(--muted-foreground)] sm:inline">· {topCtr?.displayName}</span>
+            <span className="text-xs text-[var(--muted-foreground)]">CPL médio:</span>
+            <span className="text-xs font-bold text-[var(--primary)]">{avgCpl ? formatCurrency(avgCpl) : "—"}</span>
           </div>
         </div>
       </div>
@@ -1559,9 +1616,10 @@ function MetaCriativosGrid({
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-5">
           <div className="flex flex-wrap items-center justify-center gap-5">
             {([
-              { count: countEscalar, label: "Escalar", dot: "bg-green-500", color: "text-green-500", bg: "bg-green-500/8 border-green-500/20" },
-              { count: countOtimizar, label: "Otimizar", dot: "bg-amber-500", color: "text-amber-500", bg: "bg-amber-500/8 border-amber-500/20" },
-              { count: countPausar, label: "Pausar", dot: "bg-red-500", color: "text-red-500", bg: "bg-red-500/8 border-red-500/20" },
+              { count: countEscalar,   label: "Escalar",      dot: "bg-green-500", color: "text-green-500", bg: "bg-green-500/8 border-green-500/20"  },
+              { count: countOtimizar,  label: "Otimizar",     dot: "bg-amber-500", color: "text-amber-500", bg: "bg-amber-500/8 border-amber-500/20"  },
+              { count: countValidando, label: "Em Validação", dot: "bg-blue-400",  color: "text-blue-400",  bg: "bg-blue-500/8 border-blue-500/20"    },
+              { count: countPausar,    label: "Pausar",       dot: "bg-red-500",   color: "text-red-500",   bg: "bg-red-500/8 border-red-500/20"      },
             ] as const).map((s) => (
               <div key={s.label} className={`flex items-center gap-3 rounded-xl border px-6 py-3 ${s.bg}`}>
                 <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.dot}`} />
@@ -1581,14 +1639,13 @@ function MetaCriativosGrid({
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--muted)]/10">
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Investimento</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Leads</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPL</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPC</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Score</th>
                 <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
-                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Alertas</th>
+                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Diagnóstico</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]/40">
@@ -1621,14 +1678,23 @@ function MetaCriativosGrid({
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
                       {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
-                      {item.clicks > 0 ? item.clicks.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {item.leads > 0 ? (
+                        <span className={`font-semibold ${item.cpl <= cplAlvo ? "text-green-500" : item.cpl < cplLimite ? "text-amber-500" : "text-red-400"}`}>
+                          {formatCurrency(item.cpl)}
+                        </span>
+                      ) : (
+                        <span className="text-[var(--muted-foreground)]/40">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {item.leads > 0 ? (
+                        <span className="text-[var(--foreground)]">{item.cr.toFixed(1)}%</span>
+                      ) : (
+                        <span className="text-[var(--muted-foreground)]/40">—</span>
+                      )}
                     </td>
                     <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.clicks > 0 ? formatCurrency(item.cpc) : "—"}</td>
-                    <td className="px-4 py-3 text-right">
-                      <span className={`tabular-nums font-bold ${cfg.color}`}>{item.score.toFixed(1)}</span>
-                    </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
                         {cfg.label}
@@ -1639,7 +1705,7 @@ function MetaCriativosGrid({
                         {item.alerts.length === 0 ? (
                           <span className="text-[var(--muted-foreground)]/40">—</span>
                         ) : item.alerts.map((a) => (
-                          <span key={a} className="inline-flex items-center rounded border border-[var(--border)] bg-[var(--muted)]/30 px-1.5 py-0.5 text-[10px] font-medium text-[var(--muted-foreground)]">
+                          <span key={a} className="inline-flex items-center rounded border border-amber-500/30 bg-amber-500/8 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
                             {a}
                           </span>
                         ))}
@@ -1725,7 +1791,7 @@ function MetaCriativosGrid({
               <div>
                 <p className="font-bold text-[var(--foreground)]">{modalItem.displayName}</p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                  {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"} · Score {modalItem.score.toFixed(1)}{modalItem.leads > 0 ? ` · ${modalItem.leads} leads` : ""}
+                  {modalItem.mediaType === "video" ? "Vídeo" : "Imagem"}{modalItem.leads > 0 ? ` · ${modalItem.leads} lead${modalItem.leads > 1 ? "s" : ""} · CPL ${formatCurrency(modalItem.cpl)}` : " · sem leads"}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -1766,21 +1832,53 @@ function MetaCriativosGrid({
               </div>
 
               <div className="flex min-w-0 flex-1 flex-col gap-4">
+                {/* Métricas principais */}
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { label: "Investimento", value: formatCurrency(modalItem.spend), hi: false },
-                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%`, hi: false },
-                    { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—", hi: false },
-                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR"), hi: false },
-                    { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency((modalItem.spend / modalItem.impressions) * 1000) : "—", hi: false },
-                    { label: "Cliques", value: modalItem.clicks.toLocaleString("pt-BR"), hi: false },
+                    { label: "Investimento", value: formatCurrency(modalItem.spend) },
+                    { label: "Leads", value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—" },
+                    { label: "CPL", value: modalItem.leads > 0 ? formatCurrency(modalItem.cpl) : "—" },
+                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%` },
+                    { label: "CR (clique→lead)", value: modalItem.leads > 0 ? `${modalItem.cr.toFixed(1)}%` : "—" },
+                    { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—" },
+                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR") },
+                    { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency(modalItem.cpm) : "—" },
+                    { label: "Frequência", value: modalItem.frequency > 0 ? modalItem.frequency.toFixed(1) : "—" },
                   ].map((m) => (
                     <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-3 text-center">
                       <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                      <p className={`mt-1 text-sm font-bold tabular-nums ${m.hi ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>{m.value}</p>
+                      <p className="mt-1 text-sm font-bold tabular-nums text-[var(--foreground)]">{m.value}</p>
                     </div>
                   ))}
                 </div>
+                {/* Métricas de vídeo */}
+                {modalItem.mediaType === "video" && (modalItem.hookRate > 0 || modalItem.holdRate > 0) && (
+                  <div>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Performance de Vídeo</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        {
+                          label: "Hook Rate",
+                          desc: "Visualizações 3s / Impressões",
+                          value: modalItem.hookRate > 0 ? `${modalItem.hookRate.toFixed(1)}%` : "—",
+                          color: modalItem.hookRate >= 25 ? "text-green-500" : modalItem.hookRate >= 15 ? "text-amber-500" : "text-red-400",
+                        },
+                        {
+                          label: "Hold Rate",
+                          desc: "Conclusões 100% / Visualizações 3s",
+                          value: modalItem.holdRate > 0 ? `${modalItem.holdRate.toFixed(1)}%` : "—",
+                          color: modalItem.holdRate >= 20 ? "text-green-500" : modalItem.holdRate >= 10 ? "text-amber-500" : "text-red-400",
+                        },
+                      ].map((m) => (
+                        <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-3 text-center">
+                          <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                          <p className="text-[8px] text-[var(--muted-foreground)]/60">{m.desc}</p>
+                          <p className={`mt-1 text-sm font-bold tabular-nums ${m.color}`}>{m.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {modalItem.primaryText && (
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-4">
                     <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Texto do anúncio</p>
@@ -1788,12 +1886,15 @@ function MetaCriativosGrid({
                   </div>
                 )}
                 {modalItem.alerts.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {modalItem.alerts.map((a) => (
-                      <span key={a} className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/30 px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)]">
-                        {a}
-                      </span>
-                    ))}
+                  <div>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Diagnóstico</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {modalItem.alerts.map((a) => (
+                        <span key={a} className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/8 px-3 py-1.5 text-xs font-medium text-amber-400">
+                          {a}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
