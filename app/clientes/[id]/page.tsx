@@ -1550,9 +1550,21 @@ function MetaCriativosGrid({
       return { ...item, cpl, score, status, alerts: alerts.slice(0, 3), spShare };
     })
     .sort((a, b) => {
+      // Primeiro: agrupa por status (melhor → pior decisão)
       const order = { ESCALAR: 0, OTIMIZAR: 1, VALIDANDO: 2, PAUSAR: 3 };
       if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
-      return b.score - a.score;
+
+      // Dentro do mesmo status: critério de desempenho específico
+      if (a.status === "ESCALAR" || a.status === "OTIMIZAR") {
+        // Menor CPL = melhor resultado
+        return a.cpl - b.cpl;
+      }
+      if (a.status === "VALIDANDO") {
+        // Maior CTR = mais promissor
+        return b.ctr - a.ctr;
+      }
+      // PAUSAR: maior gasto = mais urgente de pausar
+      return b.spend - a.spend;
     });
 
   const countEscalar = scoredItems.filter((i) => i.status === "ESCALAR").length;
