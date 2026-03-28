@@ -254,3 +254,11 @@ model SystemConfig {
   key   String @unique
   value String
 }
+
+model Segmento {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  cor       String   @default("#6b7280")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

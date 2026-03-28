@@ -8,13 +8,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Plus, Search, LayoutList, LayoutGrid, ArrowUpRight } from "lucide-react";
 
 async function fetchClientes(): Promise<ClienteCardData[]> {
-  const res = await fetch("/api/clientes");
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
+  const [clientesRes, segmentosRes] = await Promise.all([
+    fetch("/api/clientes"),
+    fetch("/api/admin/segmentos"),
+  ]);
+  const data = await clientesRes.json().catch(() => ({}));
+  if (!clientesRes.ok) {
     const msg = (data as { error?: string }).error ?? "Falha ao carregar clientes";
     throw new Error(msg);
   }
-  return data as ClienteCardData[];
+  const segmentos: { nome: string; cor: string }[] = await segmentosRes.json().catch(() => []);
+  const segMap: Record<string, string> = {};
+  for (const s of segmentos) segMap[s.nome] = s.cor;
+  return (data as ClienteCardData[]).map((c) => ({
+    ...c,
+    segmentoCor: c.segmento ? segMap[c.segmento] ?? null : null,
+  }));
 }
 
 function normalizeForSearch(text: string): string {

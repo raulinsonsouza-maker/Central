@@ -73,6 +73,11 @@ export type FatoAnalyticsPorCanal = $Result.DefaultSelection<Prisma.$FatoAnalyti
  * 
  */
 export type SystemConfig = $Result.DefaultSelection<Prisma.$SystemConfigPayload>
+/**
+ * Model Segmento
+ * 
+ */
+export type Segmento = $Result.DefaultSelection<Prisma.$SegmentoPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -311,6 +316,16 @@ export class PrismaClient<
     * ```
     */
   get systemConfig(): Prisma.SystemConfigDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.segmento`: Exposes CRUD operations for the **Segmento** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Segmentos
+    * const segmentos = await prisma.segmento.findMany()
+    * ```
+    */
+  get segmento(): Prisma.SegmentoDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -763,7 +778,8 @@ export namespace Prisma {
     MetaAdsCriativo: 'MetaAdsCriativo',
     FatoAnalyticsDiario: 'FatoAnalyticsDiario',
     FatoAnalyticsPorCanal: 'FatoAnalyticsPorCanal',
-    SystemConfig: 'SystemConfig'
+    SystemConfig: 'SystemConfig',
+    Segmento: 'Segmento'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -782,7 +798,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cliente" | "conta" | "fatoMidiaDiario" | "agregadoMidiaSemanal" | "agregadoMidiaMensal" | "meta" | "pautaReuniao" | "googleAdsCriativo" | "metaAdsCriativo" | "fatoAnalyticsDiario" | "fatoAnalyticsPorCanal" | "systemConfig"
+      modelProps: "cliente" | "conta" | "fatoMidiaDiario" | "agregadoMidiaSemanal" | "agregadoMidiaMensal" | "meta" | "pautaReuniao" | "googleAdsCriativo" | "metaAdsCriativo" | "fatoAnalyticsDiario" | "fatoAnalyticsPorCanal" | "systemConfig" | "segmento"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1674,6 +1690,80 @@ export namespace Prisma {
           }
         }
       }
+      Segmento: {
+        payload: Prisma.$SegmentoPayload<ExtArgs>
+        fields: Prisma.SegmentoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SegmentoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SegmentoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          findFirst: {
+            args: Prisma.SegmentoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SegmentoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          findMany: {
+            args: Prisma.SegmentoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>[]
+          }
+          create: {
+            args: Prisma.SegmentoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          createMany: {
+            args: Prisma.SegmentoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SegmentoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>[]
+          }
+          delete: {
+            args: Prisma.SegmentoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          update: {
+            args: Prisma.SegmentoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          deleteMany: {
+            args: Prisma.SegmentoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SegmentoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SegmentoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>[]
+          }
+          upsert: {
+            args: Prisma.SegmentoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentoPayload>
+          }
+          aggregate: {
+            args: Prisma.SegmentoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSegmento>
+          }
+          groupBy: {
+            args: Prisma.SegmentoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SegmentoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SegmentoCountArgs<ExtArgs>
+            result: $Utils.Optional<SegmentoCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1782,6 +1872,7 @@ export namespace Prisma {
     fatoAnalyticsDiario?: FatoAnalyticsDiarioOmit
     fatoAnalyticsPorCanal?: FatoAnalyticsPorCanalOmit
     systemConfig?: SystemConfigOmit
+    segmento?: SegmentoOmit
   }
 
   /* Types for Logging */
@@ -16897,6 +16988,1001 @@ export namespace Prisma {
 
 
   /**
+   * Model Segmento
+   */
+
+  export type AggregateSegmento = {
+    _count: SegmentoCountAggregateOutputType | null
+    _min: SegmentoMinAggregateOutputType | null
+    _max: SegmentoMaxAggregateOutputType | null
+  }
+
+  export type SegmentoMinAggregateOutputType = {
+    id: string | null
+    nome: string | null
+    cor: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SegmentoMaxAggregateOutputType = {
+    id: string | null
+    nome: string | null
+    cor: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SegmentoCountAggregateOutputType = {
+    id: number
+    nome: number
+    cor: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SegmentoMinAggregateInputType = {
+    id?: true
+    nome?: true
+    cor?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SegmentoMaxAggregateInputType = {
+    id?: true
+    nome?: true
+    cor?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SegmentoCountAggregateInputType = {
+    id?: true
+    nome?: true
+    cor?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SegmentoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Segmento to aggregate.
+     */
+    where?: SegmentoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Segmentos to fetch.
+     */
+    orderBy?: SegmentoOrderByWithRelationInput | SegmentoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SegmentoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Segmentos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Segmentos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Segmentos
+    **/
+    _count?: true | SegmentoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SegmentoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SegmentoMaxAggregateInputType
+  }
+
+  export type GetSegmentoAggregateType<T extends SegmentoAggregateArgs> = {
+        [P in keyof T & keyof AggregateSegmento]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSegmento[P]>
+      : GetScalarType<T[P], AggregateSegmento[P]>
+  }
+
+
+
+
+  export type SegmentoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SegmentoWhereInput
+    orderBy?: SegmentoOrderByWithAggregationInput | SegmentoOrderByWithAggregationInput[]
+    by: SegmentoScalarFieldEnum[] | SegmentoScalarFieldEnum
+    having?: SegmentoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SegmentoCountAggregateInputType | true
+    _min?: SegmentoMinAggregateInputType
+    _max?: SegmentoMaxAggregateInputType
+  }
+
+  export type SegmentoGroupByOutputType = {
+    id: string
+    nome: string
+    cor: string
+    createdAt: Date
+    updatedAt: Date
+    _count: SegmentoCountAggregateOutputType | null
+    _min: SegmentoMinAggregateOutputType | null
+    _max: SegmentoMaxAggregateOutputType | null
+  }
+
+  type GetSegmentoGroupByPayload<T extends SegmentoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SegmentoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SegmentoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SegmentoGroupByOutputType[P]>
+            : GetScalarType<T[P], SegmentoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SegmentoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    cor?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["segmento"]>
+
+  export type SegmentoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    cor?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["segmento"]>
+
+  export type SegmentoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    nome?: boolean
+    cor?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["segmento"]>
+
+  export type SegmentoSelectScalar = {
+    id?: boolean
+    nome?: boolean
+    cor?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SegmentoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nome" | "cor" | "createdAt" | "updatedAt", ExtArgs["result"]["segmento"]>
+
+  export type $SegmentoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Segmento"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      nome: string
+      cor: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["segmento"]>
+    composites: {}
+  }
+
+  type SegmentoGetPayload<S extends boolean | null | undefined | SegmentoDefaultArgs> = $Result.GetResult<Prisma.$SegmentoPayload, S>
+
+  type SegmentoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SegmentoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SegmentoCountAggregateInputType | true
+    }
+
+  export interface SegmentoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Segmento'], meta: { name: 'Segmento' } }
+    /**
+     * Find zero or one Segmento that matches the filter.
+     * @param {SegmentoFindUniqueArgs} args - Arguments to find a Segmento
+     * @example
+     * // Get one Segmento
+     * const segmento = await prisma.segmento.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SegmentoFindUniqueArgs>(args: SelectSubset<T, SegmentoFindUniqueArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Segmento that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SegmentoFindUniqueOrThrowArgs} args - Arguments to find a Segmento
+     * @example
+     * // Get one Segmento
+     * const segmento = await prisma.segmento.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SegmentoFindUniqueOrThrowArgs>(args: SelectSubset<T, SegmentoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Segmento that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoFindFirstArgs} args - Arguments to find a Segmento
+     * @example
+     * // Get one Segmento
+     * const segmento = await prisma.segmento.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SegmentoFindFirstArgs>(args?: SelectSubset<T, SegmentoFindFirstArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Segmento that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoFindFirstOrThrowArgs} args - Arguments to find a Segmento
+     * @example
+     * // Get one Segmento
+     * const segmento = await prisma.segmento.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SegmentoFindFirstOrThrowArgs>(args?: SelectSubset<T, SegmentoFindFirstOrThrowArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Segmentos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Segmentos
+     * const segmentos = await prisma.segmento.findMany()
+     * 
+     * // Get first 10 Segmentos
+     * const segmentos = await prisma.segmento.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const segmentoWithIdOnly = await prisma.segmento.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SegmentoFindManyArgs>(args?: SelectSubset<T, SegmentoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Segmento.
+     * @param {SegmentoCreateArgs} args - Arguments to create a Segmento.
+     * @example
+     * // Create one Segmento
+     * const Segmento = await prisma.segmento.create({
+     *   data: {
+     *     // ... data to create a Segmento
+     *   }
+     * })
+     * 
+     */
+    create<T extends SegmentoCreateArgs>(args: SelectSubset<T, SegmentoCreateArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Segmentos.
+     * @param {SegmentoCreateManyArgs} args - Arguments to create many Segmentos.
+     * @example
+     * // Create many Segmentos
+     * const segmento = await prisma.segmento.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SegmentoCreateManyArgs>(args?: SelectSubset<T, SegmentoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Segmentos and returns the data saved in the database.
+     * @param {SegmentoCreateManyAndReturnArgs} args - Arguments to create many Segmentos.
+     * @example
+     * // Create many Segmentos
+     * const segmento = await prisma.segmento.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Segmentos and only return the `id`
+     * const segmentoWithIdOnly = await prisma.segmento.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SegmentoCreateManyAndReturnArgs>(args?: SelectSubset<T, SegmentoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Segmento.
+     * @param {SegmentoDeleteArgs} args - Arguments to delete one Segmento.
+     * @example
+     * // Delete one Segmento
+     * const Segmento = await prisma.segmento.delete({
+     *   where: {
+     *     // ... filter to delete one Segmento
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SegmentoDeleteArgs>(args: SelectSubset<T, SegmentoDeleteArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Segmento.
+     * @param {SegmentoUpdateArgs} args - Arguments to update one Segmento.
+     * @example
+     * // Update one Segmento
+     * const segmento = await prisma.segmento.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SegmentoUpdateArgs>(args: SelectSubset<T, SegmentoUpdateArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Segmentos.
+     * @param {SegmentoDeleteManyArgs} args - Arguments to filter Segmentos to delete.
+     * @example
+     * // Delete a few Segmentos
+     * const { count } = await prisma.segmento.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SegmentoDeleteManyArgs>(args?: SelectSubset<T, SegmentoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Segmentos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Segmentos
+     * const segmento = await prisma.segmento.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SegmentoUpdateManyArgs>(args: SelectSubset<T, SegmentoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Segmentos and returns the data updated in the database.
+     * @param {SegmentoUpdateManyAndReturnArgs} args - Arguments to update many Segmentos.
+     * @example
+     * // Update many Segmentos
+     * const segmento = await prisma.segmento.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Segmentos and only return the `id`
+     * const segmentoWithIdOnly = await prisma.segmento.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SegmentoUpdateManyAndReturnArgs>(args: SelectSubset<T, SegmentoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Segmento.
+     * @param {SegmentoUpsertArgs} args - Arguments to update or create a Segmento.
+     * @example
+     * // Update or create a Segmento
+     * const segmento = await prisma.segmento.upsert({
+     *   create: {
+     *     // ... data to create a Segmento
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Segmento we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SegmentoUpsertArgs>(args: SelectSubset<T, SegmentoUpsertArgs<ExtArgs>>): Prisma__SegmentoClient<$Result.GetResult<Prisma.$SegmentoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Segmentos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoCountArgs} args - Arguments to filter Segmentos to count.
+     * @example
+     * // Count the number of Segmentos
+     * const count = await prisma.segmento.count({
+     *   where: {
+     *     // ... the filter for the Segmentos we want to count
+     *   }
+     * })
+    **/
+    count<T extends SegmentoCountArgs>(
+      args?: Subset<T, SegmentoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SegmentoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Segmento.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SegmentoAggregateArgs>(args: Subset<T, SegmentoAggregateArgs>): Prisma.PrismaPromise<GetSegmentoAggregateType<T>>
+
+    /**
+     * Group by Segmento.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SegmentoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SegmentoGroupByArgs['orderBy'] }
+        : { orderBy?: SegmentoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SegmentoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSegmentoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Segmento model
+   */
+  readonly fields: SegmentoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Segmento.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SegmentoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Segmento model
+   */
+  interface SegmentoFieldRefs {
+    readonly id: FieldRef<"Segmento", 'String'>
+    readonly nome: FieldRef<"Segmento", 'String'>
+    readonly cor: FieldRef<"Segmento", 'String'>
+    readonly createdAt: FieldRef<"Segmento", 'DateTime'>
+    readonly updatedAt: FieldRef<"Segmento", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Segmento findUnique
+   */
+  export type SegmentoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter, which Segmento to fetch.
+     */
+    where: SegmentoWhereUniqueInput
+  }
+
+  /**
+   * Segmento findUniqueOrThrow
+   */
+  export type SegmentoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter, which Segmento to fetch.
+     */
+    where: SegmentoWhereUniqueInput
+  }
+
+  /**
+   * Segmento findFirst
+   */
+  export type SegmentoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter, which Segmento to fetch.
+     */
+    where?: SegmentoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Segmentos to fetch.
+     */
+    orderBy?: SegmentoOrderByWithRelationInput | SegmentoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Segmentos.
+     */
+    cursor?: SegmentoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Segmentos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Segmentos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Segmentos.
+     */
+    distinct?: SegmentoScalarFieldEnum | SegmentoScalarFieldEnum[]
+  }
+
+  /**
+   * Segmento findFirstOrThrow
+   */
+  export type SegmentoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter, which Segmento to fetch.
+     */
+    where?: SegmentoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Segmentos to fetch.
+     */
+    orderBy?: SegmentoOrderByWithRelationInput | SegmentoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Segmentos.
+     */
+    cursor?: SegmentoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Segmentos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Segmentos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Segmentos.
+     */
+    distinct?: SegmentoScalarFieldEnum | SegmentoScalarFieldEnum[]
+  }
+
+  /**
+   * Segmento findMany
+   */
+  export type SegmentoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter, which Segmentos to fetch.
+     */
+    where?: SegmentoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Segmentos to fetch.
+     */
+    orderBy?: SegmentoOrderByWithRelationInput | SegmentoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Segmentos.
+     */
+    cursor?: SegmentoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Segmentos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Segmentos.
+     */
+    skip?: number
+    distinct?: SegmentoScalarFieldEnum | SegmentoScalarFieldEnum[]
+  }
+
+  /**
+   * Segmento create
+   */
+  export type SegmentoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Segmento.
+     */
+    data: XOR<SegmentoCreateInput, SegmentoUncheckedCreateInput>
+  }
+
+  /**
+   * Segmento createMany
+   */
+  export type SegmentoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Segmentos.
+     */
+    data: SegmentoCreateManyInput | SegmentoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Segmento createManyAndReturn
+   */
+  export type SegmentoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * The data used to create many Segmentos.
+     */
+    data: SegmentoCreateManyInput | SegmentoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Segmento update
+   */
+  export type SegmentoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Segmento.
+     */
+    data: XOR<SegmentoUpdateInput, SegmentoUncheckedUpdateInput>
+    /**
+     * Choose, which Segmento to update.
+     */
+    where: SegmentoWhereUniqueInput
+  }
+
+  /**
+   * Segmento updateMany
+   */
+  export type SegmentoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Segmentos.
+     */
+    data: XOR<SegmentoUpdateManyMutationInput, SegmentoUncheckedUpdateManyInput>
+    /**
+     * Filter which Segmentos to update
+     */
+    where?: SegmentoWhereInput
+    /**
+     * Limit how many Segmentos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Segmento updateManyAndReturn
+   */
+  export type SegmentoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * The data used to update Segmentos.
+     */
+    data: XOR<SegmentoUpdateManyMutationInput, SegmentoUncheckedUpdateManyInput>
+    /**
+     * Filter which Segmentos to update
+     */
+    where?: SegmentoWhereInput
+    /**
+     * Limit how many Segmentos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Segmento upsert
+   */
+  export type SegmentoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Segmento to update in case it exists.
+     */
+    where: SegmentoWhereUniqueInput
+    /**
+     * In case the Segmento found by the `where` argument doesn't exist, create a new Segmento with this data.
+     */
+    create: XOR<SegmentoCreateInput, SegmentoUncheckedCreateInput>
+    /**
+     * In case the Segmento was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SegmentoUpdateInput, SegmentoUncheckedUpdateInput>
+  }
+
+  /**
+   * Segmento delete
+   */
+  export type SegmentoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+    /**
+     * Filter which Segmento to delete.
+     */
+    where: SegmentoWhereUniqueInput
+  }
+
+  /**
+   * Segmento deleteMany
+   */
+  export type SegmentoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Segmentos to delete
+     */
+    where?: SegmentoWhereInput
+    /**
+     * Limit how many Segmentos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Segmento without action
+   */
+  export type SegmentoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Segmento
+     */
+    select?: SegmentoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Segmento
+     */
+    omit?: SegmentoOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -17134,6 +18220,17 @@ export namespace Prisma {
   };
 
   export type SystemConfigScalarFieldEnum = (typeof SystemConfigScalarFieldEnum)[keyof typeof SystemConfigScalarFieldEnum]
+
+
+  export const SegmentoScalarFieldEnum: {
+    id: 'id',
+    nome: 'nome',
+    cor: 'cor',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SegmentoScalarFieldEnum = (typeof SegmentoScalarFieldEnum)[keyof typeof SegmentoScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -18463,6 +19560,58 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"SystemConfig"> | string
     key?: StringWithAggregatesFilter<"SystemConfig"> | string
     value?: StringWithAggregatesFilter<"SystemConfig"> | string
+  }
+
+  export type SegmentoWhereInput = {
+    AND?: SegmentoWhereInput | SegmentoWhereInput[]
+    OR?: SegmentoWhereInput[]
+    NOT?: SegmentoWhereInput | SegmentoWhereInput[]
+    id?: StringFilter<"Segmento"> | string
+    nome?: StringFilter<"Segmento"> | string
+    cor?: StringFilter<"Segmento"> | string
+    createdAt?: DateTimeFilter<"Segmento"> | Date | string
+    updatedAt?: DateTimeFilter<"Segmento"> | Date | string
+  }
+
+  export type SegmentoOrderByWithRelationInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    cor?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SegmentoWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    nome?: string
+    AND?: SegmentoWhereInput | SegmentoWhereInput[]
+    OR?: SegmentoWhereInput[]
+    NOT?: SegmentoWhereInput | SegmentoWhereInput[]
+    cor?: StringFilter<"Segmento"> | string
+    createdAt?: DateTimeFilter<"Segmento"> | Date | string
+    updatedAt?: DateTimeFilter<"Segmento"> | Date | string
+  }, "id" | "nome">
+
+  export type SegmentoOrderByWithAggregationInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    cor?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SegmentoCountOrderByAggregateInput
+    _max?: SegmentoMaxOrderByAggregateInput
+    _min?: SegmentoMinOrderByAggregateInput
+  }
+
+  export type SegmentoScalarWhereWithAggregatesInput = {
+    AND?: SegmentoScalarWhereWithAggregatesInput | SegmentoScalarWhereWithAggregatesInput[]
+    OR?: SegmentoScalarWhereWithAggregatesInput[]
+    NOT?: SegmentoScalarWhereWithAggregatesInput | SegmentoScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Segmento"> | string
+    nome?: StringWithAggregatesFilter<"Segmento"> | string
+    cor?: StringWithAggregatesFilter<"Segmento"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Segmento"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Segmento"> | Date | string
   }
 
   export type ClienteCreateInput = {
@@ -19837,6 +20986,62 @@ export namespace Prisma {
     value?: StringFieldUpdateOperationsInput | string
   }
 
+  export type SegmentoCreateInput = {
+    id?: string
+    nome: string
+    cor?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SegmentoUncheckedCreateInput = {
+    id?: string
+    nome: string
+    cor?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SegmentoUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    cor?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SegmentoUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    cor?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SegmentoCreateManyInput = {
+    id?: string
+    nome: string
+    cor?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SegmentoUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    cor?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SegmentoUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    cor?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -20979,6 +22184,30 @@ export namespace Prisma {
     id?: SortOrder
     key?: SortOrder
     value?: SortOrder
+  }
+
+  export type SegmentoCountOrderByAggregateInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    cor?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SegmentoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    cor?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SegmentoMinOrderByAggregateInput = {
+    id?: SortOrder
+    nome?: SortOrder
+    cor?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type AgregadoMidiaMensalCreateNestedManyWithoutClienteInput = {

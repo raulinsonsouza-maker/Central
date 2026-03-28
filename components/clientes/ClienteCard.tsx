@@ -16,6 +16,7 @@ export interface ClienteCardData {
   slug: string;
   logoUrl: string | null;
   segmento: string | null;
+  segmentoCor?: string | null;
   totalLeads: number;
   conversao: number;
   ativo?: boolean;
@@ -44,7 +45,7 @@ export function ClienteCard({ cliente }: { cliente: ClienteCardData }) {
 
   const statusConfig = getStatusConfig(cliente.conversao, cliente.totalLeads);
   const displayBadge = cliente.segmento?.trim()
-    ? { label: cliente.segmento.trim(), bg: "var(--badge-digital)", dot: "#0ea5e9" }
+    ? { label: cliente.segmento.trim(), bg: cliente.segmentoCor ?? "var(--badge-digital)", dot: "rgba(255,255,255,0.6)" }
     : semDados
       ? { label: "Sem dados", bg: "var(--muted)", dot: "var(--muted-foreground)" }
       : statusConfig;

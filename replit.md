@@ -47,6 +47,20 @@ Uses Replit's built-in PostgreSQL. Schema managed via Prisma.
 - `SYNC_CRON_TOKEN` - Token for protecting sync endpoints
 - `ADMIN_SECRET` - Token for admin area protection
 
+## Admin Features
+
+### Segment Management
+- `Segmento` Prisma model: `id`, `nome` (unique), `cor` (hex color)
+- API: `GET /api/admin/segmentos` (public), `POST /api/admin/segmentos` (admin), `PATCH/DELETE /api/admin/segmentos/[id]` (admin)
+- Admin form uses a custom Combobox with colored dots + "+" button to open `SegmentoManagerModal`
+- `SegmentoManagerModal` has two tabs: "Novo segmento" (create with color picker) and "Editar" (list, inline edit, delete)
+- Segment color is propagated to `ClienteCard` via `segmentoCor` field and used as badge background
+
+### Logo Upload
+- API: `POST /api/admin/upload-logo` (multipart), `DELETE /api/admin/upload-logo` (removes file)
+- Files saved to `public/logos/` directory, served at `/logos/<filename>`
+- `LogoUploadField` component: shows preview + "Trocar"/"Remover" buttons when logo exists; shows dashed upload button when empty
+
 ## Design System (InOut Standard)
 
 ### Section Headers

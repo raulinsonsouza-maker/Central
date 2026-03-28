@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Building2,
   CheckCircle2,
+  ChevronDown,
   Eye,
   KeyRound,
   Pencil,
@@ -18,6 +19,8 @@ import {
   X,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SegmentoManagerModal, fetchSegmentos, type Segmento } from "./SegmentoManagerModal";
+import { LogoUploadField } from "./LogoUploadField";
 
 interface ContaAdmin {
   id: string;
@@ -152,26 +155,127 @@ function FormField({
 const inputClass =
   "w-full rounded-xl border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-sm transition-colors focus:border-[var(--primary)]/40 focus:outline-none";
 
-function normalizeSegmentLabel(value: string) {
-  return value.trim().replace(/\s+/g, " ");
-}
-
 function getConta(cliente: ClienteAdmin, plataforma: "GOOGLE_ADS" | "META" | "GOOGLE_ANALYTICS") {
   return cliente.contas.find((conta) => conta.plataforma === plataforma);
 }
 
-function buildSegmentOptions(segmentos: Array<string | null | undefined>) {
-  const values = Array.from(
-    new Set(segmentos.map((segmento) => normalizeSegmentLabel(segmento ?? "")).filter(Boolean))
+function SegmentoCombobox({
+  value,
+  onChange,
+  segmentos,
+  onOpenManager,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  segmentos: Segmento[];
+  onOpenManager: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [inputVal, setInputVal] = useState(value);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setInputVal(value); }, [value]);
+
+  useEffect(() => {
+    function handle(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, []);
+
+  const filtered = segmentos.filter((s) =>
+    s.nome.toLowerCase().includes(inputVal.toLowerCase())
   );
-  return values.sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  const selectedSegmento = segmentos.find((s) => s.nome === value);
+
+  function select(nome: string) {
+    onChange(nome);
+    setInputVal(nome);
+    setOpen(false);
+  }
+
+  function handleInput(v: string) {
+    setInputVal(v);
+    onChange(v);
+    setOpen(true);
+  }
+
+  return (
+    <div ref={ref} className="relative flex items-center gap-2">
+      <div className="relative flex-1">
+        {selectedSegmento && !open && (
+          <span
+            className="pointer-events-none absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 rounded-sm"
+            style={{ backgroundColor: selectedSegmento.cor }}
+          />
+        )}
+        <input
+          value={inputVal}
+          onChange={(e) => handleInput(e.target.value)}
+          onFocus={() => setOpen(true)}
+          placeholder="Selecionar ou digitar segmento..."
+          className={`${inputClass} ${selectedSegmento && !open ? "pl-8" : ""} pr-8`}
+        />
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]"
+        >
+          <ChevronDown className="h-4 w-4" />
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={onOpenManager}
+        title="Gerenciar segmentos"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] transition hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5 hover:text-[var(--primary)]"
+      >
+        <Plus className="h-4 w-4" />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 max-h-52 w-[calc(100%-2.75rem)] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xl">
+          {filtered.length === 0 && (
+            <div className="px-4 py-3 text-xs text-[var(--muted-foreground)]">
+              {inputVal ? `Pressione + para criar "${inputVal}"` : "Nenhum segmento cadastrado"}
+            </div>
+          )}
+          {value && (
+            <button
+              type="button"
+              onMouseDown={() => select("")}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-xs text-[var(--muted-foreground)] transition hover:bg-[var(--muted)]"
+            >
+              <X className="h-3 w-3" /> Limpar seleção
+            </button>
+          )}
+          {filtered.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onMouseDown={() => select(s.nome)}
+              className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition hover:bg-[var(--muted)] ${
+                value === s.nome ? "bg-[var(--primary)]/5 font-semibold" : ""
+              }`}
+            >
+              <span className="h-3 w-3 shrink-0 rounded-sm" style={{ backgroundColor: s.cor }} />
+              {s.nome}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ClienteForm({
   title,
   submitLabel,
   initialValues,
-  segmentOptions,
+  segmentos,
+  adminToken,
   pending,
   error,
   success,
@@ -181,7 +285,8 @@ function ClienteForm({
   title: string;
   submitLabel: string;
   initialValues: ClientePayload;
-  segmentOptions: string[];
+  segmentos: Segmento[];
+  adminToken: string;
   pending: boolean;
   error: string;
   success: string;
@@ -207,168 +312,182 @@ function ClienteForm({
   const [syncAfterSave, setSyncAfterSave] = useState(
     initialValues.syncAfterCreate ?? initialValues.syncNow ?? true
   );
+  const [showSegmentoManager, setShowSegmentoManager] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <Card className="w-full max-w-2xl overflow-hidden rounded-2xl border-[var(--border)]">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-[var(--border)] bg-gradient-to-b from-[var(--primary)]/[0.03] to-transparent pb-5">
-          <div>
-            <CardTitle>{title}</CardTitle>
-            <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-              Configure os IDs de conta que alimentam o dashboard.
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </CardHeader>
-        <CardContent className="max-h-[75vh] space-y-5 overflow-y-auto pt-5">
-          <FormField label="Nome" required>
-            <input value={nome} onChange={(e) => setNome(e.target.value)} className={inputClass} />
-          </FormField>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="ID conta Google Ads" hint="Pode colar com ou sem hífens.">
-              <input
-                value={googleAdsAccountId}
-                onChange={(e) => setGoogleAdsAccountId(e.target.value)}
-                placeholder="299-043-1301"
-                className={inputClass}
-              />
-            </FormField>
-            <FormField label="MCC Google (login-customer-id)" hint="Ex.: 3830547260 ou 4896650578">
-              <input
-                value={googleAdsLoginCustomerId}
-                onChange={(e) => setGoogleAdsLoginCustomerId(e.target.value)}
-                placeholder="3830547260"
-                className={inputClass}
-              />
-            </FormField>
-            <FormField label="ID conta Meta Ads" hint="Pode colar com ou sem act_.">
-              <input
-                value={metaAdsAccountId}
-                onChange={(e) => setMetaAdsAccountId(e.target.value)}
-                placeholder="320901911416777"
-                className={inputClass}
-              />
-            </FormField>
-            <FormField label="GA4 Property ID" hint="ID numérico da propriedade GA4 (Admin > Propriedade).">
-              <input
-                value={ga4PropertyId}
-                onChange={(e) => setGa4PropertyId(e.target.value)}
-                placeholder="456789012"
-                className={inputClass}
-              />
-            </FormField>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="URL da logo">
-              <input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} className={inputClass} />
-            </FormField>
-            <FormField label="Segmento">
-              <input list="segmentos-existentes" value={segmento} onChange={(e) => setSegmento(e.target.value)} className={inputClass} />
-              <datalist id="segmentos-existentes">
-                {segmentOptions.map((option) => (
-                  <option key={option} value={option} />
-                ))}
-              </datalist>
-            </FormField>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Orçamento mensal Google (R$)">
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={orcamentoGoogle}
-                onChange={(e) => setOrcamentoGoogle(e.target.value)}
-                className={inputClass}
-              />
-            </FormField>
-            <FormField label="Orçamento mensal Meta (R$)">
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={orcamentoMeta}
-                onChange={(e) => setOrcamentoMeta(e.target.value)}
-                className={inputClass}
-              />
-            </FormField>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-5 rounded-xl bg-[var(--muted)]/30 px-4 py-3">
-            <label className="flex cursor-pointer items-center gap-2.5">
-              <input
-                type="checkbox"
-                checked={ativo}
-                onChange={(e) => setAtivo(e.target.checked)}
-                className="h-4 w-4 rounded border-[var(--border)] accent-[var(--primary)]"
-              />
-              <span className="text-sm text-[var(--foreground)]">{ativo ? "Ativo" : "Churn"}</span>
-            </label>
-            <label className="flex cursor-pointer items-center gap-2.5">
-              <input
-                type="checkbox"
-                checked={syncAfterSave}
-                onChange={(e) => setSyncAfterSave(e.target.checked)}
-                className="h-4 w-4 rounded border-[var(--border)] accent-[var(--primary)]"
-              />
-              <span className="text-sm text-[var(--foreground)]">Sincronizar após salvar</span>
-            </label>
-          </div>
-
-          {error && (
-            <div className="flex items-center gap-2 rounded-lg bg-[var(--accent)]/10 px-3 py-2 text-sm text-[var(--accent)]">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              {error}
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <Card className="w-full max-w-2xl overflow-hidden rounded-2xl border-[var(--border)]">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[var(--border)] bg-gradient-to-b from-[var(--primary)]/[0.03] to-transparent pb-5">
+            <div>
+              <CardTitle>{title}</CardTitle>
+              <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+                Configure os IDs de conta que alimentam o dashboard.
+              </p>
             </div>
-          )}
-          {success && (
-            <div className="flex items-center gap-2 rounded-lg bg-[var(--success)]/10 px-3 py-2 text-sm text-[var(--success)]">
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              {success}
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2 border-t border-[var(--border)] pt-4">
             <button
               onClick={onClose}
-              className="rounded-xl border border-[var(--border)] px-5 py-2.5 text-sm font-medium text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
             >
-              Cancelar
+              <X className="h-4 w-4" />
             </button>
-            <button
-              onClick={() =>
-                onSubmit({
-                  nome: nome.trim(),
-                  logoUrl: logoUrl.trim() || undefined,
-                  segmento: normalizeSegmentLabel(segmento),
-                  ativo,
-                  orcamentoMidiaGoogleMensal: orcamentoGoogle ? Number(orcamentoGoogle) : null,
-                  orcamentoMidiaMetaMensal: orcamentoMeta ? Number(orcamentoMeta) : null,
-                  googleAdsAccountId: googleAdsAccountId.trim() || null,
-                  googleAdsLoginCustomerId: googleAdsLoginCustomerId.trim() || null,
-                  metaAdsAccountId: metaAdsAccountId.trim() || null,
-                  ga4PropertyId: ga4PropertyId.trim() || null,
-                  syncAfterCreate: syncAfterSave,
-                  syncNow: syncAfterSave,
-                })
-              }
-              disabled={pending}
-              className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary-foreground)] transition hover:opacity-90 disabled:opacity-50"
-            >
-              {pending ? "Salvando..." : submitLabel}
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </CardHeader>
+          <CardContent className="max-h-[75vh] space-y-5 overflow-y-auto pt-5">
+            <FormField label="Nome" required>
+              <input value={nome} onChange={(e) => setNome(e.target.value)} className={inputClass} />
+            </FormField>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField label="ID conta Google Ads" hint="Pode colar com ou sem hífens.">
+                <input
+                  value={googleAdsAccountId}
+                  onChange={(e) => setGoogleAdsAccountId(e.target.value)}
+                  placeholder="299-043-1301"
+                  className={inputClass}
+                />
+              </FormField>
+              <FormField label="MCC Google (login-customer-id)" hint="Ex.: 3830547260 ou 4896650578">
+                <input
+                  value={googleAdsLoginCustomerId}
+                  onChange={(e) => setGoogleAdsLoginCustomerId(e.target.value)}
+                  placeholder="3830547260"
+                  className={inputClass}
+                />
+              </FormField>
+              <FormField label="ID conta Meta Ads" hint="Pode colar com ou sem act_.">
+                <input
+                  value={metaAdsAccountId}
+                  onChange={(e) => setMetaAdsAccountId(e.target.value)}
+                  placeholder="320901911416777"
+                  className={inputClass}
+                />
+              </FormField>
+              <FormField label="GA4 Property ID" hint="ID numérico da propriedade GA4 (Admin > Propriedade).">
+                <input
+                  value={ga4PropertyId}
+                  onChange={(e) => setGa4PropertyId(e.target.value)}
+                  placeholder="456789012"
+                  className={inputClass}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField label="Logo do cliente">
+                <LogoUploadField
+                  value={logoUrl}
+                  onChange={setLogoUrl}
+                  adminToken={adminToken}
+                />
+              </FormField>
+              <FormField label="Segmento">
+                <SegmentoCombobox
+                  value={segmento}
+                  onChange={setSegmento}
+                  segmentos={segmentos}
+                  onOpenManager={() => setShowSegmentoManager(true)}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField label="Orçamento mensal Google (R$)">
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={orcamentoGoogle}
+                  onChange={(e) => setOrcamentoGoogle(e.target.value)}
+                  className={inputClass}
+                />
+              </FormField>
+              <FormField label="Orçamento mensal Meta (R$)">
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={orcamentoMeta}
+                  onChange={(e) => setOrcamentoMeta(e.target.value)}
+                  className={inputClass}
+                />
+              </FormField>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-5 rounded-xl bg-[var(--muted)]/30 px-4 py-3">
+              <label className="flex cursor-pointer items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  checked={ativo}
+                  onChange={(e) => setAtivo(e.target.checked)}
+                  className="h-4 w-4 rounded border-[var(--border)] accent-[var(--primary)]"
+                />
+                <span className="text-sm text-[var(--foreground)]">{ativo ? "Ativo" : "Churn"}</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  checked={syncAfterSave}
+                  onChange={(e) => setSyncAfterSave(e.target.checked)}
+                  className="h-4 w-4 rounded border-[var(--border)] accent-[var(--primary)]"
+                />
+                <span className="text-sm text-[var(--foreground)]">Sincronizar após salvar</span>
+              </label>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 rounded-lg bg-[var(--accent)]/10 px-3 py-2 text-sm text-[var(--accent)]">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="flex items-center gap-2 rounded-lg bg-[var(--success)]/10 px-3 py-2 text-sm text-[var(--success)]">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                {success}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 border-t border-[var(--border)] pt-4">
+              <button
+                onClick={onClose}
+                className="rounded-xl border border-[var(--border)] px-5 py-2.5 text-sm font-medium text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() =>
+                  onSubmit({
+                    nome: nome.trim(),
+                    logoUrl: logoUrl.trim() || undefined,
+                    segmento: segmento.trim() || undefined,
+                    ativo,
+                    orcamentoMidiaGoogleMensal: orcamentoGoogle ? Number(orcamentoGoogle) : null,
+                    orcamentoMidiaMetaMensal: orcamentoMeta ? Number(orcamentoMeta) : null,
+                    googleAdsAccountId: googleAdsAccountId.trim() || null,
+                    googleAdsLoginCustomerId: googleAdsLoginCustomerId.trim() || null,
+                    metaAdsAccountId: metaAdsAccountId.trim() || null,
+                    ga4PropertyId: ga4PropertyId.trim() || null,
+                    syncAfterCreate: syncAfterSave,
+                    syncNow: syncAfterSave,
+                  })
+                }
+                disabled={pending}
+                className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary-foreground)] transition hover:opacity-90 disabled:opacity-50"
+              >
+                {pending ? "Salvando..." : submitLabel}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {showSegmentoManager && (
+        <SegmentoManagerModal
+          adminToken={adminToken}
+          onClose={() => setShowSegmentoManager(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -390,6 +509,17 @@ export default function AdminClientesPage() {
     queryFn: () => fetchAdminClientes(adminToken || undefined),
     retry: (_, err) => (err instanceof Error && err.message === "Unauthorized" ? false : true),
   });
+
+  const { data: segmentos = [] } = useQuery({
+    queryKey: ["segmentos"],
+    queryFn: fetchSegmentos,
+  });
+
+  const segmentoMap = useMemo(() => {
+    const map: Record<string, Segmento> = {};
+    for (const s of segmentos) map[s.nome] = s;
+    return map;
+  }, [segmentos]);
 
   const createMutation = useMutation({
     mutationFn: (body: ClientePayload) => createCliente(body, adminToken || undefined),
@@ -464,22 +594,15 @@ export default function AdminClientesPage() {
   });
 
   const unauthorized = error instanceof Error && error.message === "Unauthorized";
-  const segmentOptions = useMemo(
-    () => buildSegmentOptions((clientes ?? []).map((cliente) => cliente.segmento)),
-    [clientes]
-  );
+
   const filteredClientes = useMemo(() => {
     if (!clientes) return [];
-
     const base =
       filterStatus === "ativos"
-        ? clientes.filter((cliente) => cliente.ativo)
-        : clientes.filter((cliente) => !cliente.ativo);
-
+        ? clientes.filter((c) => c.ativo)
+        : clientes.filter((c) => !c.ativo);
     return [...base].sort((a, b) => {
-      if (a.ativo !== b.ativo) {
-        return a.ativo ? -1 : 1; // ativos sempre primeiro
-      }
+      if (a.ativo !== b.ativo) return a.ativo ? -1 : 1;
       return a.nome.localeCompare(b.nome, "pt-BR");
     });
   }, [clientes, filterStatus]);
@@ -524,8 +647,9 @@ export default function AdminClientesPage() {
   }
 
   const total = clientes?.length ?? 0;
-  const ativos = clientes?.filter((cliente) => cliente.ativo).length ?? 0;
+  const ativos = clientes?.filter((c) => c.ativo).length ?? 0;
   const churn = total - ativos;
+
   return (
     <main className="space-y-8 pb-12">
       <section className="space-y-5">
@@ -586,10 +710,7 @@ export default function AdminClientesPage() {
             { label: "Ativos", value: ativos },
             { label: "Churn", value: churn },
           ].map((item) => (
-            <div
-              key={item.label}
-              className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3"
-            >
+            <div key={item.label} className="rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
                 {item.label}
               </p>
@@ -627,9 +748,9 @@ export default function AdminClientesPage() {
                   ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
                   : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
-              >
-                {f === "ativos" ? "Ativos" : "Churn"}
-              </button>
+            >
+              {f === "ativos" ? "Ativos" : "Churn"}
+            </button>
           ))}
         </div>
         <div className="h-px flex-1 min-w-[60px] bg-[var(--border)]" />
@@ -655,6 +776,8 @@ export default function AdminClientesPage() {
               .map((part) => part[0])
               .join("")
               .toUpperCase();
+            const seg = cliente.segmento ? segmentoMap[cliente.segmento] : null;
+            const segCor = seg?.cor ?? "#6b7280";
 
             return (
               <li
@@ -670,6 +793,7 @@ export default function AdminClientesPage() {
                         width={40}
                         height={40}
                         className="h-10 w-10 shrink-0 rounded-xl object-contain"
+                        unoptimized
                       />
                     ) : (
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--muted)] to-[var(--border)] text-sm font-bold text-[var(--muted-foreground)]">
@@ -686,7 +810,10 @@ export default function AdminClientesPage() {
 
                       {cliente.segmento && (
                         <div>
-                          <span className="inline-flex items-center rounded-full bg-[var(--badge-digital)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                          <span
+                            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
+                            style={{ backgroundColor: segCor }}
+                          >
                             {cliente.segmento}
                           </span>
                         </div>
@@ -767,7 +894,8 @@ export default function AdminClientesPage() {
           title="Novo cliente"
           submitLabel="Criar cliente"
           initialValues={{ nome: "", ativo: true, syncAfterCreate: true }}
-          segmentOptions={segmentOptions}
+          segmentos={segmentos}
+          adminToken={adminToken}
           pending={createMutation.isPending}
           error={formError}
           success=""
@@ -801,7 +929,8 @@ export default function AdminClientesPage() {
             orcamentoMidiaGoogleMensal: editing.orcamentoMidiaGoogleMensal ?? null,
             orcamentoMidiaMetaMensal: editing.orcamentoMidiaMetaMensal ?? null,
           }}
-          segmentOptions={segmentOptions}
+          segmentos={segmentos}
+          adminToken={adminToken}
           pending={updateMutation.isPending}
           error={editError}
           success={editSuccess}
