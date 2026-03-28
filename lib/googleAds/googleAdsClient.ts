@@ -229,3 +229,67 @@ export async function fetchAdCreatives(
   const results = await customer.query(query);
   return results as unknown as GoogleAdsAdCreativeRow[];
 }
+
+export interface GoogleAdsAccountBudget {
+  approvedSpendingLimit: number | null;
+  amountServed: number;
+  remaining: number | null;
+  currency: string;
+}
+
+/**
+ * Fetch account-level budget info for a Google Ads customer.
+ * Uses the account_budget resource (available for accounts with a billing setup).
+ * Returns null when no account-level budget is configured.
+ */
+export async function fetchAccountBudget(
+  customerId: string,
+  loginCustomerId?: string | null
+): Promise<GoogleAdsAccountBudget | null> {
+  const { client, refreshToken, loginCustomerId: defaultLoginCustomerId } = await getClientAndRefreshToken();
+  const customer = createCustomer(client, {
+    customerId,
+    refreshToken,
+    loginCustomerId,
+    defaultLoginCustomerId,
+  });
+
+  try {
+    const rows = await customer.query(`
+      SELECT
+        account_budget.approved_spending_limit_micros,
+        account_budget.amount_served_micros,
+        account_budget.status
+      FROM account_budget
+      WHERE account_budget.status = 'APPROVED'
+      LIMIT 1
+    `);
+
+    if (!rows || rows.length === 0) return null;
+
+    const row = rows[0] as {
+      account_budget?: {
+        approved_spending_limit_micros?: string | number;
+        amount_served_micros?: string | number;
+      };
+    };
+
+    const approved = row.account_budget?.approved_spending_limit_micros;
+    const served = row.account_budget?.amount_served_micros;
+
+    const approvedMicros = approved != null ? Number(approved) : null;
+    const servedMicros = served != null ? Number(served) : 0;
+
+    const approvedValue = approvedMicros != null ? approvedMicros / 1_000_000 : null;
+    const servedValue = servedMicros / 1_000_000;
+
+    return {
+      approvedSpendingLimit: approvedValue,
+      amountServed: servedValue,
+      remaining: approvedValue != null ? Math.max(0, approvedValue - servedValue) : null,
+      currency: "BRL",
+    };
+  } catch {
+    return null;
+  }
+}

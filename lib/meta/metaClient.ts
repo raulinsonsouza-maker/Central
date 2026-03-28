@@ -154,6 +154,32 @@ export async function fetchAdAccounts(token: string): Promise<MetaAdAccount[]> {
   return all;
 }
 
+export interface MetaAccountBalance {
+  balance: number;
+  currency: string;
+  spendCap: number | null;
+}
+
+/**
+ * Fetch the current balance (credit available) for a Meta ad account.
+ * Returns balance in the account's currency units (e.g. BRL R$).
+ * Note: balance is only meaningful for pre-paid accounts; post-paid accounts typically return 0.
+ */
+export async function fetchAccountBalance(accountId: string, token: string): Promise<MetaAccountBalance> {
+  const actId = ensureActPrefix(accountId);
+  const url = `${GRAPH_BASE}/${actId}?fields=balance,currency,spend_cap&access_token=${encodeURIComponent(token)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  const data = await res.json();
+  if (!res.ok || data.error) {
+    throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+  }
+  return {
+    balance: data.balance ? parseFloat(data.balance) / 100 : 0,
+    currency: data.currency ?? "BRL",
+    spendCap: data.spend_cap ? parseFloat(data.spend_cap) / 100 : null,
+  };
+}
+
 /**
  * Fetch account-level insights broken down by day.
  * @param accountId - e.g. act_237828749660910 or 237828749660910

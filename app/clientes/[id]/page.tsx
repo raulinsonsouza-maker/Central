@@ -447,6 +447,28 @@ export default function ClienteDetailPage() {
     enabled: !!id && (canal === "geral" || subView === "dados"),
   });
 
+  const { data: saldoMeta } = useQuery<{ saldo: number | null; moeda?: string; spendCap?: number | null; motivo?: string }>({
+    queryKey: ["saldo-meta", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/clientes/${id}/saldo?canal=meta`);
+      return res.json();
+    },
+    enabled: !!id && canal === "meta",
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: saldoGoogle } = useQuery<{ saldo: number | null; totalAprovado?: number | null; utilizado?: number; moeda?: string; motivo?: string }>({
+    queryKey: ["saldo-google", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/clientes/${id}/saldo?canal=google`);
+      return res.json();
+    },
+    enabled: !!id && canal === "google",
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   const series = midia?.series ?? [];
   const latestFiveSeries = series.slice(-5);
   const chartConversionKey = canal === "google" ? "Conversões" : "Leads";
@@ -589,23 +611,43 @@ function formatPercentage(value: number) {
             </p>
           </div>
 
-          <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
-            {(["geral", "meta", "google"] as const).map((c) => (
-              <button
-                key={c}
-                onClick={() => {
-                  setCanal(c);
-                  setSubView("dados");
-                }}
-                className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                  canal === c
-                    ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
-                    : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
-                }`}
-              >
-                {c === "geral" ? "Geral" : c === "meta" ? "META" : "Google"}
-              </button>
-            ))}
+          <div className="flex flex-col items-end gap-2">
+            {canal !== "geral" && (() => {
+              const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
+              const label = canal === "meta" ? "Saldo META" : "Saldo Google";
+              return (
+                <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{label}</span>
+                  {saldo === undefined ? (
+                    <span className="text-[10px] text-[var(--muted-foreground)] animate-pulse">carregando…</span>
+                  ) : saldo?.saldo != null ? (
+                    <span className="text-xs font-bold tabular-nums text-[var(--foreground)]">
+                      {formatCurrency(saldo.saldo)}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-[var(--muted-foreground)]">—</span>
+                  )}
+                </div>
+              );
+            })()}
+            <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
+              {(["geral", "meta", "google"] as const).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => {
+                    setCanal(c);
+                    setSubView("dados");
+                  }}
+                  className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+                    canal === c
+                      ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
+                      : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {c === "geral" ? "Geral" : c === "meta" ? "META" : "Google"}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
