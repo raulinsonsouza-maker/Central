@@ -191,64 +191,54 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
           </div>
         </CardHeader>
 
-        {/* ── KPI row ── */}
-        <CardContent className="border-b border-[var(--border)]/60 px-6 py-5 sm:px-8">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            <KpiTile label="Impressões"   value={fmt(totals.impressions)}                                      icon={Eye}              />
-            <KpiTile label="Cliques"      value={fmt(totals.clicks)}                                           icon={MousePointerClick} />
-            <KpiTile label="CTR Médio"    value={`${fmt(totals.ctr, 2)}%`}                                     icon={Percent}          />
-            <KpiTile label="Investimento" value={formatCurrency(totals.cost)}                                  icon={Wallet}           />
-            <KpiTile label="Conversões"   value={fmt(totals.conversions, 1)}                                   icon={TrendingUp}       accent />
-            <KpiTile label="CPL Médio"    value={totals.cpl > 0 ? formatCurrency(totals.cpl) : "—"}           icon={TrendingUp}       accent />
-          </div>
-        </CardContent>
+        {/* ── All content in one CardContent — no internal divider lines ── */}
+        <CardContent className="space-y-5 px-5 pb-6 pt-5 sm:px-8">
 
-        {/* ── Decision strip ── */}
-        <CardContent className="border-b border-[var(--border)]/60 px-0 py-0">
-          <div className="grid grid-cols-2 sm:grid-cols-4">
+          {/* KPI row */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            <KpiTile label="Impressões"   value={fmt(totals.impressions)}                            icon={Eye}               />
+            <KpiTile label="Cliques"      value={fmt(totals.clicks)}                                 icon={MousePointerClick}  />
+            <KpiTile label="CTR Médio"    value={`${fmt(totals.ctr, 2)}%`}                           icon={Percent}           />
+            <KpiTile label="Investimento" value={formatCurrency(totals.cost)}                        icon={Wallet}            />
+            <KpiTile label="Conversões"   value={fmt(totals.conversions, 1)}                         icon={TrendingUp}        accent />
+            <KpiTile label="CPL Médio"    value={totals.cpl > 0 ? formatCurrency(totals.cpl) : "—"} icon={TrendingUp}        accent />
+          </div>
+
+          {/* Decision pills */}
+          <div className="flex flex-wrap items-center gap-2">
             {([
-              { count: countEscalar,  label: "Escalar",  dot: "bg-green-500", color: "text-green-500" },
-              { count: countOtimizar, label: "Otimizar", dot: "bg-amber-500", color: "text-amber-500" },
-              { count: countRevisar,  label: "Revisar",  dot: "bg-blue-400",  color: "text-blue-400"  },
-              { count: countPausar,   label: "Pausar",   dot: "bg-red-500",   color: "text-red-500"   },
-            ] as const).map((s, idx) => (
+              { count: countEscalar,  label: "Escalar",  dot: "bg-green-500", ring: "border-green-500/30 bg-green-500/10 hover:bg-green-500/20", active: "!bg-green-500/20 !border-green-500/50", text: "text-green-500" },
+              { count: countOtimizar, label: "Otimizar", dot: "bg-amber-500", ring: "border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20", active: "!bg-amber-500/20 !border-amber-500/50", text: "text-amber-500" },
+              { count: countRevisar,  label: "Revisar",  dot: "bg-blue-400",  ring: "border-blue-400/30  bg-blue-400/10  hover:bg-blue-400/20",  active: "!bg-blue-400/20  !border-blue-400/50",  text: "text-blue-400"  },
+              { count: countPausar,   label: "Pausar",   dot: "bg-red-500",   ring: "border-red-500/30   bg-red-500/10   hover:bg-red-500/20",   active: "!bg-red-500/20   !border-red-500/50",   text: "text-red-500"   },
+            ] as const).map((s) => (
               <button
                 key={s.label}
                 onClick={() => setFilterDecision((v) => v === s.label.toLowerCase() ? "todos" : s.label.toLowerCase())}
-                className={`flex flex-col items-center gap-1.5 border-[var(--border)]/40 py-4 transition-all hover:bg-white/[0.03]
-                  ${idx > 0 ? "border-l" : ""}
-                  ${filterDecision === s.label.toLowerCase() ? "bg-white/[0.05]" : ""}
-                `}
+                className={`flex items-center gap-2 rounded-full border px-4 py-2 transition-all ${s.ring} ${filterDecision === s.label.toLowerCase() ? s.active : ""}`}
               >
-                <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`} />
-                  <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
-                </div>
-                <span className={`text-[11px] font-semibold uppercase tracking-wider ${s.color}`}>{s.label}</span>
+                <span className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`} />
+                <span className={`text-xl font-black tabular-nums leading-none ${s.text}`}>{s.count}</span>
+                <span className={`text-[11px] font-semibold uppercase tracking-wider ${s.text}`}>{s.label}</span>
               </button>
             ))}
+            {filterDecision !== "todos" && (
+              <button
+                onClick={() => setFilterDecision("todos")}
+                className="rounded-full border border-[var(--border)] px-3 py-2 text-[10px] text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)] hover:text-[var(--primary)]"
+              >
+                Limpar filtro
+              </button>
+            )}
+            {filterDecision === "todos" && (
+              <span className="text-[11px] text-[var(--muted-foreground)]">
+                · Clique para filtrar
+              </span>
+            )}
           </div>
-          <div className="border-t border-[var(--border)]/40 px-6 py-2">
-            <p className="text-center text-[11px] text-[var(--muted-foreground)]">
-              {filterDecision !== "todos"
-                ? `Mostrando: ${filterDecision} · ${filtered.length} termo${filtered.length !== 1 ? "s" : ""} · `
-                : "Clique em uma categoria para filtrar · "}
-              {filterDecision !== "todos" && (
-                <button
-                  onClick={() => setFilterDecision("todos")}
-                  className="underline underline-offset-2 hover:text-[var(--foreground)]"
-                >
-                  limpar
-                </button>
-              )}
-            </p>
-          </div>
-        </CardContent>
 
-        {/* ── Table ── */}
-        <CardContent className="px-3 pb-4 pt-4 sm:px-5 sm:pb-5">
-          {/* Sub-header */}
-          <div className="mb-3 flex items-center gap-2 px-1">
+          {/* Table sub-header */}
+          <div className="flex items-center gap-2">
             <span className="h-3 w-[2px] rounded-full bg-[linear-gradient(180deg,var(--accent),var(--primary))]" />
             <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
               Detalhamento de palavras-chave
