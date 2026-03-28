@@ -30,8 +30,7 @@ export function mapCampaignRowToFatoPayload(row: GoogleAdsCampaignRow): GoogleAd
 
   const impressoes = parseNum(metrics?.impressions);
   const cliques = parseNum(metrics?.clicks);
-  const conversoes =
-    parseNum(metrics?.conversions) || parseNum(metrics?.all_conversions) || parseNum(metrics?.allConversions);
+  const conversoes = parseNum(metrics?.conversions);
   const faturamento =
     parseNum(metrics?.conversions_value ?? (metrics as Record<string, unknown>)?.conversionsValue) ||
     parseNum(metrics?.all_conversions_value ?? (metrics as Record<string, unknown>)?.allConversionsValue);
@@ -139,8 +138,7 @@ export function mapAdCreativeRowToPayload(row: GoogleAdsAdCreativeRow): GoogleAd
 
   const impressoes = parseNum(metrics?.impressions);
   const cliques = parseNum(metrics?.clicks);
-  const conversoes =
-    parseNum(metrics?.conversions) || parseNum(metrics?.all_conversions) || parseNum(metrics?.allConversions);
+  const conversoes = parseNum(metrics?.conversions);
 
   const dateStr = segments?.date;
   const data = dateStr ? new Date(String(dateStr) + "T12:00:00Z") : new Date();
