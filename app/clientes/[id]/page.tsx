@@ -1582,8 +1582,6 @@ function MetaCriativosGrid({
     : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade está escalável.`
     : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com CPL abaixo da meta.`;
 
-  const escalarNames = scoredItems.filter((i) => i.status === "ESCALAR").map((i) => i.displayName);
-  const pausarNames = scoredItems.filter((i) => i.status === "PAUSAR").map((i) => i.displayName);
   const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
 
   const statusConfig = {
@@ -1774,32 +1772,124 @@ function MetaCriativosGrid({
         </div>
       </div>
 
-      {/* 5. Ações recomendadas */}
-      <div className="mx-auto max-w-[1280px] px-6">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] px-5 py-4">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Ações recomendadas</p>
-          <div className="space-y-1.5">
-            <p className="text-xs">
-              <span className="font-semibold text-green-500">Escalar: </span>
-              {escalarNames.length > 0
-                ? <span className="text-[var(--foreground)]">{escalarNames.join(", ")}</span>
-                : <span className="text-[var(--muted-foreground)]/40">—</span>}
-            </p>
-            <p className="text-xs">
-              <span className="font-semibold text-red-500">Pausar: </span>
-              {pausarNames.length > 0
-                ? <span className="text-[var(--foreground)]">{pausarNames.join(", ")}</span>
-                : <span className="text-[var(--muted-foreground)]/40">—</span>}
-            </p>
-            <p className="text-xs">
-              <span className="font-semibold text-[var(--muted-foreground)]">Ajuste: </span>
-              {pausarNames.length > 0 && escalarNames.length > 0
-                ? <span className="text-[var(--muted-foreground)]">Redistribuir verba dos criativos pausados para os top performers</span>
-                : <span className="text-[var(--muted-foreground)]/40">—</span>}
-            </p>
+      {/* 5. Plano de ação */}
+      {(() => {
+        const acaoEscalar = scoredItems.filter((i) => i.status === "ESCALAR");
+        const acaoPausar  = scoredItems.filter((i) => i.status === "PAUSAR");
+        const acaoOtimizar = scoredItems.filter((i) => i.status === "OTIMIZAR");
+        const verbaPausar = acaoPausar.reduce((acc, i) => acc + i.spend, 0);
+        const hasPlan = acaoEscalar.length > 0 || acaoPausar.length > 0 || acaoOtimizar.length > 0;
+        if (!hasPlan) return null;
+        return (
+          <div className="mx-auto max-w-[1280px] px-6">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden">
+              <div className="px-5 py-3 border-b border-[var(--border)]">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Plano de ação</p>
+              </div>
+              <div className="p-5 space-y-4">
+
+                {/* Escalar */}
+                {acaoEscalar.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-green-500">↑ Aumentar verba</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {acaoEscalar.map((item) => (
+                        <button
+                          key={item.ad.id}
+                          type="button"
+                          onClick={() => setModalAdId(item.ad.id)}
+                          className="flex items-center gap-3 rounded-xl border border-green-500/25 bg-green-500/6 px-4 py-3 text-left transition hover:border-green-500/50 hover:bg-green-500/10"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-green-500 text-[11px] font-bold">↑</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
+                            <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                              CPL {formatCurrency(item.cpl)} · {item.leads} lead{item.leads > 1 ? "s" : ""} · CTR {item.ctr.toFixed(2)}%
+                            </p>
+                          </div>
+                          <span className="shrink-0 text-[10px] font-medium text-green-500">Top performer</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Otimizar */}
+                {acaoOtimizar.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-amber-500">⟳ Otimizar</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {acaoOtimizar.map((item) => (
+                        <button
+                          key={item.ad.id}
+                          type="button"
+                          onClick={() => setModalAdId(item.ad.id)}
+                          className="flex items-center gap-3 rounded-xl border border-amber-500/25 bg-amber-500/6 px-4 py-3 text-left transition hover:border-amber-500/50 hover:bg-amber-500/10"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500 text-[11px] font-bold">⟳</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
+                            <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                              CPL {formatCurrency(item.cpl)} · acima da meta de {formatCurrency(cplAlvo)}
+                            </p>
+                          </div>
+                          {item.alerts[0] && (
+                            <span className="shrink-0 max-w-[100px] text-right text-[9px] font-medium text-amber-400 leading-tight">{item.alerts[0]}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pausar */}
+                {acaoPausar.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-red-500">✕ Pausar</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {acaoPausar.map((item) => (
+                        <button
+                          key={item.ad.id}
+                          type="button"
+                          onClick={() => setModalAdId(item.ad.id)}
+                          className="flex items-center gap-3 rounded-xl border border-red-500/25 bg-red-500/6 px-4 py-3 text-left transition hover:border-red-500/50 hover:bg-red-500/10"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-500 text-[11px] font-bold">✕</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
+                            <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                              {formatCurrency(item.spend)} investido{item.leads === 0 ? " sem leads" : ` · CPL ${formatCurrency(item.cpl)}`}
+                            </p>
+                          </div>
+                          {item.alerts[0] ? (
+                            <span className="shrink-0 max-w-[100px] text-right text-[9px] font-medium text-red-400 leading-tight">{item.alerts[0]}</span>
+                          ) : (
+                            <span className="shrink-0 text-[9px] font-medium text-red-400">Sem resultado</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Redistribuição */}
+                {verbaPausar > 0 && acaoEscalar.length > 0 && (
+                  <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--muted)]/8 px-4 py-3">
+                    <span className="text-base">→</span>
+                    <p className="text-xs text-[var(--muted-foreground)]">
+                      Redistribuir{" "}
+                      <span className="font-bold text-[var(--foreground)]">{formatCurrency(verbaPausar)}</span>
+                      {" "}dos criativos pausados para{" "}
+                      <span className="font-bold text-green-500">{acaoEscalar.map((i) => i.displayName).join(", ")}</span>
+                    </p>
+                  </div>
+                )}
+
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Modal de criativo */}
       {modalItem && (
