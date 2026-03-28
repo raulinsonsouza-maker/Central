@@ -50,7 +50,9 @@ export async function GET(
   }
 
   if (canal === "google") {
-    const orcamento = cliente?.orcamentoMidiaGoogleMensal ?? null;
+    const orcamento = cliente?.orcamentoMidiaGoogleMensal != null
+      ? Number(cliente.orcamentoMidiaGoogleMensal)
+      : null;
 
     // Calcula gasto do mês atual no DB
     const now = new Date();
