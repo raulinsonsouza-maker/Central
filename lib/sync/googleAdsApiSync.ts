@@ -2,6 +2,7 @@ import {
   fetchCampaignMetrics,
   fetchAdCreatives,
   fetchBeginCheckoutConversions,
+  fetchPurchaseConversions,
 } from "@/lib/googleAds/googleAdsClient";
 import {
   aggregateCampaignRowsByDate,
@@ -56,7 +57,7 @@ export async function syncGoogleAdsCliente(
   const dateTo = options?.dateTo ?? today;
 
   try {
-    const [campaignRows, creativeRows, checkoutByDate] = await Promise.all([
+    const [campaignRows, creativeRows, checkoutByDate, purchaseByDate] = await Promise.all([
       fetchCampaignMetrics(customerId, dateFrom, dateTo, {
         loginCustomerId: conta?.googleAdsLoginCustomerId,
       }),
@@ -66,6 +67,9 @@ export async function syncGoogleAdsCliente(
       fetchBeginCheckoutConversions(customerId, dateFrom, dateTo, {
         loginCustomerId: conta?.googleAdsLoginCustomerId,
       }),
+      fetchPurchaseConversions(customerId, dateFrom, dateTo, {
+        loginCustomerId: conta?.googleAdsLoginCustomerId,
+      }),
     ]);
 
     const byDate = aggregateCampaignRowsByDate(campaignRows);
@@ -73,15 +77,18 @@ export async function syncGoogleAdsCliente(
       const dateKey = payload.data.toISOString().slice(0, 10);
       const checkoutIniciado = checkoutByDate.get(dateKey) ?? 0;
       const conv = Math.round(payload.conversoes);
+      const purchaseData = purchaseByDate.get(dateKey);
+      const purchases = purchaseData ? Math.round(purchaseData.count) : 0;
+      const purchaseValue = purchaseData?.value ?? 0;
 
       await upsertFatoMidia(clienteId, payload.data, "GOOGLE", {
         impressoes: payload.impressoes,
         cliques: payload.cliques,
         leads: conv,
         conversoes: conv,
-        purchases: conv,
+        purchases,
         investimento: payload.investimento,
-        websitePurchasesConversionValue: payload.faturamento,
+        websitePurchasesConversionValue: purchaseValue,
         alcance: payload.alcance,
         checkoutIniciado: Math.round(checkoutIniciado),
         contaId: conta?.id ?? undefined,

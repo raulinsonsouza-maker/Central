@@ -186,6 +186,60 @@ export async function fetchBeginCheckoutConversions(
 }
 
 /**
+ * Busca conversões de COMPRA (PURCHASE) por dia.
+ * Retorna um mapa dateString -> { count, value } para compras reais.
+ * Ao contrário de metrics.conversions (que conta TODAS as conversões primárias),
+ * este busca especificamente a categoria PURCHASE.
+ */
+export async function fetchPurchaseConversions(
+  customerId: string,
+  dateFrom: string,
+  dateTo: string,
+  options?: { loginCustomerId?: string | null }
+): Promise<Map<string, { count: number; value: number }>> {
+  const { client, refreshToken, loginCustomerId } = await getClientAndRefreshToken();
+  const customer = createCustomer(client, {
+    customerId,
+    refreshToken,
+    loginCustomerId: options?.loginCustomerId,
+    defaultLoginCustomerId: loginCustomerId,
+  });
+
+  const query = `
+    SELECT
+      segments.date,
+      segments.conversion_action_category,
+      metrics.all_conversions,
+      metrics.all_conversions_value
+    FROM campaign
+    WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
+      AND segments.conversion_action_category = 'PURCHASE'
+  `;
+
+  try {
+    const results = (await customer.query(query)) as unknown as Array<Record<string, unknown>>;
+    const byDate = new Map<string, { count: number; value: number }>();
+    for (const row of results) {
+      const segments = row.segments as Record<string, unknown> | undefined;
+      const metrics = row.metrics as Record<string, unknown> | undefined;
+      const dateStr = segments?.date ? String(segments.date) : null;
+      const count = parseFloat(String(metrics?.all_conversions ?? 0));
+      const value = parseFloat(String(metrics?.all_conversions_value ?? 0));
+      if (dateStr && Number.isFinite(count)) {
+        const existing = byDate.get(dateStr) ?? { count: 0, value: 0 };
+        byDate.set(dateStr, {
+          count: existing.count + (Number.isFinite(count) ? count : 0),
+          value: existing.value + (Number.isFinite(value) ? value : 0),
+        });
+      }
+    }
+    return byDate;
+  } catch {
+    return new Map();
+  }
+}
+
+/**
  * Busca criativos (ad_group_ad) com métricas por dia.
  * Retorna uma linha por anúncio por data.
  */
