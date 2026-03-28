@@ -131,7 +131,7 @@ export default function CentralClientesPage() {
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-[var(--border)]" />
         <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-          {(searchQuery || segmentFilter !== "todos")
+          {searchQuery
             ? `${filteredClientes.length} resultado${filteredClientes.length !== 1 ? "s" : ""}`
             : "Clientes ativos"}
         </span>
