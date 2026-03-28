@@ -470,7 +470,7 @@ export default function ClienteDetailPage() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: saldoGoogle } = useQuery<{ saldo: number | null; totalAprovado?: number | null; utilizado?: number; moeda?: string; motivo?: string }>({
+  const { data: saldoGoogle } = useQuery<{ saldo: number | null; totalAprovado?: number | null; utilizado?: number; moeda?: string; motivo?: string; fonte?: string }>({
     queryKey: ["saldo-google", id],
     queryFn: async () => {
       const res = await fetch(`/api/clientes/${id}/saldo?canal=google`);
@@ -654,8 +654,12 @@ function formatPercentage(value: number) {
             const plataforma = canal === "meta" ? "META" : "Google";
             const value = saldo?.saldo;
             const isLoading = saldo === undefined;
-            const isCritical = value != null && value < 100;
-            const isWarning = value != null && value >= 100 && value < 200;
+            // fonte "gasto_mes" = sem orçamento, mostra investido do mês
+            const isGastoMes = canal === "google" && (saldo as { fonte?: string })?.fonte === "gasto_mes";
+            const utilizado = (saldo as { utilizado?: number })?.utilizado;
+            const displayValue = isGastoMes ? utilizado : value;
+            const isCritical = !isGastoMes && value != null && value < 100;
+            const isWarning  = !isGastoMes && value != null && value >= 100 && value < 200;
 
             const containerClass = isCritical
               ? "border-red-500/40 bg-red-500/8 text-red-400"
@@ -674,12 +678,12 @@ function formatPercentage(value: number) {
                 <Wallet className={`h-4 w-4 shrink-0 ${isCritical ? "text-red-400" : isWarning ? "text-amber-400" : "text-[var(--primary)]"}`} />
                 <div className="flex flex-col leading-tight">
                   <span className={`text-[9px] font-semibold uppercase tracking-widest sm:text-[10px] ${labelClass}`}>
-                    Saldo {plataforma}
+                    {isGastoMes ? `Investido ${plataforma}` : `Saldo ${plataforma}`}
                   </span>
                   {isLoading ? (
                     <span className="text-xs animate-pulse text-[var(--muted-foreground)]">carregando…</span>
-                  ) : value != null ? (
-                    <span className="text-sm font-bold tabular-nums">{formatCurrency(value)}</span>
+                  ) : displayValue != null ? (
+                    <span className="text-sm font-bold tabular-nums">{formatCurrency(displayValue)}</span>
                   ) : (
                     <span className="text-xs text-[var(--muted-foreground)]">—</span>
                   )}

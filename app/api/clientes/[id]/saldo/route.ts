@@ -90,7 +90,7 @@ export async function GET(
       }
     }
 
-    // Fallback: orçamento mensal do cliente - investimento do mês atual
+    // Fallback 1: orçamento mensal do cliente - investimento do mês atual
     if (orcamento != null && orcamento > 0) {
       const remaining = Math.max(0, orcamento - investido);
       return NextResponse.json({
@@ -99,6 +99,17 @@ export async function GET(
         utilizado: investido,
         moeda: "BRL",
         fonte: "orcamento_mensal",
+      });
+    }
+
+    // Fallback 2: se há gasto no mês, exibe como investimento (sem saldo definido)
+    if (investido > 0) {
+      return NextResponse.json({
+        saldo: null,
+        utilizado: investido,
+        moeda: "BRL",
+        fonte: "gasto_mes",
+        motivo: "Sem orçamento configurado — exibindo investimento do mês",
       });
     }
 
