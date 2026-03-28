@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.facebook.com", pathname: "/**" },
       { protocol: "https", hostname: "fbcdn.net", pathname: "/**" },
       { protocol: "https", hostname: "facebook.com", pathname: "/**" },
+      { protocol: "https", hostname: "**.public.blob.vercel-storage.com", pathname: "/**" },
     ],
   },
 };
