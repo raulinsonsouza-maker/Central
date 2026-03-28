@@ -21,7 +21,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X, Wallet, AlertTriangle } from "lucide-react";
 import { upgradeFbCdnImageUrl } from "@/lib/utils";
 
 /* ─── data fetchers (unchanged) ─── */
@@ -611,50 +611,74 @@ function formatPercentage(value: number) {
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
-            {canal !== "geral" && (() => {
-              const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
-              const label = canal === "meta" ? "Saldo META" : "Saldo Google";
-              return (
-                <div className="flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{label}</span>
-                  {saldo === undefined ? (
-                    <span className="text-[10px] text-[var(--muted-foreground)] animate-pulse">carregando…</span>
-                  ) : saldo?.saldo != null ? (
-                    <span className="text-xs font-bold tabular-nums text-[var(--foreground)]">
-                      {formatCurrency(saldo.saldo)}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-[var(--muted-foreground)]">—</span>
-                  )}
-                </div>
-              );
-            })()}
-            <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
-              {(["geral", "meta", "google"] as const).map((c) => (
-                <button
-                  key={c}
-                  onClick={() => {
-                    setCanal(c);
-                    setSubView("dados");
-                  }}
-                  className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                    canal === c
-                      ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
-                      : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
-                  }`}
-                >
-                  {c === "geral" ? "Geral" : c === "meta" ? "META" : "Google"}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
+            {(["geral", "meta", "google"] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setCanal(c);
+                  setSubView("dados");
+                }}
+                className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+                  canal === c
+                    ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-md shadow-[var(--primary)]/20"
+                    : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {c === "geral" ? "Geral" : c === "meta" ? "META" : "Google"}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── Date filter + sub-aba Criativos / Análise de dados (Meta/Google) ── */}
-      <div className="flex flex-wrap items-center justify-end gap-3" ref={filterRef}>
-        <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
+      <div className="flex flex-wrap items-center gap-3" ref={filterRef}>
+        {/* Saldo chip — esquerda, só em Meta/Google */}
+        {canal !== "geral" && (() => {
+          const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
+          const plataforma = canal === "meta" ? "META" : "Google Ads";
+          const value = saldo?.saldo;
+          const isLoading = saldo === undefined;
+          const isCritical = value != null && value < 100;
+          const isWarning = value != null && value >= 100 && value < 200;
+
+          const containerClass = isCritical
+            ? "border-red-500/40 bg-red-500/8 text-red-400"
+            : isWarning
+              ? "border-amber-400/40 bg-amber-400/8 text-amber-400"
+              : "border-[var(--border)] bg-[var(--card)] text-[var(--foreground)]";
+
+          const labelClass = isCritical
+            ? "text-red-400/70"
+            : isWarning
+              ? "text-amber-400/70"
+              : "text-[var(--muted-foreground)]";
+
+          return (
+            <div className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-all ${containerClass}`}>
+              <Wallet className={`h-4 w-4 shrink-0 ${isCritical ? "text-red-400" : isWarning ? "text-amber-400" : "text-[var(--primary)]"}`} />
+              <div className="flex flex-col leading-tight">
+                <span className={`text-[10px] font-semibold uppercase tracking-widest ${labelClass}`}>
+                  Saldo {plataforma}
+                </span>
+                {isLoading ? (
+                  <span className="text-xs animate-pulse text-[var(--muted-foreground)]">carregando…</span>
+                ) : value != null ? (
+                  <span className="text-sm font-bold tabular-nums">{formatCurrency(value)}</span>
+                ) : (
+                  <span className="text-xs text-[var(--muted-foreground)]">não disponível</span>
+                )}
+              </div>
+              {(isCritical || isWarning) && (
+                <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${isCritical ? "text-red-400" : "text-amber-400"}`} />
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Filtro de data + subviews — direita */}
+        <div className="ml-auto flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
           <button
             onClick={() => setFilterOpen((v) => !v)}
             className="inline-flex items-center gap-2.5 rounded-lg px-4 py-2 text-xs transition-all hover:bg-[var(--muted)]/60 sm:text-sm"
