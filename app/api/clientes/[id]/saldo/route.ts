@@ -15,7 +15,7 @@ export async function GET(
     return NextResponse.json({ saldo: null, motivo: "Canal inválido" }, { status: 400 });
   }
 
-  const plataforma = canal === "meta" ? "META" : "GOOGLE";
+  const plataforma = canal === "meta" ? "META" : "GOOGLE_ADS";
 
   const [conta, cliente] = await Promise.all([
     prisma.conta.findFirst({ where: { clienteId: id, plataforma } }),
