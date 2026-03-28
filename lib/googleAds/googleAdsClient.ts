@@ -230,6 +230,68 @@ export async function fetchAdCreatives(
   return results as unknown as GoogleAdsAdCreativeRow[];
 }
 
+export interface GoogleAdsKeywordRow {
+  campaign?: { id?: string; name?: string };
+  ad_group?: { id?: string; name?: string };
+  ad_group_criterion?: {
+    keyword?: { text?: string; match_type?: string };
+    status?: string;
+  };
+  metrics?: {
+    impressions?: string | number;
+    clicks?: string | number;
+    cost_micros?: string | number;
+    conversions?: string | number;
+    all_conversions?: string | number;
+    ctr?: string | number;
+    average_cpc?: string | number;
+  };
+}
+
+/**
+ * Busca métricas de palavras-chave agregadas pelo período.
+ */
+export async function fetchKeywordMetrics(
+  customerId: string,
+  dateFrom: string,
+  dateTo: string,
+  options?: { loginCustomerId?: string | null }
+): Promise<GoogleAdsKeywordRow[]> {
+  const { client, refreshToken, loginCustomerId } = await getClientAndRefreshToken();
+  const customer = createCustomer(client, {
+    customerId,
+    refreshToken,
+    loginCustomerId: options?.loginCustomerId,
+    defaultLoginCustomerId: loginCustomerId,
+  });
+
+  const query = `
+    SELECT
+      campaign.id,
+      campaign.name,
+      ad_group.id,
+      ad_group.name,
+      ad_group_criterion.keyword.text,
+      ad_group_criterion.keyword.match_type,
+      ad_group_criterion.status,
+      metrics.impressions,
+      metrics.clicks,
+      metrics.cost_micros,
+      metrics.conversions,
+      metrics.all_conversions,
+      metrics.ctr,
+      metrics.average_cpc
+    FROM keyword_view
+    WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
+      AND ad_group_criterion.status != 'REMOVED'
+    ORDER BY metrics.impressions DESC
+    LIMIT 500
+  `;
+
+  const results = await customer.query(query);
+  return results as unknown as GoogleAdsKeywordRow[];
+}
+
 export interface GoogleAdsAccountBudget {
   approvedSpendingLimit: number | null;
   amountServed: number;
