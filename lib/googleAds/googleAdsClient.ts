@@ -284,6 +284,7 @@ export async function fetchKeywordMetrics(
     FROM keyword_view
     WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'
       AND ad_group_criterion.status != 'REMOVED'
+      AND metrics.impressions > 0
     ORDER BY metrics.impressions DESC
     LIMIT 500
   `;

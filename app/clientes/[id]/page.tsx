@@ -119,20 +119,6 @@ async function fetchMetaAds(clienteId: string, filter: DateFilter, live = false)
   return body;
 }
 
-async function fetchGoogleAdsCriativos(
-  clienteId: string,
-  periodo?: string,
-  ordenarPor?: string
-) {
-  const params = new URLSearchParams();
-  if (periodo) params.set("periodo", periodo);
-  if (ordenarPor) params.set("ordenarPor", ordenarPor);
-  const res = await fetch(
-    `/api/clientes/${clienteId}/criativos-google?${params.toString()}`
-  );
-  if (!res.ok) throw new Error("Falha ao carregar criativos Google");
-  return res.json();
-}
 
 async function fetchGoogleKeywords(id: string, filter: DateFilter) {
   const params = buildQueryParams(filter);
@@ -441,12 +427,6 @@ export default function ClienteDetailPage() {
     queryKey: ["meta-ads", id, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
     queryFn: () => fetchMetaAds(id, dateFilter, true),
     enabled: !!id && canal === "meta",
-  });
-  const { data: googleCriativosData, isLoading: googleCriativosLoading } = useQuery({
-    queryKey: ["google-criativos", id, dateFilter.periodo],
-    queryFn: () =>
-      fetchGoogleAdsCriativos(id, dateFilter.periodo, "impressoes"),
-    enabled: !!id && canal === "google",
   });
   const { data: googleKeywordsData, isLoading: googleKeywordsLoading } = useQuery({
     queryKey: ["google-keywords", id, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -927,86 +907,20 @@ function formatPercentage(value: number) {
         </div>
       )}
 
-      {/* ── Criativos / Anúncios (Google Ads) ── */}
+      {/* ── Keywords Analysis (Google Ads) ── */}
       {canal === "google" && subView === "criativos" && (
-        <div className="space-y-10">
-          {/* ── Keywords Analysis ── */}
-          <GoogleKeywordsPanel
-            data={
-              googleKeywordsData ?? {
-                keywords: [],
-                totals: { impressions: 0, clicks: 0, cost: 0, conversions: 0, cpl: 0, ctr: 0 },
-                dateFrom: "",
-                dateTo: "",
-              }
+        <GoogleKeywordsPanel
+          data={
+            googleKeywordsData ?? {
+              keywords: [],
+              totals: { impressions: 0, clicks: 0, cost: 0, conversions: 0, cpl: 0, ctr: 0 },
+              dateFrom: "",
+              dateTo: "",
             }
-            formatCurrency={formatCurrency}
-            isLoading={googleKeywordsLoading}
-          />
-
-          {/* ── Ad Creatives ── */}
-          <div>
-            <div className="mb-4 flex items-start gap-3">
-              <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">Google Ads</p>
-                <h2 className="text-xl font-extrabold tracking-tight text-[var(--foreground)]">Criativos (Anúncios)</h2>
-                <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">Headlines, descrições e performance dos anúncios ativos</p>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-              {googleCriativosLoading ? (
-                <p className="py-12 text-center text-sm text-[var(--muted-foreground)]">Carregando criativos Google…</p>
-              ) : googleCriativosData?.criativos?.length ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[720px] text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--border)] bg-[var(--muted)]/20">
-                        <th className="px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Campanha / Grupo</th>
-                        <th className="px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Headline 1</th>
-                        <th className="px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Headline 2</th>
-                        <th className="px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Descrição</th>
-                        <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Investimento</th>
-                        <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Impressões</th>
-                        <th className="px-3 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">Cliques</th>
-                        <th className="px-4 py-3 text-right text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">CTR</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {googleCriativosData.criativos.map((c: { adResourceName: string; campaignName?: string; adGroupName?: string; headline1?: string; headline2?: string; description?: string; investimento: number; impressoes: number; cliques: number; ctr: number }) => (
-                        <tr key={c.adResourceName} className="border-b border-[var(--border)]/60 transition-colors hover:bg-[var(--muted)]/20">
-                          <td className="px-4 py-3">
-                            <span className="font-medium text-[var(--foreground)]">{c.campaignName || "—"}</span>
-                            {c.adGroupName && (
-                              <span className="block text-xs text-[var(--muted-foreground)]">{c.adGroupName}</span>
-                            )}
-                          </td>
-                          <td className="max-w-[160px] px-3 py-3 text-[var(--muted-foreground)]">
-                            <span className="line-clamp-2 text-xs">{c.headline1 || "—"}</span>
-                          </td>
-                          <td className="max-w-[160px] px-3 py-3 text-[var(--muted-foreground)]">
-                            <span className="line-clamp-2 text-xs">{c.headline2 || "—"}</span>
-                          </td>
-                          <td className="max-w-[200px] px-3 py-3 text-[var(--muted-foreground)]">
-                            <span className="line-clamp-2 text-xs">{c.description || "—"}</span>
-                          </td>
-                          <td className="px-3 py-3 text-right tabular-nums text-sm">{formatCurrency(c.investimento)}</td>
-                          <td className="px-3 py-3 text-right tabular-nums text-sm">{c.impressoes.toLocaleString("pt-BR")}</td>
-                          <td className="px-3 py-3 text-right tabular-nums text-sm">{c.cliques.toLocaleString("pt-BR")}</td>
-                          <td className="px-4 py-3 text-right tabular-nums text-sm">{c.ctr.toFixed(2)}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="py-12 text-center text-sm text-[var(--muted-foreground)]">
-                  Nenhum criativo Google Ads encontrado para o período.
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+          }
+          formatCurrency={formatCurrency}
+          isLoading={googleKeywordsLoading}
+        />
       )}
 
       {/* ── Default panel (KPIs, chart, weekly table, financial) ── */}

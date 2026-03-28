@@ -1,16 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-import { AlertTriangle, TrendingUp, Search, Zap, Target, Eye } from "lucide-react";
+import { AlertTriangle, Search } from "lucide-react";
 
 export interface KeywordAnalysis {
   text: string;
@@ -56,19 +47,6 @@ const DECISION_CONFIG = {
   neutro: { label: "Neutro", dot: "bg-[var(--muted-foreground)]", color: "text-[var(--muted-foreground)]", badge: "bg-[var(--muted)] text-[var(--muted-foreground)] border-[var(--border)]" },
 };
 
-const tooltipStyle = {
-  contentStyle: {
-    backgroundColor: "var(--card)",
-    border: "1px solid var(--border)",
-    borderRadius: "10px",
-    color: "var(--foreground)",
-    boxShadow: "0 8px 24px rgba(0,0,0,.35)",
-    padding: "10px 14px",
-    fontSize: 12,
-  },
-  labelStyle: { color: "var(--foreground)", fontWeight: 600, marginBottom: 4 },
-};
-
 function fmt(n: number, decimals = 0) {
   return n.toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
@@ -85,12 +63,6 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
   const countPausar = keywords.filter((k) => k.decision === "pausar").length;
   const countRevisar = keywords.filter((k) => k.decision === "revisar").length;
 
-  // Top 5 performers for chart
-  const topPerformers = [...keywords]
-    .filter((k) => k.clicks > 0)
-    .sort((a, b) => b.conversions - a.conversions || b.clicks - a.clicks)
-    .slice(0, 6);
-
   const filtered = React.useMemo(() => {
     let list = filterDecision === "todos" ? keywords : keywords.filter((k) => k.decision === filterDecision);
     list = [...list].sort((a, b) => {
@@ -104,11 +76,6 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
     if (sortBy === col) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
     else { setSortBy(col); setSortDir("desc"); }
   }
-
-  // Strategic insights
-  const topKw = keywords.find((k) => k.conversions > 0);
-  const worstKw = keywords.filter((k) => k.decision === "pausar")[0];
-  const revisionKw = keywords.filter((k) => k.decision === "revisar")[0];
 
   if (isLoading) {
     return (
@@ -209,109 +176,6 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
         </div>
       </div>
 
-      {/* ── Insights + Chart row ── */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Insights */}
-        <div className="space-y-3">
-          {topKw && (
-            <div className="flex gap-3 rounded-2xl border border-green-500/20 bg-green-500/5 p-4">
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-              <div>
-                <p className="text-xs font-bold text-green-500 uppercase tracking-wide">Top performer</p>
-                <p className="mt-1 text-sm text-[var(--foreground)]">
-                  <strong>&ldquo;{topKw.text}&rdquo;</strong> ({topKw.matchType}) gerou{" "}
-                  <strong>{fmt(topKw.conversions, 1)} conversão{topKw.conversions !== 1 ? "ões" : ""}</strong> com CPL de{" "}
-                  <strong className="text-green-500">{formatCurrency(topKw.cpl)}</strong>.
-                  {countEscalar > 0 && ` Considere aumentar o orçamento desta campanha.`}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {worstKw && (
-            <div className="flex gap-3 rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
-              <Target className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
-              <div>
-                <p className="text-xs font-bold text-red-500 uppercase tracking-wide">Desperdício detectado</p>
-                <p className="mt-1 text-sm text-[var(--foreground)]">
-                  <strong>&ldquo;{worstKw.text}&rdquo;</strong> ({worstKw.matchType}) gerou{" "}
-                  <strong>{fmt(worstKw.clicks)} cliques</strong> e custou{" "}
-                  <strong className="text-red-400">{formatCurrency(worstKw.cost)}</strong> sem nenhuma conversão.
-                  Considere pausar ou adicionar como palavra-chave negativa.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {revisionKw && (
-            <div className="flex gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
-              <Eye className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
-              <div>
-                <p className="text-xs font-bold text-blue-400 uppercase tracking-wide">Baixa taxa de cliques</p>
-                <p className="mt-1 text-sm text-[var(--foreground)]">
-                  <strong>&ldquo;{revisionKw.text}&rdquo;</strong> tem{" "}
-                  <strong>{fmt(revisionKw.impressions)} impressões</strong> com CTR de apenas{" "}
-                  <strong className="text-blue-400">{fmt(revisionKw.ctr, 2)}%</strong>.
-                  Revise o anúncio ou o lance para melhorar a relevância.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {!topKw && !worstKw && !revisionKw && (
-            <div className="flex gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4">
-              <Zap className="mt-0.5 h-4 w-4 shrink-0 text-[var(--primary)]" />
-              <p className="text-sm text-[var(--muted-foreground)]">
-                Dados insuficientes para gerar insights automáticos. Amplie o período ou aguarde mais dados.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Bar chart — top por cliques */}
-        {topPerformers.length > 0 && (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-              Top keywords — cliques e conversões
-            </p>
-            <ResponsiveContainer width="100%" height={190}>
-              <BarChart
-                data={topPerformers}
-                layout="vertical"
-                margin={{ top: 0, right: 8, left: 0, bottom: 0 }}
-              >
-                <XAxis type="number" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
-                <YAxis
-                  type="category"
-                  dataKey="text"
-                  width={120}
-                  tick={{ fontSize: 10, fill: "var(--foreground)" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: string) => v.length > 18 ? v.slice(0, 18) + "…" : v}
-                />
-                <Tooltip
-                  {...tooltipStyle}
-                  formatter={(value: number, name: string) => [
-                    name === "clicks" ? fmt(value) : fmt(value, 1),
-                    name === "clicks" ? "Cliques" : "Conversões",
-                  ]}
-                />
-                <Bar dataKey="clicks" name="clicks" radius={[0, 4, 4, 0]}>
-                  {topPerformers.map((k) => (
-                    <Cell key={k.text} fill={k.decision === "escalar" ? "#22c55e" : k.decision === "pausar" ? "#ef4444" : "var(--primary)"} fillOpacity={0.7} />
-                  ))}
-                </Bar>
-                <Bar dataKey="conversions" name="conversions" radius={[0, 4, 4, 0]}>
-                  {topPerformers.map((k) => (
-                    <Cell key={k.text} fill={k.decision === "escalar" ? "#22c55e" : k.decision === "pausar" ? "#ef4444" : "var(--primary)"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
 
       {/* ── Keywords table ── */}
       <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
