@@ -1508,33 +1508,37 @@ function MetaCriativosGrid({
       // ── Alertas inteligentes ──────────────────────────────────────────────
       const alerts: string[] = [];
 
-      // Universal — Falso Positivo (clickbait)
-      if (item.ctr > 1.5 && item.cr < 5 && item.leads > 0 && cpl > cplAlvo) {
+      // Alertas só fazem sentido quando o criativo está com problema
+      const isUnderperforming = status === "PAUSAR" || status === "OTIMIZAR";
+      const isNotEscalar = status !== "ESCALAR";
+
+      // Falso Positivo (clickbait) — CTR alto mas leads não chegam
+      if (isNotEscalar && item.ctr > 1.5 && item.cr < 5 && item.leads > 0 && cpl > cplAlvo) {
         alerts.push("Clickbait: cliques não convertem na LP");
       }
-      // Universal — Leilão Hostil
-      if (avgCpm > 0 && item.cpm > avgCpm * 1.5) {
-        alerts.push("CPM alto: público disputado ou feedback negativo");
+      // Leilão Hostil — só relevante quando o CPM alto está prejudicando resultado
+      if (isUnderperforming && avgCpm > 0 && item.cpm > avgCpm * 1.5) {
+        alerts.push("CPM alto: rever segmentação ou público");
       }
-      // Universal — Verba concentrada
-      if (spShare > 45) {
-        alerts.push("Verba concentrada neste criativo");
+      // Verba concentrada em criativo ruim — escalar não conta
+      if (isUnderperforming && spShare > 35) {
+        alerts.push("Verba concentrada em criativo de baixa performance");
       }
-      // Universal — Oportunidade de escala
+      // Oportunidade de escala — criativo bom mas sub-investido
       if (spShare < 10 && (status === "ESCALAR" || status === "VALIDANDO") && item.ctr >= averageCtr) {
-        alerts.push("Oportunidade: aumentar verba");
+        alerts.push("Oportunidade: aumentar verba neste criativo");
       }
 
-      // Vídeo — Hook fraco
-      if (item.mediaType === "video" && item.hookRate > 0 && item.hookRate < 25 && cpl > cplLimite) {
+      // Vídeo — Hook fraco (só quando o criativo está mal performando)
+      if (item.mediaType === "video" && item.hookRate > 0 && item.hookRate < 25 && isUnderperforming) {
         alerts.push("Hook fraco: refaça os primeiros 3s");
       }
       // Vídeo — Conteúdo maçante (bom hook, baixa retenção)
-      if (item.mediaType === "video" && item.hookRate >= 25 && item.holdRate > 0 && item.holdRate < 10 && cpl > cplLimite) {
+      if (item.mediaType === "video" && item.hookRate >= 25 && item.holdRate > 0 && item.holdRate < 10 && isUnderperforming) {
         alerts.push("Retenção baixa: roteiro perde ritmo no meio");
       }
       // Imagem — Cegueira de banner
-      if (item.mediaType === "image" && item.ctr < 0.6 && item.impressions > 2000 && cpl > cplLimite) {
+      if (item.mediaType === "image" && item.ctr < 0.6 && item.impressions > 2000 && isUnderperforming) {
         alerts.push("Arte ignorável: sem thumbstop no scroll");
       }
 
@@ -1640,10 +1644,12 @@ function MetaCriativosGrid({
               <tr className="border-b border-[var(--border)] bg-[var(--muted)]/10">
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Impr.</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Leads</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPL</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
                 <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Diagnóstico</th>
               </tr>
@@ -1675,6 +1681,12 @@ function MetaCriativosGrid({
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
+                      {item.impressions > 0 ? item.impressions.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
+                      {item.clicks > 0 ? item.clicks.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">
                       {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="text-[var(--muted-foreground)]/40">—</span>}
                     </td>
@@ -1687,6 +1699,7 @@ function MetaCriativosGrid({
                         <span className="text-[var(--muted-foreground)]/40">—</span>
                       )}
                     </td>
+                    <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {item.leads > 0 ? (
                         <span className="text-[var(--foreground)]">{item.cr.toFixed(1)}%</span>
@@ -1694,7 +1707,6 @@ function MetaCriativosGrid({
                         <span className="text-[var(--muted-foreground)]/40">—</span>
                       )}
                     </td>
-                    <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-center">
                       <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
                         {cfg.label}
