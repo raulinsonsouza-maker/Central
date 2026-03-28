@@ -11,7 +11,7 @@ import { AnalyticsGA4Section } from "@/components/clientes/AnalyticsGA4Section";
 import { HotelFazendaSaoJoaoPanel } from "@/components/clientes/HotelFazendaSaoJoaoPanel";
 import { TertuliaPanel } from "@/components/clientes/TertuliaPanel";
 import { VarellaMotosPanel } from "@/components/clientes/VarellaMotosPanel";
-import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos } from "@/lib/clientProfiles";
+import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis } from "@/lib/clientProfiles";
 import {
   Bar,
   XAxis,
@@ -436,6 +436,7 @@ export default function ClienteDetailPage() {
   const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google";
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
+  const isMiguelPanel = isMiguelImoveis(cliente) && canal === "meta";
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -483,10 +484,10 @@ export default function ClienteDetailPage() {
 
   const series = midia?.series ?? [];
   const latestFiveSeries = series.slice(-5);
-  const chartConversionKey = canal === "google" ? "Conversões" : "Leads";
-  const chartData = series.map((s: { periodo: string; investimento: number; leads: number }) => {
+  const chartConversionKey = canal === "google" ? "Conversões" : isMiguelPanel ? "Conversas" : "Leads";
+  const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number }) => {
     const inv = Math.round(s.investimento * 100) / 100;
-    const conv = s.leads;
+    const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
     return {
       periodo: s.periodo,
       Investimento: inv,
@@ -502,23 +503,29 @@ export default function ClienteDetailPage() {
   };
 
   type MetricTrend = "higher" | "lower" | "neutral";
-  type MetricRow = { investimento: number; leads: number; impressoes: number; cliques: number };
+  type MetricRow = { investimento: number; leads: number; conversas?: number; impressoes: number; cliques: number };
 
   const metricDefinitions = React.useMemo(() => {
-    const conversionLabel = canal === "google" ? "CONVERSÕES" : "LEADS";
+    const conversionLabel = canal === "google" ? "CONVERSÕES" : isMiguelPanel ? "CONVERSAS" : "LEADS";
     const conversionDesc =
       canal === "google"
         ? "Total de conversões atribuídas (alinhado ao relatório de campanhas do Google Ads)."
-        : "Conversões atribuídas ao período.";
+        : isMiguelPanel
+          ? "Conversas por mensagem iniciadas no período (objetivo principal das campanhas)."
+          : "Conversões atribuídas ao período.";
     const taxaDesc =
       canal === "google"
         ? "Conversões em relação aos cliques (taxa de conversão aproximada)."
-        : "Percentual de leads sobre cliques.";
-    const custoPorResultadoLabel = canal === "google" ? "CUSTO / CONV." : "CPL";
+        : isMiguelPanel
+          ? "Percentual de conversas iniciadas sobre os cliques gerados."
+          : "Percentual de leads sobre cliques.";
+    const custoPorResultadoLabel = canal === "google" ? "CUSTO / CONV." : isMiguelPanel ? "CUSTO / CONVERSA" : "CPL";
     const custoPorResultadoDesc =
       canal === "google"
         ? "Investimento ÷ conversões da semana (equivalente ao custo por conversão do Google)."
-        : "Custo médio por lead da semana.";
+        : isMiguelPanel
+          ? "Investimento ÷ conversas iniciadas da semana."
+          : "Custo médio por lead da semana.";
     return [
       {
         label: "INVESTIMENTO",
@@ -555,14 +562,17 @@ export default function ClienteDetailPage() {
         label: conversionLabel,
         description: conversionDesc,
         trend: "higher" as MetricTrend,
-        value: (s: MetricRow) => s.leads,
+        value: (s: MetricRow) => isMiguelPanel ? (s.conversas ?? 0) : s.leads,
         format: (value: number) => formatInteger(value),
       },
       {
-        label: "TAXA CONV.",
+        label: isMiguelPanel ? "TAXA CONVERSA" : "TAXA CONV.",
         description: taxaDesc,
         trend: "higher" as MetricTrend,
-        value: (s: MetricRow) => (s.cliques > 0 ? (s.leads / s.cliques) * 100 : 0),
+        value: (s: MetricRow) => {
+          const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+          return s.cliques > 0 ? (conv / s.cliques) * 100 : 0;
+        },
         format: (value: number) => formatPercentage(value),
       },
       {
@@ -576,11 +586,14 @@ export default function ClienteDetailPage() {
         label: custoPorResultadoLabel,
         description: custoPorResultadoDesc,
         trend: "lower" as MetricTrend,
-        value: (s: MetricRow) => (s.leads > 0 ? s.investimento / s.leads : 0),
+        value: (s: MetricRow) => {
+          const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+          return conv > 0 ? s.investimento / conv : 0;
+        },
         format: (value: number) => formatCurrency(value),
       },
     ];
-  }, [canal]);
+  }, [canal, isMiguelPanel]);
 
 function formatCurrency(value: number) {
   return `R$ ${value.toLocaleString("pt-BR", {
@@ -902,6 +915,7 @@ function formatPercentage(value: number) {
             <MetaCriativosGrid
               ads={metaAdsData.data}
               formatCurrency={formatCurrency}
+              conversasMode={isMiguelImoveis(cliente)}
             />
           ) : (
             <div className="flex items-center justify-center py-16">
@@ -930,7 +944,15 @@ function formatPercentage(value: number) {
       {/* ── Default panel (KPIs, chart, weekly table, financial) ── */}
       {(canal === "geral" || subView === "dados") && !isSpecialPanel && resumo && (
         <DefaultPanel
-          resumo={resumo}
+          resumo={
+            isMiguelPanel
+              ? {
+                  ...resumo,
+                  leads: (resumo as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? resumo.leads,
+                  cpl: (resumo as { custoPorConversa?: number }).custoPorConversa ?? resumo.cpl,
+                }
+              : resumo
+          }
           chartData={chartData}
           chartConversionKey={chartConversionKey}
           latestFiveSeries={latestFiveSeries}
@@ -940,6 +962,7 @@ function formatPercentage(value: number) {
           canalLabels={canalLabels}
           financeiro={financeiro ?? undefined}
           formatCurrency={formatCurrency}
+          conversasMode={isMiguelPanel}
         />
       )}
 
@@ -1332,9 +1355,11 @@ function CriativoPreview({
 function MetaCriativosGrid({
   ads,
   formatCurrency,
+  conversasMode = false,
 }: {
   ads: MetaAdItem[];
   formatCurrency: (v: number) => string;
+  conversasMode?: boolean;
 }) {
   const sorted = React.useMemo(() => {
     const nameCounts: Record<string, number> = {};
@@ -1363,7 +1388,12 @@ function MetaCriativosGrid({
         const leadCount = getAction("lead");
         const onFbLeads = getAction("onsite_conversion.lead_grouped");
         const websiteLeads = getAction("offsite_conversion.fb_pixel_lead") || getAction("website_lead");
-        const leads = leadCount || onFbLeads || websiteLeads;
+        const conventionalLeads = leadCount || onFbLeads || websiteLeads;
+        const conversasCount =
+          getAction("messaging_conversation_started_7d") ||
+          getAction("onsite_messaging_conversation_started_7d") ||
+          getAction("messaging_first_reply");
+        const leads = conversasMode ? conversasCount : conventionalLeads;
         const video3sViews = getAction("video_view");
         const video100Views = parseInt(
           insight?.video_p100_watched_actions?.[0]?.value ?? "0", 10
@@ -1403,7 +1433,7 @@ function MetaCriativosGrid({
         if (b.clicks !== a.clicks) return b.clicks - a.clicks;
         return b.impressions - a.impressions;
       });
-  }, [ads]);
+  }, [ads, conversasMode]);
 
   const [modalAdId, setModalAdId] = React.useState<string | null>(null);
   const [modalFallback, setModalFallback] = React.useState(false);
@@ -1545,18 +1575,25 @@ function MetaCriativosGrid({
   const avgCpl = totalLeads > 0 ? totalSpend / totalLeads : null;
 
   const topEscalar = scoredItems.find((i) => i.status === "ESCALAR");
+  const metricLabel = conversasMode ? "custo por conversa" : "CPL";
   const decisionInsight =
     pctPausar > 30
-      ? `${pctPausar}% da verba está em criativos sem retorno — redistribuição urgente para preservar o CPL.`
+      ? `${pctPausar}% da verba está em criativos sem retorno — redistribuição urgente para preservar o ${metricLabel}.`
     : countValidando === sorted.length
-      ? `Ainda sem dados de conversão suficientes. Aguarde mais investimento para o sistema avaliar cada criativo.`
+      ? conversasMode
+        ? `Ainda sem dados de conversas suficientes. Aguarde mais investimento para o sistema avaliar cada criativo.`
+        : `Ainda sem dados de conversão suficientes. Aguarde mais investimento para o sistema avaliar cada criativo.`
     : countEscalar === 0 && countValidando === 0
-      ? `Nenhum criativo está batendo a meta de CPL. Considere testar novos formatos, textos ou ofertas.`
+      ? conversasMode
+        ? `Nenhum criativo está batendo a meta de custo por conversa. Considere testar novos formatos, textos ou abordagens.`
+        : `Nenhum criativo está batendo a meta de CPL. Considere testar novos formatos, textos ou ofertas.`
     : countEscalar >= sorted.length * 0.5
-      ? `Conjunto saudável: a maioria dos criativos está convertendo dentro da meta de CPL.`
+      ? conversasMode
+        ? `Conjunto saudável: a maioria dos criativos está gerando conversas dentro do custo-alvo.`
+        : `Conjunto saudável: a maioria dos criativos está convertendo dentro da meta de CPL.`
     : countEscalar === 1 && topEscalar
       ? `"${topEscalar.displayName}" é o único dentro da meta — concentre o orçamento nele e contenha o restante.`
-    : `${countEscalar} criativos estão dentro da meta de CPL — direcione o orçamento para eles.`;
+    : `${countEscalar} criativos estão dentro da meta de ${metricLabel} — direcione o orçamento para eles.`;
 
   const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
 
@@ -1588,17 +1625,17 @@ function MetaCriativosGrid({
             accent: false,
           },
           {
-            label: "Total de Leads",
+            label: conversasMode ? "Total de Conversas" : "Total de Leads",
             value: totalLeads > 0 ? totalLeads.toLocaleString("pt-BR") : "—",
             accent: true,
           },
           {
-            label: "CPL Alvo",
+            label: conversasMode ? "Meta Custo/Conv." : "CPL Alvo",
             value: totalLeads > 0 ? formatCurrency(cplAlvo) : "—",
             accent: false,
           },
           {
-            label: "CPL Médio",
+            label: conversasMode ? "Custo Médio Conv." : "CPL Médio",
             value: avgCpl ? formatCurrency(avgCpl) : "—",
             valueColor: avgCpl
               ? avgCpl <= cplAlvo
@@ -1660,8 +1697,8 @@ function MetaCriativosGrid({
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Impr.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Leads</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CPL</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">{conversasMode ? "Conv." : "Leads"}</th>
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">{conversasMode ? "Custo/Conv." : "CPL"}</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
                 <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
@@ -1818,7 +1855,7 @@ function MetaCriativosGrid({
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
                             <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                              CPL {formatCurrency(item.cpl)} · {item.leads} lead{item.leads > 1 ? "s" : ""} · CTR {item.ctr.toFixed(2)}%
+                              {conversasMode ? "Custo/conv." : "CPL"} {formatCurrency(item.cpl)} · {item.leads} {conversasMode ? "conv." : `lead${item.leads > 1 ? "s" : ""}`} · CTR {item.ctr.toFixed(2)}%
                             </p>
                           </div>
                           <span className="shrink-0 text-[10px] font-medium text-green-500">Top performer</span>
@@ -1844,7 +1881,7 @@ function MetaCriativosGrid({
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
                             <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                              CPL {formatCurrency(item.cpl)} · acima da meta de {formatCurrency(cplAlvo)}
+                              {conversasMode ? "Custo/conv." : "CPL"} {formatCurrency(item.cpl)} · acima da meta de {formatCurrency(cplAlvo)}
                             </p>
                           </div>
                           {item.alerts[0] && (
@@ -1872,7 +1909,7 @@ function MetaCriativosGrid({
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-xs font-semibold text-[var(--foreground)]">{item.displayName}</p>
                             <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
-                              {formatCurrency(item.spend)} investido{item.leads === 0 ? " sem leads" : ` · CPL ${formatCurrency(item.cpl)}`}
+                              {formatCurrency(item.spend)} investido{item.leads === 0 ? (conversasMode ? " sem conversas" : " sem leads") : ` · ${conversasMode ? "Custo/conv." : "CPL"} ${formatCurrency(item.cpl)}`}
                             </p>
                           </div>
                           {item.alerts[0] ? (
@@ -1963,10 +2000,10 @@ function MetaCriativosGrid({
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Investimento", value: formatCurrency(modalItem.spend) },
-                    { label: "Leads", value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—" },
-                    { label: "CPL", value: modalItem.leads > 0 ? formatCurrency(modalItem.cpl) : "—" },
+                    { label: conversasMode ? "Conversas" : "Leads", value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—" },
+                    { label: conversasMode ? "Custo/Conv." : "CPL", value: modalItem.leads > 0 ? formatCurrency(modalItem.cpl) : "—" },
                     { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%` },
-                    { label: "CR (clique→lead)", value: modalItem.leads > 0 ? `${modalItem.cr.toFixed(1)}%` : "—" },
+                    { label: conversasMode ? "CR (clique→conv.)" : "CR (clique→lead)", value: modalItem.leads > 0 ? `${modalItem.cr.toFixed(1)}%` : "—" },
                     { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—" },
                     { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR") },
                     { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency(modalItem.cpm) : "—" },

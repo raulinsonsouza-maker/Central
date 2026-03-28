@@ -1,6 +1,7 @@
 export const HOTEL_FAZENDA_SAO_JOAO_SLUG = "hotel-fazenda-sao-joao";
 export const TERTULIA_SLUG = "tertulia";
 export const VARELLA_MOTOS_SLUG = "varella-motos";
+export const MIGUEL_IMOVEIS_SLUG = "miguel-imoveis";
 
 type ClientIdentity = {
   nome?: string | null;
@@ -44,4 +45,18 @@ export function isVarellaMotos(client?: ClientIdentity | null) {
   const nome = normalizeText(client.nome);
 
   return slug === VARELLA_MOTOS_SLUG || nome === "varella motos";
+}
+
+export function isMiguelImoveis(client?: ClientIdentity | null) {
+  if (!client) return false;
+
+  const slug = normalizeText(client.slug);
+  const nome = normalizeText(client.nome);
+
+  return (
+    slug === MIGUEL_IMOVEIS_SLUG ||
+    nome === "miguel imoveis" ||
+    nome === "miguel imoveis anuncio" ||
+    slug.includes("miguel") && slug.includes("imoveis")
+  );
 }

@@ -55,6 +55,7 @@ export async function GET(
         periodo: string;
         investimento: number;
         leads: number;
+        conversas: number;
         impressoes: number;
         cliques: number;
         inicio: Date;
@@ -69,11 +70,13 @@ export async function GET(
       const existing = byWeek.get(key);
       const inv = Number(f.investimento);
       const leads = outcomeCountForFato(f.canal, f.leads, f.conversoes);
+      const conversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
       const imp = f.impressoes;
       const clk = f.cliques;
       if (existing) {
         existing.investimento += inv;
         existing.leads += leads;
+        existing.conversas += conversas;
         existing.impressoes += imp;
         existing.cliques += clk;
       } else {
@@ -81,6 +84,7 @@ export async function GET(
           periodo: label,
           investimento: inv,
           leads,
+          conversas,
           impressoes: imp,
           cliques: clk,
           inicio,
@@ -99,6 +103,7 @@ export async function GET(
         data: f.data,
         investimento: Number(f.investimento),
         leads: outcomeCountForFato(f.canal, f.leads, f.conversoes),
+        conversas: (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0,
         impressoes: f.impressoes,
         cliques: f.cliques,
       })),

@@ -53,6 +53,7 @@ export async function GET(
       investimento: true,
       impressoes: true,
       cliques: true,
+      messagingConversationsStarted: true,
     },
   });
 
@@ -60,14 +61,17 @@ export async function GET(
   let totalLeads = 0;
   let totalImpressoes = 0;
   let totalCliques = 0;
+  let totalConversas = 0;
   for (const r of rows) {
     totalInvestimento += Number(r.investimento);
     totalLeads += outcomeCountForFato(r.canal, r.leads, r.conversoes);
     totalImpressoes += r.impressoes;
     totalCliques += r.cliques;
+    totalConversas += r.messagingConversationsStarted ?? 0;
   }
   const cpl = totalLeads > 0 ? totalInvestimento / totalLeads : 0;
   const cpm = totalImpressoes > 0 ? (totalInvestimento / totalImpressoes) * 1000 : 0;
+  const custoPorConversa = totalConversas > 0 ? totalInvestimento / totalConversas : 0;
   const diasSelecionados = Math.max(
     1,
     Math.floor((dataFim.getTime() - dataInicio.getTime()) / (24 * 60 * 60 * 1000)) + 1
@@ -82,5 +86,7 @@ export async function GET(
     cliques: totalCliques,
     cpl: Math.round(cpl * 100) / 100,
     cpm: Math.round(cpm * 100) / 100,
+    messagingConversationsStarted: totalConversas,
+    custoPorConversa: Math.round(custoPorConversa * 100) / 100,
   });
 }
