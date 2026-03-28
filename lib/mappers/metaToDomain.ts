@@ -79,10 +79,15 @@ export function mapMetaInsightToFatoPayload(row: MetaInsightRow): MetaInsightPay
   const checkoutIniciado = getActionExact(actions, "initiate_checkout");
 
   const purchaseCount =
-    getActionExact(actions, "purchase") || getActionExact(actions, "omni_purchase");
+    getActionExact(actions, "purchase") ||
+    getActionExact(actions, "omni_purchase") ||
+    getActionExact(actions, "offsite_conversion.fb_pixel_purchase") ||
+    getActionExact(actions, "website_purchase");
   const purchaseValue =
     getActionValueExact(actionValues, "purchase") ||
-    getActionValueExact(actionValues, "omni_purchase");
+    getActionValueExact(actionValues, "omni_purchase") ||
+    getActionValueExact(actionValues, "offsite_conversion.fb_pixel_purchase") ||
+    getActionValueExact(actionValues, "website_purchase");
 
   const leadCount = getActionExact(actions, "lead");
   const leads = leadCount || onFacebookLeads || websiteLeads;

@@ -53,6 +53,8 @@ export interface GoogleAdsCampaignRow {
     cost_micros?: string | number;
     conversions?: string | number;
     all_conversions?: string | number;
+    conversions_value?: string | number;
+    all_conversions_value?: string | number;
     unique_users?: string | number;
   };
 }
@@ -119,6 +121,8 @@ export async function fetchCampaignMetrics(
       metrics.cost_micros,
       metrics.conversions,
       metrics.all_conversions,
+      metrics.conversions_value,
+      metrics.all_conversions_value,
       metrics.unique_users
     FROM campaign
     WHERE segments.date BETWEEN '${dateFrom}' AND '${dateTo}'

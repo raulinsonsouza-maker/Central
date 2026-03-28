@@ -12,6 +12,7 @@ export interface GoogleAdsCampaignPayload {
   impressoes: number;
   cliques: number;
   conversoes: number;
+  faturamento: number;
   investimento: number;
   alcance: number;
 }
@@ -31,6 +32,9 @@ export function mapCampaignRowToFatoPayload(row: GoogleAdsCampaignRow): GoogleAd
   const cliques = parseNum(metrics?.clicks);
   const conversoes =
     parseNum(metrics?.conversions) || parseNum(metrics?.all_conversions) || parseNum(metrics?.allConversions);
+  const faturamento =
+    parseNum(metrics?.conversions_value ?? (metrics as Record<string, unknown>)?.conversionsValue) ||
+    parseNum(metrics?.all_conversions_value ?? (metrics as Record<string, unknown>)?.allConversionsValue);
   const alcance = parseNum(metrics?.unique_users ?? (metrics as Record<string, unknown>)?.uniqueUsers);
 
   const dateStr = segments?.date;
@@ -41,6 +45,7 @@ export function mapCampaignRowToFatoPayload(row: GoogleAdsCampaignRow): GoogleAd
     impressoes,
     cliques,
     conversoes,
+    faturamento,
     investimento,
     alcance,
   };
@@ -64,6 +69,7 @@ export function aggregateCampaignRowsByDate(
       existing.impressoes += payload.impressoes;
       existing.cliques += payload.cliques;
       existing.conversoes += payload.conversoes;
+      existing.faturamento += payload.faturamento;
       existing.investimento += payload.investimento;
       existing.alcance += payload.alcance;
     } else {
