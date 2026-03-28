@@ -28,7 +28,6 @@ function normalizeForSearch(text: string): string {
 export default function CentralClientesPage() {
   const [viewMode, setViewMode] = React.useState<"lista" | "card">("lista");
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [segmentFilter, setSegmentFilter] = React.useState<string>("todos");
 
   const {
     data: clientes,
@@ -45,25 +44,12 @@ export default function CentralClientesPage() {
     return [...onlyActive].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   }, [clientes]);
 
-  const segmentOptions = React.useMemo(() => {
-    const labels = new Set<string>();
-    for (const c of activeClientes) {
-      const label = (c.segmento ?? "").trim();
-      if (label) labels.add(label);
-    }
-    return Array.from(labels).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  }, [activeClientes]);
-
   const filteredClientes = React.useMemo(() => {
     if (!activeClientes) return [];
-    let base = activeClientes;
-    if (segmentFilter !== "todos") {
-      base = base.filter((c) => (c.segmento ?? "").trim() === segmentFilter);
-    }
-    if (!searchQuery.trim()) return base;
+    if (!searchQuery.trim()) return activeClientes;
     const q = normalizeForSearch(searchQuery);
-    return base.filter((c) => normalizeForSearch(c.nome).includes(q));
-  }, [activeClientes, searchQuery, segmentFilter]);
+    return activeClientes.filter((c) => normalizeForSearch(c.nome).includes(q));
+  }, [activeClientes, searchQuery]);
 
   return (
     <main className="space-y-6">
@@ -138,19 +124,6 @@ export default function CentralClientesPage() {
             </div>
           </div>
 
-          {/* Linha 2: filtro de segmento (só aparece se houver segmentos) */}
-          {segmentOptions.length > 0 && (
-            <select
-              value={segmentFilter}
-              onChange={(e) => setSegmentFilter(e.target.value)}
-              className="w-full rounded-xl border border-[var(--border)] bg-white/[0.04] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] focus:border-[var(--primary)]/40 focus:outline-none transition-colors sm:w-auto sm:min-w-[160px]"
-            >
-              <option value="todos">Todos os segmentos</option>
-              {segmentOptions.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          )}
         </div>
       </section>
 
