@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ClienteCard, type ClienteCardData } from "@/components/clientes/ClienteCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Plus, Users, Search, LayoutList, LayoutGrid, ArrowUpRight } from "lucide-react";
+import { ChevronRight, Plus, Search, LayoutList, LayoutGrid, ArrowUpRight } from "lucide-react";
 
 async function fetchClientes(): Promise<ClienteCardData[]> {
   const res = await fetch("/api/clientes");
@@ -74,69 +74,76 @@ export default function CentralClientesPage() {
         <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[var(--primary)] opacity-[0.05] blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 left-1/3 h-48 w-48 rounded-full bg-[var(--primary)] opacity-[0.03] blur-3xl" />
 
-        {/* Topo: título + contador */}
-        <div className="relative flex flex-col gap-6 px-8 pb-6 pt-8 sm:flex-row sm:items-center sm:justify-between sm:px-10 sm:pt-10">
-          {/* Esquerda: eyebrow + título + descrição */}
-          <div>
-            <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--primary)]">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
-              Consultoria estratégica
-            </p>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-              <span className="text-[var(--foreground)]">Central de </span>
-              <span className="bg-gradient-to-r from-[var(--primary)] to-[#ff9a40] bg-clip-text text-transparent">
-                Clientes
-              </span>
-            </h1>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--muted-foreground)]">
-              Hub consolidado de performance dos clientes ativos. Escolha um cliente para analisar funil,
-              investimento e resultados em profundidade.
-            </p>
-          </div>
-
-          {/* Direita: badge de clientes ativos */}
-          <div className="flex shrink-0 items-center gap-4 self-start sm:self-auto">
-            <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-[var(--border)] bg-white/[0.03] px-6 py-4 text-center">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)]">
-                <Users className="h-4 w-4" />
-              </div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-                Clientes ativos
-              </p>
-              <p className="text-3xl font-extrabold tabular-nums leading-none text-[var(--foreground)]">
-                {isLoading ? (
-                  <span className="animate-pulse text-[var(--muted-foreground)]">—</span>
-                ) : (
-                  activeClientes.length
-                )}
-              </p>
-            </div>
-          </div>
+        {/* Topo: título */}
+        <div className="relative px-8 pb-6 pt-8 sm:px-10 sm:pt-10">
+          <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-[var(--primary)]">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
+            Consultoria estratégica
+          </p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+            <span className="text-[var(--foreground)]">Central de </span>
+            <span className="bg-gradient-to-r from-[var(--primary)] to-[#ff9a40] bg-clip-text text-transparent">
+              Clientes
+            </span>
+          </h1>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-[var(--muted-foreground)]">
+            Hub consolidado de performance dos clientes ativos. Escolha um cliente para analisar funil,
+            investimento e resultados em profundidade.
+          </p>
         </div>
 
         {/* Divisor */}
         <div className="h-px bg-[var(--border)]/50" />
 
-        {/* Rodapé: pesquisa + filtro de segmento + toggle de visualização */}
-        <div className="relative flex flex-col gap-3 px-8 py-4 sm:flex-row sm:items-center sm:gap-4 sm:px-10">
-          {/* Search */}
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
-            <input
-              type="text"
-              placeholder="Pesquisar por nome do cliente..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-[var(--border)] bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--primary)]/40 focus:bg-white/[0.06] focus:outline-none transition-colors"
-            />
+        {/* Rodapé: pesquisa + toggle (sempre na mesma linha) + filtro de segmento */}
+        <div className="relative flex flex-col gap-2 px-8 py-4 sm:px-10">
+          {/* Linha 1: search + toggle */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted-foreground)]" />
+              <input
+                type="text"
+                placeholder="Pesquisar por nome do cliente..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-[var(--border)] bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--primary)]/40 focus:bg-white/[0.06] focus:outline-none transition-colors"
+              />
+            </div>
+            {/* View toggle — compacto, sempre visível */}
+            <div className="flex shrink-0 items-center gap-1 rounded-xl border border-[var(--border)] bg-white/[0.04] p-1">
+              <button
+                onClick={() => setViewMode("lista")}
+                title="Visualização em lista"
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+                  viewMode === "lista"
+                    ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20"
+                    : "text-[var(--muted-foreground)] hover:bg-white/[0.05] hover:text-[var(--foreground)]"
+                }`}
+              >
+                <LayoutList className="h-4 w-4" />
+                <span className="hidden sm:inline">Lista</span>
+              </button>
+              <button
+                onClick={() => setViewMode("card")}
+                title="Visualização em cards"
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
+                  viewMode === "card"
+                    ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20"
+                    : "text-[var(--muted-foreground)] hover:bg-white/[0.05] hover:text-[var(--foreground)]"
+                }`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                <span className="hidden sm:inline">Card</span>
+              </button>
+            </div>
           </div>
 
-          {/* Segment filter */}
+          {/* Linha 2: filtro de segmento (só aparece se houver segmentos) */}
           {segmentOptions.length > 0 && (
             <select
               value={segmentFilter}
               onChange={(e) => setSegmentFilter(e.target.value)}
-              className="min-w-[160px] rounded-xl border border-[var(--border)] bg-white/[0.04] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] focus:border-[var(--primary)]/40 focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-[var(--border)] bg-white/[0.04] px-3 py-2.5 text-xs font-medium text-[var(--foreground)] focus:border-[var(--primary)]/40 focus:outline-none transition-colors sm:w-auto sm:min-w-[160px]"
             >
               <option value="todos">Todos os segmentos</option>
               {segmentOptions.map((s) => (
@@ -144,35 +151,6 @@ export default function CentralClientesPage() {
               ))}
             </select>
           )}
-
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          {/* View toggle */}
-          <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-white/[0.04] p-1">
-            <button
-              onClick={() => setViewMode("lista")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                viewMode === "lista"
-                  ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20"
-                  : "text-[var(--muted-foreground)] hover:bg-white/[0.05] hover:text-[var(--foreground)]"
-              }`}
-            >
-              <LayoutList className="h-4 w-4" />
-              Lista
-            </button>
-            <button
-              onClick={() => setViewMode("card")}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                viewMode === "card"
-                  ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20"
-                  : "text-[var(--muted-foreground)] hover:bg-white/[0.05] hover:text-[var(--foreground)]"
-              }`}
-            >
-              <LayoutGrid className="h-4 w-4" />
-              Card
-            </button>
-          </div>
         </div>
       </section>
 
