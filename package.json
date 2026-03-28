@@ -28,7 +28,7 @@
     "google-ads-api": "^23.0.0",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.460.0",
-    "next": "15.0.3",
+    "next": "15.5.14",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.13.0",
@@ -40,10 +40,15 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "15.0.3",
+    "eslint-config-next": "15.5.14",
     "postcss": "^8.4.49",
     "prisma": "^6.0.0",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.0"
+  },
+  "overrides": {
+    "effect": "^3.20.0",
+    "flatted": "^3.4.2",
+    "picomatch": "^4.0.4"
   }
 }
