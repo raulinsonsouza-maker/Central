@@ -53,25 +53,17 @@ function fmt(n: number, decimals = 0) {
 }
 
 export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) {
-  const [filterDecision, setFilterDecision] = React.useState<string>("todos");
   const [sortBy, setSortBy] = React.useState<"impressions" | "clicks" | "cost" | "conversions" | "cpl" | "ctr">("conversions");
   const [sortDir, setSortDir] = React.useState<"desc" | "asc">("desc");
 
   const { keywords, totals } = data;
 
-  const countEscalar  = keywords.filter((k) => k.decision === "escalar").length;
-  const countOtimizar = keywords.filter((k) => k.decision === "otimizar").length;
-  const countPausar   = keywords.filter((k) => k.decision === "pausar").length;
-  const countRevisar  = keywords.filter((k) => k.decision === "revisar").length;
-
-  const filtered = React.useMemo(() => {
-    let list = filterDecision === "todos" ? keywords : keywords.filter((k) => k.decision === filterDecision);
-    list = [...list].sort((a, b) => {
+  const sorted = React.useMemo(() => {
+    return [...keywords].sort((a, b) => {
       const diff = (a[sortBy] as number) - (b[sortBy] as number);
       return sortDir === "desc" ? -diff : diff;
     });
-    return list;
-  }, [keywords, filterDecision, sortBy, sortDir]);
+  }, [keywords, sortBy, sortDir]);
 
   function toggleSort(col: typeof sortBy) {
     if (sortBy === col) setSortDir((d) => (d === "desc" ? "asc" : "desc"));
@@ -84,7 +76,7 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {[1,2,3,4,5,6].map((i) => (
-            <div key={i} className="h-[88px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--card)]" />
+            <div key={i} className="h-[76px] animate-pulse rounded-2xl border border-[var(--border)] bg-[var(--card)]" />
           ))}
         </div>
         <div className="h-64 animate-pulse rounded-[2rem] border border-[var(--border)] bg-[var(--card)]" />
@@ -125,7 +117,7 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
   return (
     <div className="space-y-6">
 
-      {/* ── Section header — mesma barra laranja do restante do site ── */}
+      {/* ── Section header ── */}
       <div className="flex items-start gap-3">
         <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
         <div>
@@ -138,67 +130,34 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
         </div>
       </div>
 
-      {/* ── KPI cards — flutuando diretamente, mesmo padrão da aba Análise ── */}
+      {/* ── KPI cards ── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {([
-          { label: "Impressões",   value: fmt(totals.impressions),                                    icon: Eye,               accent: false },
-          { label: "Cliques",      value: fmt(totals.clicks),                                         icon: MousePointerClick, accent: false },
-          { label: "CTR Médio",    value: `${fmt(totals.ctr, 2)}%`,                                   icon: Percent,           accent: false },
-          { label: "Investimento", value: formatCurrency(totals.cost),                                icon: Wallet,            accent: false },
-          { label: "Conversões",   value: fmt(totals.conversions, 1),                                 icon: TrendingUp,        accent: true  },
-          { label: "CPL Médio",    value: totals.cpl > 0 ? formatCurrency(totals.cpl) : "—",          icon: TrendingUp,        accent: true  },
+          { label: "Impressões",   value: fmt(totals.impressions),                           icon: Eye,               accent: false },
+          { label: "Cliques",      value: fmt(totals.clicks),                                icon: MousePointerClick, accent: false },
+          { label: "CTR Médio",    value: `${fmt(totals.ctr, 2)}%`,                          icon: Percent,           accent: false },
+          { label: "Investimento", value: formatCurrency(totals.cost),                       icon: Wallet,            accent: false },
+          { label: "Conversões",   value: fmt(totals.conversions, 1),                        icon: TrendingUp,        accent: true  },
+          { label: "CPL Médio",    value: totals.cpl > 0 ? formatCurrency(totals.cpl) : "—", icon: TrendingUp,        accent: true  },
         ] as const).map(({ label, value, icon: Icon, accent }) => (
           <Card key={label} className="group relative overflow-hidden rounded-2xl border-[var(--border)] transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]">
             <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-[0.05]" />
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
-                <Icon className="h-5 w-5" />
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)]">
+                  <Icon className="h-3.5 w-3.5" />
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)] leading-tight">{label}</p>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{label}</p>
-                <p className={`mt-1 text-2xl font-extrabold tabular-nums leading-none ${accent ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
-                  {value}
-                </p>
-              </div>
+              <p className={`text-lg font-extrabold tabular-nums leading-none truncate ${accent ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
+                {value}
+              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* ── Decision pills — horizontal, sem linhas divisórias ── */}
-      <div className="flex flex-wrap items-center gap-2">
-        {([
-          { count: countEscalar,  label: "Escalar",  dot: "bg-green-500", color: "text-green-500", ring: "border-green-500/25 bg-green-500/8",  activeRing: "border-green-500/50 bg-green-500/15"  },
-          { count: countOtimizar, label: "Otimizar", dot: "bg-amber-500", color: "text-amber-500", ring: "border-amber-500/25 bg-amber-500/8",  activeRing: "border-amber-500/50 bg-amber-500/15"  },
-          { count: countRevisar,  label: "Revisar",  dot: "bg-blue-400",  color: "text-blue-400",  ring: "border-blue-400/25  bg-blue-400/8",   activeRing: "border-blue-400/50  bg-blue-400/15"   },
-          { count: countPausar,   label: "Pausar",   dot: "bg-red-500",   color: "text-red-500",   ring: "border-red-500/25   bg-red-500/8",    activeRing: "border-red-500/50   bg-red-500/15"    },
-        ] as const).map((s) => {
-          const isActive = filterDecision === s.label.toLowerCase();
-          return (
-            <button
-              key={s.label}
-              onClick={() => setFilterDecision(isActive ? "todos" : s.label.toLowerCase())}
-              className={`flex items-center gap-2 rounded-full border px-4 py-1.5 transition-all ${isActive ? s.activeRing : s.ring} hover:opacity-90`}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-              <span className={`text-lg font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
-              <span className={`text-[11px] font-semibold uppercase tracking-wider ${s.color}`}>{s.label}</span>
-            </button>
-          );
-        })}
-        {filterDecision !== "todos" ? (
-          <button
-            onClick={() => setFilterDecision("todos")}
-            className="rounded-full border border-[var(--border)] px-3 py-1.5 text-[10px] text-[var(--muted-foreground)] transition-colors hover:border-[var(--primary)] hover:text-[var(--primary)]"
-          >
-            Limpar filtro
-          </button>
-        ) : (
-          <span className="text-[11px] text-[var(--muted-foreground)]">· Clique para filtrar</span>
-        )}
-      </div>
-
-      {/* ── Tabela — card flutuante, mesmo estilo Semana a semana ── */}
+      {/* ── Tabela — card flutuante ── */}
       <Card className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
         <CardHeader className="border-b border-[var(--border)]/60 px-6 pb-4 pt-5 sm:px-8">
           <div className="flex items-center justify-between gap-4">
@@ -211,9 +170,7 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
                   Detalhamento de palavras-chave
                 </h3>
                 <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">
-                  {filterDecision !== "todos"
-                    ? `${filtered.length} termo${filtered.length !== 1 ? "s" : ""} · filtrando: ${filterDecision}`
-                    : `${filtered.length} termo${filtered.length !== 1 ? "s" : ""}`}
+                  {sorted.length} termo{sorted.length !== 1 ? "s" : ""}
                 </p>
               </div>
             </div>
@@ -253,7 +210,7 @@ export function GoogleKeywordsPanel({ data, formatCurrency, isLoading }: Props) 
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((kw, i) => {
+                {sorted.map((kw, i) => {
                   const cfg = DECISION_CONFIG[kw.decision];
                   return (
                     <tr key={`${kw.text}-${kw.matchType}-${i}`} className="group">
