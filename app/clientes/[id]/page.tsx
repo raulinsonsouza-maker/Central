@@ -1575,12 +1575,19 @@ function MetaCriativosGrid({
   const pctPausar = totalSpend > 0 ? Math.round((pausarSpend / totalSpend) * 100) : 0;
   const avgCpl = totalLeads > 0 ? totalSpend / totalLeads : null;
 
+  const topEscalar = scoredItems.find((i) => i.status === "ESCALAR");
   const decisionInsight =
-    pctPausar > 30 ? `${pctPausar}% da verba em criativos que não trazem resultado.`
-    : countValidando === sorted.length ? `Todos os criativos ainda em validação — aguarde mais dados.`
-    : countEscalar === 0 && countValidando === 0 ? `Nenhum criativo escalável. Refine a oferta ou crie novas artes.`
-    : countEscalar >= sorted.length * 0.5 ? `Conjunto saudável — mais da metade está escalável.`
-    : `Foque o orçamento nos ${countEscalar} criativo${countEscalar > 1 ? "s" : ""} com CPL abaixo da meta.`;
+    pctPausar > 30
+      ? `${pctPausar}% da verba está em criativos sem retorno — redistribuição urgente para preservar o CPL.`
+    : countValidando === sorted.length
+      ? `Ainda sem dados de conversão suficientes. Aguarde mais investimento para o sistema avaliar cada criativo.`
+    : countEscalar === 0 && countValidando === 0
+      ? `Nenhum criativo está batendo a meta de CPL. Considere testar novos formatos, textos ou ofertas.`
+    : countEscalar >= sorted.length * 0.5
+      ? `Conjunto saudável: a maioria dos criativos está convertendo dentro da meta de CPL.`
+    : countEscalar === 1 && topEscalar
+      ? `"${topEscalar.displayName}" é o único dentro da meta — concentre o orçamento nele e contenha o restante.`
+    : `${countEscalar} criativos estão dentro da meta de CPL — direcione o orçamento para eles.`;
 
   const modalItem = modalAdId ? scoredItems.find((i) => i.ad.id === modalAdId) ?? null : null;
 
