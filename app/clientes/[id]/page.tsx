@@ -438,11 +438,12 @@ export default function ClienteDetailPage() {
   const isVarellaPanel = isVarellaMotos(cliente);
   const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)) && canal !== "google";
   const isComprasPanel = isDor(cliente) && canal !== "google";
-  const convLabels = isComprasPanel
+  const convLabels = React.useMemo(() => isComprasPanel
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
     : isMiguelPanel
     ? { singular: "conv.", plural: "conversas", metric: "Custo/conv.", metricFull: "Custo / Conversa", kpi: "Meta Custo/Conv.", dbKey: "CONVERSAS", taxa: "TAXA CONVERSA", cust: "CUSTO / CONVERSA", semResult: "sem conversas", crLabel: "CR (clique→conv.)", chartKey: "Conversas", sub: "Conversas por mensagem iniciadas no período" }
-    : { singular: "lead", plural: "leads", metric: "CPL", metricFull: "CPL", kpi: "CPL Alvo", dbKey: "LEADS", taxa: "TAXA CONV.", cust: "CPL", semResult: "sem leads", crLabel: "CR (clique→lead)", chartKey: "Leads", sub: "Total do período" };
+    : { singular: "lead", plural: "leads", metric: "CPL", metricFull: "CPL", kpi: "CPL Alvo", dbKey: "LEADS", taxa: "TAXA CONV.", cust: "CPL", semResult: "sem leads", crLabel: "CR (clique→lead)", chartKey: "Leads", sub: "Total do período" }
+  , [isComprasPanel, isMiguelPanel]);
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -928,6 +929,8 @@ function formatPercentage(value: number) {
               ads={metaAdsData.data}
               formatCurrency={formatCurrency}
               conversasMode={isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)}
+              isComprasPanel={isComprasPanel}
+              convLabels={convLabels}
             />
           ) : (
             <div className="flex items-center justify-center py-16">
@@ -1365,14 +1368,24 @@ function CriativoPreview({
   return <Placeholder />;
 }
 
+type ConvLabels = {
+  singular: string; plural: string; metric: string; metricFull: string; kpi: string;
+  dbKey: string; taxa: string; cust: string; semResult: string; crLabel: string;
+  chartKey: string; sub: string;
+};
+
 function MetaCriativosGrid({
   ads,
   formatCurrency,
   conversasMode = false,
+  isComprasPanel = false,
+  convLabels,
 }: {
   ads: MetaAdItem[];
   formatCurrency: (v: number) => string;
   conversasMode?: boolean;
+  isComprasPanel?: boolean;
+  convLabels: ConvLabels;
 }) {
   const sorted = React.useMemo(() => {
     const nameCounts: Record<string, number> = {};
@@ -1406,7 +1419,10 @@ function MetaCriativosGrid({
           getAction("messaging_conversation_started_7d") ||
           getAction("onsite_messaging_conversation_started_7d") ||
           getAction("messaging_first_reply");
-        const leads = conversasMode ? conversasCount : conventionalLeads;
+        const comprasCount =
+          getAction("offsite_conversion.fb_pixel_purchase") ||
+          getAction("purchase");
+        const leads = isComprasPanel ? comprasCount : conversasMode ? conversasCount : conventionalLeads;
         const video3sViews = getAction("video_view");
         const video100Views = parseInt(
           insight?.video_p100_watched_actions?.[0]?.value ?? "0", 10
