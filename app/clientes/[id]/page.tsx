@@ -1461,14 +1461,6 @@ function MetaCriativosGrid({
   const totalImpressions = sorted.reduce((acc, item) => acc + item.impressions, 0);
   const totalClicks = sorted.reduce((acc, item) => acc + item.clicks, 0);
   const averageCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
-  const avgFrequency = (() => {
-    const withFreq = sorted.filter((i) => i.frequency > 0);
-    if (!withFreq.length) return 0;
-    const totalImpr = withFreq.reduce((acc, i) => acc + i.impressions, 0);
-    if (!totalImpr) return 0;
-    return withFreq.reduce((acc, i) => acc + i.frequency * i.impressions, 0) / totalImpr;
-  })();
-
   const previewFormat = "MOBILE_FEED_STANDARD" as const;
 
   if (!sorted.length) {
@@ -1627,13 +1619,13 @@ function MetaCriativosGrid({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {([
           {
-            label: "CTR Médio",
-            value: averageCtr > 0 ? `${averageCtr.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : "—",
-            accent: false,
+            label: "Em Veiculação",
+            value: sorted.length.toLocaleString("pt-BR"),
+            accent: true,
           },
           {
-            label: "Frequência Média",
-            value: avgFrequency > 0 ? avgFrequency.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—",
+            label: "CTR Médio",
+            value: averageCtr > 0 ? `${averageCtr.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : "—",
             accent: false,
           },
           {
