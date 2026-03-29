@@ -182,7 +182,13 @@ export function DefaultPanel({
                 subtitle={
                   canal === "google"
                     ? "Investimento e conversões por semana"
-                    : "Investimento e leads por semana"
+                    : visitasMode
+                      ? "Investimento e visitas ao perfil por semana"
+                      : comprasMode
+                        ? "Investimento e compras por semana"
+                        : conversasMode
+                          ? "Investimento e conversas por semana"
+                          : "Investimento e leads por semana"
                 }
               />
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">

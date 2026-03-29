@@ -522,26 +522,32 @@ export default function ClienteDetailPage() {
         ? "Total de conversões atribuídas (alinhado ao relatório de campanhas do Google Ads)."
         : isComprasPanel
           ? "Compras no site atribuídas ao período (objetivo principal das campanhas)."
-          : isMiguelPanel
-            ? "Conversas por mensagem iniciadas no período (objetivo principal das campanhas)."
-            : "Conversões atribuídas ao período.";
+          : isVisitasPanel
+            ? "Visitas ao perfil do Instagram geradas no período."
+            : isMiguelPanel
+              ? "Conversas por mensagem iniciadas no período (objetivo principal das campanhas)."
+              : "Conversões atribuídas ao período.";
     const taxaDesc =
       canal === "google"
         ? "Conversões em relação aos cliques (taxa de conversão aproximada)."
         : isComprasPanel
           ? "Percentual de compras sobre os cliques gerados."
-          : isMiguelPanel
-            ? "Percentual de conversas iniciadas sobre os cliques gerados."
-            : "Percentual de leads sobre cliques.";
+          : isVisitasPanel
+            ? "Visitas ao perfil por mil impressões (taxa de entrega de visitas)."
+            : isMiguelPanel
+              ? "Percentual de conversas iniciadas sobre os cliques gerados."
+              : "Percentual de leads sobre cliques.";
     const custoPorResultadoLabel = canal === "google" ? "CUSTO / CONV." : convLabels.cust;
     const custoPorResultadoDesc =
       canal === "google"
         ? "Investimento ÷ conversões da semana (equivalente ao custo por conversão do Google)."
         : isComprasPanel
           ? "Investimento ÷ compras no site da semana."
-          : isMiguelPanel
-            ? "Investimento ÷ conversas iniciadas da semana."
-            : "Custo médio por lead da semana.";
+          : isVisitasPanel
+            ? "Investimento ÷ visitas ao perfil da semana."
+            : isMiguelPanel
+              ? "Investimento ÷ conversas iniciadas da semana."
+              : "Custo médio por lead da semana.";
     return [
       {
         label: "INVESTIMENTO",
@@ -587,9 +593,10 @@ export default function ClienteDetailPage() {
         trend: "higher" as MetricTrend,
         value: (s: MetricRow) => {
           const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+          if (isVisitasPanel) return s.impressoes > 0 ? (conv / s.impressoes) * 1000 : 0;
           return s.cliques > 0 ? (conv / s.cliques) * 100 : 0;
         },
-        format: (value: number) => formatPercentage(value),
+        format: (value: number) => isVisitasPanel ? value.toFixed(2) : formatPercentage(value),
       },
       {
         label: "CPC",

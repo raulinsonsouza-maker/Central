@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { findFatosByClienteAndPeriod } from "@/lib/repositories/fatosMidiaRepository";
 import { findClienteById } from "@/lib/repositories/clientesRepository";
 import { outcomeCountForFato } from "@/lib/metrics/fatoMidiaOutcome";
+import { isFlorien } from "@/lib/clientProfiles";
 import { startOfWeek, endOfWeek, getISOWeek, getYear } from "date-fns";
 export async function GET(
   request: NextRequest,
@@ -48,6 +49,13 @@ export async function GET(
     canalFilter
   );
 
+  // For profile-visit clients, use profileVisits as the primary outcome metric
+  const usesProfileVisits = isFlorien(cliente);
+  const getLeads = (f: (typeof fatos)[number]) =>
+    usesProfileVisits && f.canal !== "GOOGLE"
+      ? ((f as { profileVisits?: number }).profileVisits ?? 0)
+      : outcomeCountForFato(f.canal, f.leads, f.conversoes);
+
   if (agrupamento === "semanal") {
     const byWeek = new Map<
       string,
@@ -70,7 +78,7 @@ export async function GET(
       const existing = byWeek.get(key);
       const inv = Number(f.investimento);
       const conversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
-      const leads = outcomeCountForFato(f.canal, f.leads, f.conversoes);
+      const leads = getLeads(f);
       const imp = f.impressoes;
       const clk = f.cliques;
       if (existing) {
@@ -104,7 +112,7 @@ export async function GET(
         return {
           data: f.data,
           investimento: Number(f.investimento),
-          leads: outcomeCountForFato(f.canal, f.leads, f.conversoes),
+          leads: getLeads(f),
           conversas: fConversas,
           impressoes: f.impressoes,
           cliques: f.cliques,
@@ -120,7 +128,7 @@ export async function GET(
     diario: fatos.map((f) => ({
       data: f.data,
       investimento: Number(f.investimento),
-      leads: outcomeCountForFato(f.canal, f.leads, f.conversoes),
+      leads: getLeads(f),
       impressoes: f.impressoes,
       cliques: f.cliques,
     })),
