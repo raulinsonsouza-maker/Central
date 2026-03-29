@@ -1956,12 +1956,12 @@ export namespace Prisma {
     agregadosMensal: number
     agregadosSemanal: number
     contas: number
-    fatosMidia: number
     fatosAnalyticsDiario: number
     fatosAnalyticsPorCanal: number
+    fatosMidia: number
     googleAdsCriativos: number
-    metaAdsCriativos: number
     metas: number
+    metaAdsCriativos: number
     pautasReuniao: number
   }
 
@@ -1969,12 +1969,12 @@ export namespace Prisma {
     agregadosMensal?: boolean | ClienteCountOutputTypeCountAgregadosMensalArgs
     agregadosSemanal?: boolean | ClienteCountOutputTypeCountAgregadosSemanalArgs
     contas?: boolean | ClienteCountOutputTypeCountContasArgs
-    fatosMidia?: boolean | ClienteCountOutputTypeCountFatosMidiaArgs
     fatosAnalyticsDiario?: boolean | ClienteCountOutputTypeCountFatosAnalyticsDiarioArgs
     fatosAnalyticsPorCanal?: boolean | ClienteCountOutputTypeCountFatosAnalyticsPorCanalArgs
+    fatosMidia?: boolean | ClienteCountOutputTypeCountFatosMidiaArgs
     googleAdsCriativos?: boolean | ClienteCountOutputTypeCountGoogleAdsCriativosArgs
-    metaAdsCriativos?: boolean | ClienteCountOutputTypeCountMetaAdsCriativosArgs
     metas?: boolean | ClienteCountOutputTypeCountMetasArgs
+    metaAdsCriativos?: boolean | ClienteCountOutputTypeCountMetaAdsCriativosArgs
     pautasReuniao?: boolean | ClienteCountOutputTypeCountPautasReuniaoArgs
   }
 
@@ -2013,13 +2013,6 @@ export namespace Prisma {
   /**
    * ClienteCountOutputType without action
    */
-  export type ClienteCountOutputTypeCountFatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FatoMidiaDiarioWhereInput
-  }
-
-  /**
-   * ClienteCountOutputType without action
-   */
   export type ClienteCountOutputTypeCountFatosAnalyticsDiarioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FatoAnalyticsDiarioWhereInput
   }
@@ -2034,6 +2027,13 @@ export namespace Prisma {
   /**
    * ClienteCountOutputType without action
    */
+  export type ClienteCountOutputTypeCountFatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FatoMidiaDiarioWhereInput
+  }
+
+  /**
+   * ClienteCountOutputType without action
+   */
   export type ClienteCountOutputTypeCountGoogleAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GoogleAdsCriativoWhereInput
   }
@@ -2041,15 +2041,15 @@ export namespace Prisma {
   /**
    * ClienteCountOutputType without action
    */
-  export type ClienteCountOutputTypeCountMetaAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MetaAdsCriativoWhereInput
+  export type ClienteCountOutputTypeCountMetasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MetaWhereInput
   }
 
   /**
    * ClienteCountOutputType without action
    */
-  export type ClienteCountOutputTypeCountMetasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: MetaWhereInput
+  export type ClienteCountOutputTypeCountMetaAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MetaAdsCriativoWhereInput
   }
 
   /**
@@ -2065,15 +2065,15 @@ export namespace Prisma {
    */
 
   export type ContaCountOutputType = {
-    fatosMidia: number
     fatosAnalyticsDiario: number
+    fatosMidia: number
     googleAdsCriativos: number
     metaAdsCriativos: number
   }
 
   export type ContaCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    fatosMidia?: boolean | ContaCountOutputTypeCountFatosMidiaArgs
     fatosAnalyticsDiario?: boolean | ContaCountOutputTypeCountFatosAnalyticsDiarioArgs
+    fatosMidia?: boolean | ContaCountOutputTypeCountFatosMidiaArgs
     googleAdsCriativos?: boolean | ContaCountOutputTypeCountGoogleAdsCriativosArgs
     metaAdsCriativos?: boolean | ContaCountOutputTypeCountMetaAdsCriativosArgs
   }
@@ -2092,15 +2092,15 @@ export namespace Prisma {
   /**
    * ContaCountOutputType without action
    */
-  export type ContaCountOutputTypeCountFatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FatoMidiaDiarioWhereInput
+  export type ContaCountOutputTypeCountFatosAnalyticsDiarioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FatoAnalyticsDiarioWhereInput
   }
 
   /**
    * ContaCountOutputType without action
    */
-  export type ContaCountOutputTypeCountFatosAnalyticsDiarioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FatoAnalyticsDiarioWhereInput
+  export type ContaCountOutputTypeCountFatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FatoMidiaDiarioWhereInput
   }
 
   /**
@@ -2367,12 +2367,12 @@ export namespace Prisma {
     agregadosMensal?: boolean | Cliente$agregadosMensalArgs<ExtArgs>
     agregadosSemanal?: boolean | Cliente$agregadosSemanalArgs<ExtArgs>
     contas?: boolean | Cliente$contasArgs<ExtArgs>
-    fatosMidia?: boolean | Cliente$fatosMidiaArgs<ExtArgs>
     fatosAnalyticsDiario?: boolean | Cliente$fatosAnalyticsDiarioArgs<ExtArgs>
     fatosAnalyticsPorCanal?: boolean | Cliente$fatosAnalyticsPorCanalArgs<ExtArgs>
+    fatosMidia?: boolean | Cliente$fatosMidiaArgs<ExtArgs>
     googleAdsCriativos?: boolean | Cliente$googleAdsCriativosArgs<ExtArgs>
-    metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
     metas?: boolean | Cliente$metasArgs<ExtArgs>
+    metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
     pautasReuniao?: boolean | Cliente$pautasReuniaoArgs<ExtArgs>
     _count?: boolean | ClienteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cliente"]>
@@ -2421,12 +2421,12 @@ export namespace Prisma {
     agregadosMensal?: boolean | Cliente$agregadosMensalArgs<ExtArgs>
     agregadosSemanal?: boolean | Cliente$agregadosSemanalArgs<ExtArgs>
     contas?: boolean | Cliente$contasArgs<ExtArgs>
-    fatosMidia?: boolean | Cliente$fatosMidiaArgs<ExtArgs>
     fatosAnalyticsDiario?: boolean | Cliente$fatosAnalyticsDiarioArgs<ExtArgs>
     fatosAnalyticsPorCanal?: boolean | Cliente$fatosAnalyticsPorCanalArgs<ExtArgs>
+    fatosMidia?: boolean | Cliente$fatosMidiaArgs<ExtArgs>
     googleAdsCriativos?: boolean | Cliente$googleAdsCriativosArgs<ExtArgs>
-    metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
     metas?: boolean | Cliente$metasArgs<ExtArgs>
+    metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
     pautasReuniao?: boolean | Cliente$pautasReuniaoArgs<ExtArgs>
     _count?: boolean | ClienteCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -2439,12 +2439,12 @@ export namespace Prisma {
       agregadosMensal: Prisma.$AgregadoMidiaMensalPayload<ExtArgs>[]
       agregadosSemanal: Prisma.$AgregadoMidiaSemanalPayload<ExtArgs>[]
       contas: Prisma.$ContaPayload<ExtArgs>[]
-      fatosMidia: Prisma.$FatoMidiaDiarioPayload<ExtArgs>[]
       fatosAnalyticsDiario: Prisma.$FatoAnalyticsDiarioPayload<ExtArgs>[]
       fatosAnalyticsPorCanal: Prisma.$FatoAnalyticsPorCanalPayload<ExtArgs>[]
+      fatosMidia: Prisma.$FatoMidiaDiarioPayload<ExtArgs>[]
       googleAdsCriativos: Prisma.$GoogleAdsCriativoPayload<ExtArgs>[]
-      metaAdsCriativos: Prisma.$MetaAdsCriativoPayload<ExtArgs>[]
       metas: Prisma.$MetaPayload<ExtArgs>[]
+      metaAdsCriativos: Prisma.$MetaAdsCriativoPayload<ExtArgs>[]
       pautasReuniao: Prisma.$PautaReuniaoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2855,12 +2855,12 @@ export namespace Prisma {
     agregadosMensal<T extends Cliente$agregadosMensalArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$agregadosMensalArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgregadoMidiaMensalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     agregadosSemanal<T extends Cliente$agregadosSemanalArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$agregadosSemanalArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgregadoMidiaSemanalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     contas<T extends Cliente$contasArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$contasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    fatosMidia<T extends Cliente$fatosMidiaArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$fatosMidiaArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoMidiaDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fatosAnalyticsDiario<T extends Cliente$fatosAnalyticsDiarioArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$fatosAnalyticsDiarioArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoAnalyticsDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fatosAnalyticsPorCanal<T extends Cliente$fatosAnalyticsPorCanalArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$fatosAnalyticsPorCanalArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoAnalyticsPorCanalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fatosMidia<T extends Cliente$fatosMidiaArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$fatosMidiaArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoMidiaDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     googleAdsCriativos<T extends Cliente$googleAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$googleAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    metaAdsCriativos<T extends Cliente$metaAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metaAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     metas<T extends Cliente$metasArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    metaAdsCriativos<T extends Cliente$metaAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metaAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pautasReuniao<T extends Cliente$pautasReuniaoArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$pautasReuniaoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PautaReuniaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3361,30 +3361,6 @@ export namespace Prisma {
   }
 
   /**
-   * Cliente.fatosMidia
-   */
-  export type Cliente$fatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the FatoMidiaDiario
-     */
-    select?: FatoMidiaDiarioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the FatoMidiaDiario
-     */
-    omit?: FatoMidiaDiarioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: FatoMidiaDiarioInclude<ExtArgs> | null
-    where?: FatoMidiaDiarioWhereInput
-    orderBy?: FatoMidiaDiarioOrderByWithRelationInput | FatoMidiaDiarioOrderByWithRelationInput[]
-    cursor?: FatoMidiaDiarioWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: FatoMidiaDiarioScalarFieldEnum | FatoMidiaDiarioScalarFieldEnum[]
-  }
-
-  /**
    * Cliente.fatosAnalyticsDiario
    */
   export type Cliente$fatosAnalyticsDiarioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3433,6 +3409,30 @@ export namespace Prisma {
   }
 
   /**
+   * Cliente.fatosMidia
+   */
+  export type Cliente$fatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FatoMidiaDiario
+     */
+    select?: FatoMidiaDiarioSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FatoMidiaDiario
+     */
+    omit?: FatoMidiaDiarioOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FatoMidiaDiarioInclude<ExtArgs> | null
+    where?: FatoMidiaDiarioWhereInput
+    orderBy?: FatoMidiaDiarioOrderByWithRelationInput | FatoMidiaDiarioOrderByWithRelationInput[]
+    cursor?: FatoMidiaDiarioWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FatoMidiaDiarioScalarFieldEnum | FatoMidiaDiarioScalarFieldEnum[]
+  }
+
+  /**
    * Cliente.googleAdsCriativos
    */
   export type Cliente$googleAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3457,30 +3457,6 @@ export namespace Prisma {
   }
 
   /**
-   * Cliente.metaAdsCriativos
-   */
-  export type Cliente$metaAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the MetaAdsCriativo
-     */
-    select?: MetaAdsCriativoSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the MetaAdsCriativo
-     */
-    omit?: MetaAdsCriativoOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: MetaAdsCriativoInclude<ExtArgs> | null
-    where?: MetaAdsCriativoWhereInput
-    orderBy?: MetaAdsCriativoOrderByWithRelationInput | MetaAdsCriativoOrderByWithRelationInput[]
-    cursor?: MetaAdsCriativoWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: MetaAdsCriativoScalarFieldEnum | MetaAdsCriativoScalarFieldEnum[]
-  }
-
-  /**
    * Cliente.metas
    */
   export type Cliente$metasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3502,6 +3478,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MetaScalarFieldEnum | MetaScalarFieldEnum[]
+  }
+
+  /**
+   * Cliente.metaAdsCriativos
+   */
+  export type Cliente$metaAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaAdsCriativo
+     */
+    select?: MetaAdsCriativoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaAdsCriativo
+     */
+    omit?: MetaAdsCriativoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaAdsCriativoInclude<ExtArgs> | null
+    where?: MetaAdsCriativoWhereInput
+    orderBy?: MetaAdsCriativoOrderByWithRelationInput | MetaAdsCriativoOrderByWithRelationInput[]
+    cursor?: MetaAdsCriativoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MetaAdsCriativoScalarFieldEnum | MetaAdsCriativoScalarFieldEnum[]
   }
 
   /**
@@ -3736,8 +3736,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
-    fatosMidia?: boolean | Conta$fatosMidiaArgs<ExtArgs>
     fatosAnalyticsDiario?: boolean | Conta$fatosAnalyticsDiarioArgs<ExtArgs>
+    fatosMidia?: boolean | Conta$fatosMidiaArgs<ExtArgs>
     googleAdsCriativos?: boolean | Conta$googleAdsCriativosArgs<ExtArgs>
     metaAdsCriativos?: boolean | Conta$metaAdsCriativosArgs<ExtArgs>
     _count?: boolean | ContaCountOutputTypeDefaultArgs<ExtArgs>
@@ -3781,8 +3781,8 @@ export namespace Prisma {
   export type ContaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "plataforma" | "accountIdPlataforma" | "googleAdsLoginCustomerId" | "nomeConta" | "createdAt" | "updatedAt", ExtArgs["result"]["conta"]>
   export type ContaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
-    fatosMidia?: boolean | Conta$fatosMidiaArgs<ExtArgs>
     fatosAnalyticsDiario?: boolean | Conta$fatosAnalyticsDiarioArgs<ExtArgs>
+    fatosMidia?: boolean | Conta$fatosMidiaArgs<ExtArgs>
     googleAdsCriativos?: boolean | Conta$googleAdsCriativosArgs<ExtArgs>
     metaAdsCriativos?: boolean | Conta$metaAdsCriativosArgs<ExtArgs>
     _count?: boolean | ContaCountOutputTypeDefaultArgs<ExtArgs>
@@ -3798,8 +3798,8 @@ export namespace Prisma {
     name: "Conta"
     objects: {
       cliente: Prisma.$ClientePayload<ExtArgs>
-      fatosMidia: Prisma.$FatoMidiaDiarioPayload<ExtArgs>[]
       fatosAnalyticsDiario: Prisma.$FatoAnalyticsDiarioPayload<ExtArgs>[]
+      fatosMidia: Prisma.$FatoMidiaDiarioPayload<ExtArgs>[]
       googleAdsCriativos: Prisma.$GoogleAdsCriativoPayload<ExtArgs>[]
       metaAdsCriativos: Prisma.$MetaAdsCriativoPayload<ExtArgs>[]
     }
@@ -4207,8 +4207,8 @@ export namespace Prisma {
   export interface Prisma__ContaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     cliente<T extends ClienteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClienteDefaultArgs<ExtArgs>>): Prisma__ClienteClient<$Result.GetResult<Prisma.$ClientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    fatosMidia<T extends Conta$fatosMidiaArgs<ExtArgs> = {}>(args?: Subset<T, Conta$fatosMidiaArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoMidiaDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fatosAnalyticsDiario<T extends Conta$fatosAnalyticsDiarioArgs<ExtArgs> = {}>(args?: Subset<T, Conta$fatosAnalyticsDiarioArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoAnalyticsDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fatosMidia<T extends Conta$fatosMidiaArgs<ExtArgs> = {}>(args?: Subset<T, Conta$fatosMidiaArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FatoMidiaDiarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     googleAdsCriativos<T extends Conta$googleAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Conta$googleAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     metaAdsCriativos<T extends Conta$metaAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Conta$metaAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -4644,30 +4644,6 @@ export namespace Prisma {
   }
 
   /**
-   * Conta.fatosMidia
-   */
-  export type Conta$fatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the FatoMidiaDiario
-     */
-    select?: FatoMidiaDiarioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the FatoMidiaDiario
-     */
-    omit?: FatoMidiaDiarioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: FatoMidiaDiarioInclude<ExtArgs> | null
-    where?: FatoMidiaDiarioWhereInput
-    orderBy?: FatoMidiaDiarioOrderByWithRelationInput | FatoMidiaDiarioOrderByWithRelationInput[]
-    cursor?: FatoMidiaDiarioWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: FatoMidiaDiarioScalarFieldEnum | FatoMidiaDiarioScalarFieldEnum[]
-  }
-
-  /**
    * Conta.fatosAnalyticsDiario
    */
   export type Conta$fatosAnalyticsDiarioArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4689,6 +4665,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FatoAnalyticsDiarioScalarFieldEnum | FatoAnalyticsDiarioScalarFieldEnum[]
+  }
+
+  /**
+   * Conta.fatosMidia
+   */
+  export type Conta$fatosMidiaArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FatoMidiaDiario
+     */
+    select?: FatoMidiaDiarioSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FatoMidiaDiario
+     */
+    omit?: FatoMidiaDiarioOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FatoMidiaDiarioInclude<ExtArgs> | null
+    where?: FatoMidiaDiarioWhereInput
+    orderBy?: FatoMidiaDiarioOrderByWithRelationInput | FatoMidiaDiarioOrderByWithRelationInput[]
+    cursor?: FatoMidiaDiarioWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FatoMidiaDiarioScalarFieldEnum | FatoMidiaDiarioScalarFieldEnum[]
   }
 
   /**
@@ -4787,6 +4787,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: Decimal | null
     alcance: number | null
     checkoutIniciado: number | null
+    profileVisits: number | null
   }
 
   export type FatoMidiaDiarioSumAggregateOutputType = {
@@ -4806,6 +4807,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: Decimal | null
     alcance: number | null
     checkoutIniciado: number | null
+    profileVisits: number | null
   }
 
   export type FatoMidiaDiarioMinAggregateOutputType = {
@@ -4833,6 +4835,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: Decimal | null
     alcance: number | null
     checkoutIniciado: number | null
+    profileVisits: number | null
   }
 
   export type FatoMidiaDiarioMaxAggregateOutputType = {
@@ -4860,6 +4863,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: Decimal | null
     alcance: number | null
     checkoutIniciado: number | null
+    profileVisits: number | null
   }
 
   export type FatoMidiaDiarioCountAggregateOutputType = {
@@ -4887,6 +4891,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: number
     alcance: number
     checkoutIniciado: number
+    profileVisits: number
     _all: number
   }
 
@@ -4908,6 +4913,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: true
     alcance?: true
     checkoutIniciado?: true
+    profileVisits?: true
   }
 
   export type FatoMidiaDiarioSumAggregateInputType = {
@@ -4927,6 +4933,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: true
     alcance?: true
     checkoutIniciado?: true
+    profileVisits?: true
   }
 
   export type FatoMidiaDiarioMinAggregateInputType = {
@@ -4954,6 +4961,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: true
     alcance?: true
     checkoutIniciado?: true
+    profileVisits?: true
   }
 
   export type FatoMidiaDiarioMaxAggregateInputType = {
@@ -4981,6 +4989,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: true
     alcance?: true
     checkoutIniciado?: true
+    profileVisits?: true
   }
 
   export type FatoMidiaDiarioCountAggregateInputType = {
@@ -5008,6 +5017,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: true
     alcance?: true
     checkoutIniciado?: true
+    profileVisits?: true
     _all?: true
   }
 
@@ -5122,6 +5132,7 @@ export namespace Prisma {
     websitePurchasesConversionValue: Decimal
     alcance: number
     checkoutIniciado: number
+    profileVisits: number
     _count: FatoMidiaDiarioCountAggregateOutputType | null
     _avg: FatoMidiaDiarioAvgAggregateOutputType | null
     _sum: FatoMidiaDiarioSumAggregateOutputType | null
@@ -5168,6 +5179,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: boolean
     alcance?: boolean
     checkoutIniciado?: boolean
+    profileVisits?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5197,6 +5209,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: boolean
     alcance?: boolean
     checkoutIniciado?: boolean
+    profileVisits?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5226,6 +5239,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: boolean
     alcance?: boolean
     checkoutIniciado?: boolean
+    profileVisits?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5255,9 +5269,10 @@ export namespace Prisma {
     websitePurchasesConversionValue?: boolean
     alcance?: boolean
     checkoutIniciado?: boolean
+    profileVisits?: boolean
   }
 
-  export type FatoMidiaDiarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "data" | "canal" | "impressoes" | "cliques" | "leads" | "conversoes" | "investimento" | "cpl" | "rawRowHash" | "createdAt" | "updatedAt" | "contacts" | "costPerPurchase" | "messagingConversationsStarted" | "onFacebookLeads" | "purchases" | "websiteLeads" | "websitePurchaseRoas" | "websitePurchasesConversionValue" | "alcance" | "checkoutIniciado", ExtArgs["result"]["fatoMidiaDiario"]>
+  export type FatoMidiaDiarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "data" | "canal" | "impressoes" | "cliques" | "leads" | "conversoes" | "investimento" | "cpl" | "rawRowHash" | "createdAt" | "updatedAt" | "contacts" | "costPerPurchase" | "messagingConversationsStarted" | "onFacebookLeads" | "purchases" | "websiteLeads" | "websitePurchaseRoas" | "websitePurchasesConversionValue" | "alcance" | "checkoutIniciado" | "profileVisits", ExtArgs["result"]["fatoMidiaDiario"]>
   export type FatoMidiaDiarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
@@ -5302,6 +5317,7 @@ export namespace Prisma {
       websitePurchasesConversionValue: Prisma.Decimal
       alcance: number
       checkoutIniciado: number
+      profileVisits: number
     }, ExtArgs["result"]["fatoMidiaDiario"]>
     composites: {}
   }
@@ -5751,6 +5767,7 @@ export namespace Prisma {
     readonly websitePurchasesConversionValue: FieldRef<"FatoMidiaDiario", 'Decimal'>
     readonly alcance: FieldRef<"FatoMidiaDiario", 'Int'>
     readonly checkoutIniciado: FieldRef<"FatoMidiaDiario", 'Int'>
+    readonly profileVisits: FieldRef<"FatoMidiaDiario", 'Int'>
   }
     
 
@@ -18050,7 +18067,8 @@ export namespace Prisma {
     websitePurchaseRoas: 'websitePurchaseRoas',
     websitePurchasesConversionValue: 'websitePurchasesConversionValue',
     alcance: 'alcance',
-    checkoutIniciado: 'checkoutIniciado'
+    checkoutIniciado: 'checkoutIniciado',
+    profileVisits: 'profileVisits'
   };
 
   export type FatoMidiaDiarioScalarFieldEnum = (typeof FatoMidiaDiarioScalarFieldEnum)[keyof typeof FatoMidiaDiarioScalarFieldEnum]
@@ -18373,12 +18391,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalListRelationFilter
     agregadosSemanal?: AgregadoMidiaSemanalListRelationFilter
     contas?: ContaListRelationFilter
-    fatosMidia?: FatoMidiaDiarioListRelationFilter
     fatosAnalyticsDiario?: FatoAnalyticsDiarioListRelationFilter
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalListRelationFilter
+    fatosMidia?: FatoMidiaDiarioListRelationFilter
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
-    metaAdsCriativos?: MetaAdsCriativoListRelationFilter
     metas?: MetaListRelationFilter
+    metaAdsCriativos?: MetaAdsCriativoListRelationFilter
     pautasReuniao?: PautaReuniaoListRelationFilter
   }
 
@@ -18396,12 +18414,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalOrderByRelationAggregateInput
     agregadosSemanal?: AgregadoMidiaSemanalOrderByRelationAggregateInput
     contas?: ContaOrderByRelationAggregateInput
-    fatosMidia?: FatoMidiaDiarioOrderByRelationAggregateInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioOrderByRelationAggregateInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalOrderByRelationAggregateInput
+    fatosMidia?: FatoMidiaDiarioOrderByRelationAggregateInput
     googleAdsCriativos?: GoogleAdsCriativoOrderByRelationAggregateInput
-    metaAdsCriativos?: MetaAdsCriativoOrderByRelationAggregateInput
     metas?: MetaOrderByRelationAggregateInput
+    metaAdsCriativos?: MetaAdsCriativoOrderByRelationAggregateInput
     pautasReuniao?: PautaReuniaoOrderByRelationAggregateInput
   }
 
@@ -18422,12 +18440,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalListRelationFilter
     agregadosSemanal?: AgregadoMidiaSemanalListRelationFilter
     contas?: ContaListRelationFilter
-    fatosMidia?: FatoMidiaDiarioListRelationFilter
     fatosAnalyticsDiario?: FatoAnalyticsDiarioListRelationFilter
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalListRelationFilter
+    fatosMidia?: FatoMidiaDiarioListRelationFilter
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
-    metaAdsCriativos?: MetaAdsCriativoListRelationFilter
     metas?: MetaListRelationFilter
+    metaAdsCriativos?: MetaAdsCriativoListRelationFilter
     pautasReuniao?: PautaReuniaoListRelationFilter
   }, "id" | "slug">
 
@@ -18478,8 +18496,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Conta"> | Date | string
     updatedAt?: DateTimeFilter<"Conta"> | Date | string
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
-    fatosMidia?: FatoMidiaDiarioListRelationFilter
     fatosAnalyticsDiario?: FatoAnalyticsDiarioListRelationFilter
+    fatosMidia?: FatoMidiaDiarioListRelationFilter
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
     metaAdsCriativos?: MetaAdsCriativoListRelationFilter
   }
@@ -18494,8 +18512,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     cliente?: ClienteOrderByWithRelationInput
-    fatosMidia?: FatoMidiaDiarioOrderByRelationAggregateInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioOrderByRelationAggregateInput
+    fatosMidia?: FatoMidiaDiarioOrderByRelationAggregateInput
     googleAdsCriativos?: GoogleAdsCriativoOrderByRelationAggregateInput
     metaAdsCriativos?: MetaAdsCriativoOrderByRelationAggregateInput
   }
@@ -18514,8 +18532,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Conta"> | Date | string
     updatedAt?: DateTimeFilter<"Conta"> | Date | string
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
-    fatosMidia?: FatoMidiaDiarioListRelationFilter
     fatosAnalyticsDiario?: FatoAnalyticsDiarioListRelationFilter
+    fatosMidia?: FatoMidiaDiarioListRelationFilter
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
     metaAdsCriativos?: MetaAdsCriativoListRelationFilter
   }, "id" | "clienteId_plataforma">
@@ -18576,6 +18594,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
     alcance?: IntFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
+    profileVisits?: IntFilter<"FatoMidiaDiario"> | number
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
     conta?: XOR<ContaNullableScalarRelationFilter, ContaWhereInput> | null
   }
@@ -18605,6 +18624,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
     cliente?: ClienteOrderByWithRelationInput
     conta?: ContaOrderByWithRelationInput
   }
@@ -18638,6 +18658,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
     alcance?: IntFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
+    profileVisits?: IntFilter<"FatoMidiaDiario"> | number
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
     conta?: XOR<ContaNullableScalarRelationFilter, ContaWhereInput> | null
   }, "id" | "clienteId_data_canal">
@@ -18667,6 +18688,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
     _count?: FatoMidiaDiarioCountOrderByAggregateInput
     _avg?: FatoMidiaDiarioAvgOrderByAggregateInput
     _max?: FatoMidiaDiarioMaxOrderByAggregateInput
@@ -18702,6 +18724,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalWithAggregatesFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
     alcance?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
+    profileVisits?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
   }
 
   export type AgregadoMidiaSemanalWhereInput = {
@@ -19628,12 +19651,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -19651,12 +19674,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -19674,12 +19697,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -19697,12 +19720,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -19754,8 +19777,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cliente: ClienteCreateNestedOneWithoutContasInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutContaInput
   }
@@ -19769,8 +19792,8 @@ export namespace Prisma {
     nomeConta?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutContaInput
   }
@@ -19784,8 +19807,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cliente?: ClienteUpdateOneRequiredWithoutContasNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutContaNestedInput
   }
@@ -19799,8 +19822,8 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
   }
@@ -19860,6 +19883,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
     alcance?: number
     checkoutIniciado?: number
+    profileVisits?: number
     cliente: ClienteCreateNestedOneWithoutFatosMidiaInput
     conta?: ContaCreateNestedOneWithoutFatosMidiaInput
   }
@@ -19889,6 +19913,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
     alcance?: number
     checkoutIniciado?: number
+    profileVisits?: number
   }
 
   export type FatoMidiaDiarioUpdateInput = {
@@ -19914,6 +19939,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
     cliente?: ClienteUpdateOneRequiredWithoutFatosMidiaNestedInput
     conta?: ContaUpdateOneWithoutFatosMidiaNestedInput
   }
@@ -19943,6 +19969,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
   }
 
   export type FatoMidiaDiarioCreateManyInput = {
@@ -19970,6 +19997,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
     alcance?: number
     checkoutIniciado?: number
+    profileVisits?: number
   }
 
   export type FatoMidiaDiarioUpdateManyMutationInput = {
@@ -19995,6 +20023,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
   }
 
   export type FatoMidiaDiarioUncheckedUpdateManyInput = {
@@ -20022,6 +20051,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
   }
 
   export type AgregadoMidiaSemanalCreateInput = {
@@ -21117,12 +21147,6 @@ export namespace Prisma {
     none?: ContaWhereInput
   }
 
-  export type FatoMidiaDiarioListRelationFilter = {
-    every?: FatoMidiaDiarioWhereInput
-    some?: FatoMidiaDiarioWhereInput
-    none?: FatoMidiaDiarioWhereInput
-  }
-
   export type FatoAnalyticsDiarioListRelationFilter = {
     every?: FatoAnalyticsDiarioWhereInput
     some?: FatoAnalyticsDiarioWhereInput
@@ -21135,22 +21159,28 @@ export namespace Prisma {
     none?: FatoAnalyticsPorCanalWhereInput
   }
 
+  export type FatoMidiaDiarioListRelationFilter = {
+    every?: FatoMidiaDiarioWhereInput
+    some?: FatoMidiaDiarioWhereInput
+    none?: FatoMidiaDiarioWhereInput
+  }
+
   export type GoogleAdsCriativoListRelationFilter = {
     every?: GoogleAdsCriativoWhereInput
     some?: GoogleAdsCriativoWhereInput
     none?: GoogleAdsCriativoWhereInput
   }
 
-  export type MetaAdsCriativoListRelationFilter = {
-    every?: MetaAdsCriativoWhereInput
-    some?: MetaAdsCriativoWhereInput
-    none?: MetaAdsCriativoWhereInput
-  }
-
   export type MetaListRelationFilter = {
     every?: MetaWhereInput
     some?: MetaWhereInput
     none?: MetaWhereInput
+  }
+
+  export type MetaAdsCriativoListRelationFilter = {
+    every?: MetaAdsCriativoWhereInput
+    some?: MetaAdsCriativoWhereInput
+    none?: MetaAdsCriativoWhereInput
   }
 
   export type PautaReuniaoListRelationFilter = {
@@ -21176,10 +21206,6 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type FatoMidiaDiarioOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type FatoAnalyticsDiarioOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -21188,15 +21214,19 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type FatoMidiaDiarioOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type GoogleAdsCriativoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type MetaAdsCriativoOrderByRelationAggregateInput = {
+  export type MetaOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type MetaOrderByRelationAggregateInput = {
+  export type MetaAdsCriativoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21428,6 +21458,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
   }
 
   export type FatoMidiaDiarioAvgOrderByAggregateInput = {
@@ -21447,6 +21478,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
   }
 
   export type FatoMidiaDiarioMaxOrderByAggregateInput = {
@@ -21474,6 +21506,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
   }
 
   export type FatoMidiaDiarioMinOrderByAggregateInput = {
@@ -21501,6 +21534,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
   }
 
   export type FatoMidiaDiarioSumOrderByAggregateInput = {
@@ -21520,6 +21554,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: SortOrder
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
+    profileVisits?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -22231,13 +22266,6 @@ export namespace Prisma {
     connect?: ContaWhereUniqueInput | ContaWhereUniqueInput[]
   }
 
-  export type FatoMidiaDiarioCreateNestedManyWithoutClienteInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
-    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-  }
-
   export type FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutClienteInput, FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput> | FatoAnalyticsDiarioCreateWithoutClienteInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput | FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput[]
@@ -22252,6 +22280,13 @@ export namespace Prisma {
     connect?: FatoAnalyticsPorCanalWhereUniqueInput | FatoAnalyticsPorCanalWhereUniqueInput[]
   }
 
+  export type FatoMidiaDiarioCreateNestedManyWithoutClienteInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
+    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+  }
+
   export type GoogleAdsCriativoCreateNestedManyWithoutClienteInput = {
     create?: XOR<GoogleAdsCriativoCreateWithoutClienteInput, GoogleAdsCriativoUncheckedCreateWithoutClienteInput> | GoogleAdsCriativoCreateWithoutClienteInput[] | GoogleAdsCriativoUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: GoogleAdsCriativoCreateOrConnectWithoutClienteInput | GoogleAdsCriativoCreateOrConnectWithoutClienteInput[]
@@ -22259,18 +22294,18 @@ export namespace Prisma {
     connect?: GoogleAdsCriativoWhereUniqueInput | GoogleAdsCriativoWhereUniqueInput[]
   }
 
-  export type MetaAdsCriativoCreateNestedManyWithoutClienteInput = {
-    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
-    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
-    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-  }
-
   export type MetaCreateNestedManyWithoutClienteInput = {
     create?: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput> | MetaCreateWithoutClienteInput[] | MetaUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: MetaCreateOrConnectWithoutClienteInput | MetaCreateOrConnectWithoutClienteInput[]
     createMany?: MetaCreateManyClienteInputEnvelope
     connect?: MetaWhereUniqueInput | MetaWhereUniqueInput[]
+  }
+
+  export type MetaAdsCriativoCreateNestedManyWithoutClienteInput = {
+    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
+    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
+    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
   }
 
   export type PautaReuniaoCreateNestedManyWithoutClienteInput = {
@@ -22301,13 +22336,6 @@ export namespace Prisma {
     connect?: ContaWhereUniqueInput | ContaWhereUniqueInput[]
   }
 
-  export type FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
-    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-  }
-
   export type FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutClienteInput, FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput> | FatoAnalyticsDiarioCreateWithoutClienteInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput | FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput[]
@@ -22322,6 +22350,13 @@ export namespace Prisma {
     connect?: FatoAnalyticsPorCanalWhereUniqueInput | FatoAnalyticsPorCanalWhereUniqueInput[]
   }
 
+  export type FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
+    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+  }
+
   export type GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput = {
     create?: XOR<GoogleAdsCriativoCreateWithoutClienteInput, GoogleAdsCriativoUncheckedCreateWithoutClienteInput> | GoogleAdsCriativoCreateWithoutClienteInput[] | GoogleAdsCriativoUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: GoogleAdsCriativoCreateOrConnectWithoutClienteInput | GoogleAdsCriativoCreateOrConnectWithoutClienteInput[]
@@ -22329,18 +22364,18 @@ export namespace Prisma {
     connect?: GoogleAdsCriativoWhereUniqueInput | GoogleAdsCriativoWhereUniqueInput[]
   }
 
-  export type MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput = {
-    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
-    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
-    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-  }
-
   export type MetaUncheckedCreateNestedManyWithoutClienteInput = {
     create?: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput> | MetaCreateWithoutClienteInput[] | MetaUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: MetaCreateOrConnectWithoutClienteInput | MetaCreateOrConnectWithoutClienteInput[]
     createMany?: MetaCreateManyClienteInputEnvelope
     connect?: MetaWhereUniqueInput | MetaWhereUniqueInput[]
+  }
+
+  export type MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput = {
+    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
+    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
+    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
   }
 
   export type PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput = {
@@ -22416,20 +22451,6 @@ export namespace Prisma {
     deleteMany?: ContaScalarWhereInput | ContaScalarWhereInput[]
   }
 
-  export type FatoMidiaDiarioUpdateManyWithoutClienteNestedInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
-    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput[]
-    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
-    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput[]
-    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput | FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput[]
-    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-  }
-
   export type FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutClienteInput, FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput> | FatoAnalyticsDiarioCreateWithoutClienteInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput | FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput[]
@@ -22458,6 +22479,20 @@ export namespace Prisma {
     deleteMany?: FatoAnalyticsPorCanalScalarWhereInput | FatoAnalyticsPorCanalScalarWhereInput[]
   }
 
+  export type FatoMidiaDiarioUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
+    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
+    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput | FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
+  }
+
   export type GoogleAdsCriativoUpdateManyWithoutClienteNestedInput = {
     create?: XOR<GoogleAdsCriativoCreateWithoutClienteInput, GoogleAdsCriativoUncheckedCreateWithoutClienteInput> | GoogleAdsCriativoCreateWithoutClienteInput[] | GoogleAdsCriativoUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: GoogleAdsCriativoCreateOrConnectWithoutClienteInput | GoogleAdsCriativoCreateOrConnectWithoutClienteInput[]
@@ -22472,20 +22507,6 @@ export namespace Prisma {
     deleteMany?: GoogleAdsCriativoScalarWhereInput | GoogleAdsCriativoScalarWhereInput[]
   }
 
-  export type MetaAdsCriativoUpdateManyWithoutClienteNestedInput = {
-    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
-    upsert?: MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput[]
-    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
-    set?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    disconnect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    delete?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    update?: MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput[]
-    updateMany?: MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput | MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput[]
-    deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
-  }
-
   export type MetaUpdateManyWithoutClienteNestedInput = {
     create?: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput> | MetaCreateWithoutClienteInput[] | MetaUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: MetaCreateOrConnectWithoutClienteInput | MetaCreateOrConnectWithoutClienteInput[]
@@ -22498,6 +22519,20 @@ export namespace Prisma {
     update?: MetaUpdateWithWhereUniqueWithoutClienteInput | MetaUpdateWithWhereUniqueWithoutClienteInput[]
     updateMany?: MetaUpdateManyWithWhereWithoutClienteInput | MetaUpdateManyWithWhereWithoutClienteInput[]
     deleteMany?: MetaScalarWhereInput | MetaScalarWhereInput[]
+  }
+
+  export type MetaAdsCriativoUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
+    upsert?: MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
+    set?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    disconnect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    delete?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    update?: MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput | MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
   }
 
   export type PautaReuniaoUpdateManyWithoutClienteNestedInput = {
@@ -22556,20 +22591,6 @@ export namespace Prisma {
     deleteMany?: ContaScalarWhereInput | ContaScalarWhereInput[]
   }
 
-  export type FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
-    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput[]
-    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
-    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput[]
-    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput | FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput[]
-    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-  }
-
   export type FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutClienteInput, FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput> | FatoAnalyticsDiarioCreateWithoutClienteInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput | FatoAnalyticsDiarioCreateOrConnectWithoutClienteInput[]
@@ -22598,6 +22619,20 @@ export namespace Prisma {
     deleteMany?: FatoAnalyticsPorCanalScalarWhereInput | FatoAnalyticsPorCanalScalarWhereInput[]
   }
 
+  export type FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput> | FatoMidiaDiarioCreateWithoutClienteInput[] | FatoMidiaDiarioUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutClienteInput | FatoMidiaDiarioCreateOrConnectWithoutClienteInput[]
+    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: FatoMidiaDiarioCreateManyClienteInputEnvelope
+    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput | FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
+  }
+
   export type GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput = {
     create?: XOR<GoogleAdsCriativoCreateWithoutClienteInput, GoogleAdsCriativoUncheckedCreateWithoutClienteInput> | GoogleAdsCriativoCreateWithoutClienteInput[] | GoogleAdsCriativoUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: GoogleAdsCriativoCreateOrConnectWithoutClienteInput | GoogleAdsCriativoCreateOrConnectWithoutClienteInput[]
@@ -22612,20 +22647,6 @@ export namespace Prisma {
     deleteMany?: GoogleAdsCriativoScalarWhereInput | GoogleAdsCriativoScalarWhereInput[]
   }
 
-  export type MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput = {
-    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
-    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
-    upsert?: MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput[]
-    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
-    set?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    disconnect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    delete?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
-    update?: MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput[]
-    updateMany?: MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput | MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput[]
-    deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
-  }
-
   export type MetaUncheckedUpdateManyWithoutClienteNestedInput = {
     create?: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput> | MetaCreateWithoutClienteInput[] | MetaUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: MetaCreateOrConnectWithoutClienteInput | MetaCreateOrConnectWithoutClienteInput[]
@@ -22638,6 +22659,20 @@ export namespace Prisma {
     update?: MetaUpdateWithWhereUniqueWithoutClienteInput | MetaUpdateWithWhereUniqueWithoutClienteInput[]
     updateMany?: MetaUpdateManyWithWhereWithoutClienteInput | MetaUpdateManyWithWhereWithoutClienteInput[]
     deleteMany?: MetaScalarWhereInput | MetaScalarWhereInput[]
+  }
+
+  export type MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<MetaAdsCriativoCreateWithoutClienteInput, MetaAdsCriativoUncheckedCreateWithoutClienteInput> | MetaAdsCriativoCreateWithoutClienteInput[] | MetaAdsCriativoUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
+    upsert?: MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
+    set?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    disconnect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    delete?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+    update?: MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput | MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
   }
 
   export type PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput = {
@@ -22660,18 +22695,18 @@ export namespace Prisma {
     connect?: ClienteWhereUniqueInput
   }
 
-  export type FatoMidiaDiarioCreateNestedManyWithoutContaInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
-    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-  }
-
   export type FatoAnalyticsDiarioCreateNestedManyWithoutContaInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutContaInput, FatoAnalyticsDiarioUncheckedCreateWithoutContaInput> | FatoAnalyticsDiarioCreateWithoutContaInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutContaInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutContaInput | FatoAnalyticsDiarioCreateOrConnectWithoutContaInput[]
     createMany?: FatoAnalyticsDiarioCreateManyContaInputEnvelope
     connect?: FatoAnalyticsDiarioWhereUniqueInput | FatoAnalyticsDiarioWhereUniqueInput[]
+  }
+
+  export type FatoMidiaDiarioCreateNestedManyWithoutContaInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
+    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
   }
 
   export type GoogleAdsCriativoCreateNestedManyWithoutContaInput = {
@@ -22688,18 +22723,18 @@ export namespace Prisma {
     connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
   }
 
-  export type FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
-    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-  }
-
   export type FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutContaInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutContaInput, FatoAnalyticsDiarioUncheckedCreateWithoutContaInput> | FatoAnalyticsDiarioCreateWithoutContaInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutContaInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutContaInput | FatoAnalyticsDiarioCreateOrConnectWithoutContaInput[]
     createMany?: FatoAnalyticsDiarioCreateManyContaInputEnvelope
     connect?: FatoAnalyticsDiarioWhereUniqueInput | FatoAnalyticsDiarioWhereUniqueInput[]
+  }
+
+  export type FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
+    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
   }
 
   export type GoogleAdsCriativoUncheckedCreateNestedManyWithoutContaInput = {
@@ -22724,20 +22759,6 @@ export namespace Prisma {
     update?: XOR<XOR<ClienteUpdateToOneWithWhereWithoutContasInput, ClienteUpdateWithoutContasInput>, ClienteUncheckedUpdateWithoutContasInput>
   }
 
-  export type FatoMidiaDiarioUpdateManyWithoutContaNestedInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
-    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput[]
-    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
-    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput[]
-    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput | FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput[]
-    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-  }
-
   export type FatoAnalyticsDiarioUpdateManyWithoutContaNestedInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutContaInput, FatoAnalyticsDiarioUncheckedCreateWithoutContaInput> | FatoAnalyticsDiarioCreateWithoutContaInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutContaInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutContaInput | FatoAnalyticsDiarioCreateOrConnectWithoutContaInput[]
@@ -22750,6 +22771,20 @@ export namespace Prisma {
     update?: FatoAnalyticsDiarioUpdateWithWhereUniqueWithoutContaInput | FatoAnalyticsDiarioUpdateWithWhereUniqueWithoutContaInput[]
     updateMany?: FatoAnalyticsDiarioUpdateManyWithWhereWithoutContaInput | FatoAnalyticsDiarioUpdateManyWithWhereWithoutContaInput[]
     deleteMany?: FatoAnalyticsDiarioScalarWhereInput | FatoAnalyticsDiarioScalarWhereInput[]
+  }
+
+  export type FatoMidiaDiarioUpdateManyWithoutContaNestedInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
+    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput[]
+    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
+    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput[]
+    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput | FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput[]
+    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
   }
 
   export type GoogleAdsCriativoUpdateManyWithoutContaNestedInput = {
@@ -22780,20 +22815,6 @@ export namespace Prisma {
     deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
   }
 
-  export type FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput = {
-    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
-    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
-    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput[]
-    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
-    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
-    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput[]
-    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput | FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput[]
-    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-  }
-
   export type FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaNestedInput = {
     create?: XOR<FatoAnalyticsDiarioCreateWithoutContaInput, FatoAnalyticsDiarioUncheckedCreateWithoutContaInput> | FatoAnalyticsDiarioCreateWithoutContaInput[] | FatoAnalyticsDiarioUncheckedCreateWithoutContaInput[]
     connectOrCreate?: FatoAnalyticsDiarioCreateOrConnectWithoutContaInput | FatoAnalyticsDiarioCreateOrConnectWithoutContaInput[]
@@ -22806,6 +22827,20 @@ export namespace Prisma {
     update?: FatoAnalyticsDiarioUpdateWithWhereUniqueWithoutContaInput | FatoAnalyticsDiarioUpdateWithWhereUniqueWithoutContaInput[]
     updateMany?: FatoAnalyticsDiarioUpdateManyWithWhereWithoutContaInput | FatoAnalyticsDiarioUpdateManyWithWhereWithoutContaInput[]
     deleteMany?: FatoAnalyticsDiarioScalarWhereInput | FatoAnalyticsDiarioScalarWhereInput[]
+  }
+
+  export type FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput = {
+    create?: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput> | FatoMidiaDiarioCreateWithoutContaInput[] | FatoMidiaDiarioUncheckedCreateWithoutContaInput[]
+    connectOrCreate?: FatoMidiaDiarioCreateOrConnectWithoutContaInput | FatoMidiaDiarioCreateOrConnectWithoutContaInput[]
+    upsert?: FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput[]
+    createMany?: FatoMidiaDiarioCreateManyContaInputEnvelope
+    set?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    disconnect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    delete?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    connect?: FatoMidiaDiarioWhereUniqueInput | FatoMidiaDiarioWhereUniqueInput[]
+    update?: FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput | FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput[]
+    updateMany?: FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput | FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput[]
+    deleteMany?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
   }
 
   export type GoogleAdsCriativoUncheckedUpdateManyWithoutContaNestedInput = {
@@ -23399,8 +23434,8 @@ export namespace Prisma {
     nomeConta?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutContaInput
   }
@@ -23413,8 +23448,8 @@ export namespace Prisma {
     nomeConta?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutContaInput
   }
@@ -23426,68 +23461,6 @@ export namespace Prisma {
 
   export type ContaCreateManyClienteInputEnvelope = {
     data: ContaCreateManyClienteInput | ContaCreateManyClienteInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type FatoMidiaDiarioCreateWithoutClienteInput = {
-    id?: string
-    data: Date | string
-    canal: string
-    impressoes?: number
-    cliques?: number
-    leads?: number
-    conversoes?: number
-    investimento?: Decimal | DecimalJsLike | number | string
-    cpl?: Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    contacts?: number
-    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: number
-    onFacebookLeads?: number
-    purchases?: number
-    websiteLeads?: number
-    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
-    alcance?: number
-    checkoutIniciado?: number
-    conta?: ContaCreateNestedOneWithoutFatosMidiaInput
-  }
-
-  export type FatoMidiaDiarioUncheckedCreateWithoutClienteInput = {
-    id?: string
-    contaId?: string | null
-    data: Date | string
-    canal: string
-    impressoes?: number
-    cliques?: number
-    leads?: number
-    conversoes?: number
-    investimento?: Decimal | DecimalJsLike | number | string
-    cpl?: Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    contacts?: number
-    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: number
-    onFacebookLeads?: number
-    purchases?: number
-    websiteLeads?: number
-    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
-    alcance?: number
-    checkoutIniciado?: number
-  }
-
-  export type FatoMidiaDiarioCreateOrConnectWithoutClienteInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    create: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput>
-  }
-
-  export type FatoMidiaDiarioCreateManyClienteInputEnvelope = {
-    data: FatoMidiaDiarioCreateManyClienteInput | FatoMidiaDiarioCreateManyClienteInput[]
     skipDuplicates?: boolean
   }
 
@@ -23563,6 +23536,70 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FatoMidiaDiarioCreateWithoutClienteInput = {
+    id?: string
+    data: Date | string
+    canal: string
+    impressoes?: number
+    cliques?: number
+    leads?: number
+    conversoes?: number
+    investimento?: Decimal | DecimalJsLike | number | string
+    cpl?: Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: number
+    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: number
+    onFacebookLeads?: number
+    purchases?: number
+    websiteLeads?: number
+    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
+    alcance?: number
+    checkoutIniciado?: number
+    profileVisits?: number
+    conta?: ContaCreateNestedOneWithoutFatosMidiaInput
+  }
+
+  export type FatoMidiaDiarioUncheckedCreateWithoutClienteInput = {
+    id?: string
+    contaId?: string | null
+    data: Date | string
+    canal: string
+    impressoes?: number
+    cliques?: number
+    leads?: number
+    conversoes?: number
+    investimento?: Decimal | DecimalJsLike | number | string
+    cpl?: Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: number
+    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: number
+    onFacebookLeads?: number
+    purchases?: number
+    websiteLeads?: number
+    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
+    alcance?: number
+    checkoutIniciado?: number
+    profileVisits?: number
+  }
+
+  export type FatoMidiaDiarioCreateOrConnectWithoutClienteInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    create: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput>
+  }
+
+  export type FatoMidiaDiarioCreateManyClienteInputEnvelope = {
+    data: FatoMidiaDiarioCreateManyClienteInput | FatoMidiaDiarioCreateManyClienteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type GoogleAdsCriativoCreateWithoutClienteInput = {
     id?: string
     adResourceName: string
@@ -23612,6 +23649,40 @@ export namespace Prisma {
 
   export type GoogleAdsCriativoCreateManyClienteInputEnvelope = {
     data: GoogleAdsCriativoCreateManyClienteInput | GoogleAdsCriativoCreateManyClienteInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MetaCreateWithoutClienteInput = {
+    id?: string
+    canal?: string | null
+    tipoMeta: string
+    periodicidade: string
+    ano: number
+    mes?: number | null
+    valorMeta: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaUncheckedCreateWithoutClienteInput = {
+    id?: string
+    canal?: string | null
+    tipoMeta: string
+    periodicidade: string
+    ano: number
+    mes?: number | null
+    valorMeta: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaCreateOrConnectWithoutClienteInput = {
+    where: MetaWhereUniqueInput
+    create: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput>
+  }
+
+  export type MetaCreateManyClienteInputEnvelope = {
+    data: MetaCreateManyClienteInput | MetaCreateManyClienteInput[]
     skipDuplicates?: boolean
   }
 
@@ -23676,40 +23747,6 @@ export namespace Prisma {
 
   export type MetaAdsCriativoCreateManyClienteInputEnvelope = {
     data: MetaAdsCriativoCreateManyClienteInput | MetaAdsCriativoCreateManyClienteInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type MetaCreateWithoutClienteInput = {
-    id?: string
-    canal?: string | null
-    tipoMeta: string
-    periodicidade: string
-    ano: number
-    mes?: number | null
-    valorMeta: Decimal | DecimalJsLike | number | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MetaUncheckedCreateWithoutClienteInput = {
-    id?: string
-    canal?: string | null
-    tipoMeta: string
-    periodicidade: string
-    ano: number
-    mes?: number | null
-    valorMeta: Decimal | DecimalJsLike | number | string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MetaCreateOrConnectWithoutClienteInput = {
-    where: MetaWhereUniqueInput
-    create: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput>
-  }
-
-  export type MetaCreateManyClienteInputEnvelope = {
-    data: MetaCreateManyClienteInput | MetaCreateManyClienteInput[]
     skipDuplicates?: boolean
   }
 
@@ -23843,52 +23880,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Conta"> | Date | string
   }
 
-  export type FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    update: XOR<FatoMidiaDiarioUpdateWithoutClienteInput, FatoMidiaDiarioUncheckedUpdateWithoutClienteInput>
-    create: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput>
-  }
-
-  export type FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    data: XOR<FatoMidiaDiarioUpdateWithoutClienteInput, FatoMidiaDiarioUncheckedUpdateWithoutClienteInput>
-  }
-
-  export type FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput = {
-    where: FatoMidiaDiarioScalarWhereInput
-    data: XOR<FatoMidiaDiarioUpdateManyMutationInput, FatoMidiaDiarioUncheckedUpdateManyWithoutClienteInput>
-  }
-
-  export type FatoMidiaDiarioScalarWhereInput = {
-    AND?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-    OR?: FatoMidiaDiarioScalarWhereInput[]
-    NOT?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
-    id?: StringFilter<"FatoMidiaDiario"> | string
-    clienteId?: StringFilter<"FatoMidiaDiario"> | string
-    contaId?: StringNullableFilter<"FatoMidiaDiario"> | string | null
-    data?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
-    canal?: StringFilter<"FatoMidiaDiario"> | string
-    impressoes?: IntFilter<"FatoMidiaDiario"> | number
-    cliques?: IntFilter<"FatoMidiaDiario"> | number
-    leads?: IntFilter<"FatoMidiaDiario"> | number
-    conversoes?: IntFilter<"FatoMidiaDiario"> | number
-    investimento?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
-    cpl?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: StringNullableFilter<"FatoMidiaDiario"> | string | null
-    createdAt?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
-    updatedAt?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
-    contacts?: IntFilter<"FatoMidiaDiario"> | number
-    costPerPurchase?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFilter<"FatoMidiaDiario"> | number
-    onFacebookLeads?: IntFilter<"FatoMidiaDiario"> | number
-    purchases?: IntFilter<"FatoMidiaDiario"> | number
-    websiteLeads?: IntFilter<"FatoMidiaDiario"> | number
-    websitePurchaseRoas?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
-    alcance?: IntFilter<"FatoMidiaDiario"> | number
-    checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
-  }
-
   export type FatoAnalyticsDiarioUpsertWithWhereUniqueWithoutClienteInput = {
     where: FatoAnalyticsDiarioWhereUniqueInput
     update: XOR<FatoAnalyticsDiarioUpdateWithoutClienteInput, FatoAnalyticsDiarioUncheckedUpdateWithoutClienteInput>
@@ -23955,6 +23946,53 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"FatoAnalyticsPorCanal"> | Date | string
   }
 
+  export type FatoMidiaDiarioUpsertWithWhereUniqueWithoutClienteInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    update: XOR<FatoMidiaDiarioUpdateWithoutClienteInput, FatoMidiaDiarioUncheckedUpdateWithoutClienteInput>
+    create: XOR<FatoMidiaDiarioCreateWithoutClienteInput, FatoMidiaDiarioUncheckedCreateWithoutClienteInput>
+  }
+
+  export type FatoMidiaDiarioUpdateWithWhereUniqueWithoutClienteInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    data: XOR<FatoMidiaDiarioUpdateWithoutClienteInput, FatoMidiaDiarioUncheckedUpdateWithoutClienteInput>
+  }
+
+  export type FatoMidiaDiarioUpdateManyWithWhereWithoutClienteInput = {
+    where: FatoMidiaDiarioScalarWhereInput
+    data: XOR<FatoMidiaDiarioUpdateManyMutationInput, FatoMidiaDiarioUncheckedUpdateManyWithoutClienteInput>
+  }
+
+  export type FatoMidiaDiarioScalarWhereInput = {
+    AND?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
+    OR?: FatoMidiaDiarioScalarWhereInput[]
+    NOT?: FatoMidiaDiarioScalarWhereInput | FatoMidiaDiarioScalarWhereInput[]
+    id?: StringFilter<"FatoMidiaDiario"> | string
+    clienteId?: StringFilter<"FatoMidiaDiario"> | string
+    contaId?: StringNullableFilter<"FatoMidiaDiario"> | string | null
+    data?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
+    canal?: StringFilter<"FatoMidiaDiario"> | string
+    impressoes?: IntFilter<"FatoMidiaDiario"> | number
+    cliques?: IntFilter<"FatoMidiaDiario"> | number
+    leads?: IntFilter<"FatoMidiaDiario"> | number
+    conversoes?: IntFilter<"FatoMidiaDiario"> | number
+    investimento?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
+    cpl?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: StringNullableFilter<"FatoMidiaDiario"> | string | null
+    createdAt?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
+    updatedAt?: DateTimeFilter<"FatoMidiaDiario"> | Date | string
+    contacts?: IntFilter<"FatoMidiaDiario"> | number
+    costPerPurchase?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFilter<"FatoMidiaDiario"> | number
+    onFacebookLeads?: IntFilter<"FatoMidiaDiario"> | number
+    purchases?: IntFilter<"FatoMidiaDiario"> | number
+    websiteLeads?: IntFilter<"FatoMidiaDiario"> | number
+    websitePurchaseRoas?: DecimalNullableFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFilter<"FatoMidiaDiario"> | Decimal | DecimalJsLike | number | string
+    alcance?: IntFilter<"FatoMidiaDiario"> | number
+    checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
+    profileVisits?: IntFilter<"FatoMidiaDiario"> | number
+  }
+
   export type GoogleAdsCriativoUpsertWithWhereUniqueWithoutClienteInput = {
     where: GoogleAdsCriativoWhereUniqueInput
     update: XOR<GoogleAdsCriativoUpdateWithoutClienteInput, GoogleAdsCriativoUncheckedUpdateWithoutClienteInput>
@@ -23994,6 +24032,38 @@ export namespace Prisma {
     conversoes?: IntFilter<"GoogleAdsCriativo"> | number
     createdAt?: DateTimeFilter<"GoogleAdsCriativo"> | Date | string
     updatedAt?: DateTimeFilter<"GoogleAdsCriativo"> | Date | string
+  }
+
+  export type MetaUpsertWithWhereUniqueWithoutClienteInput = {
+    where: MetaWhereUniqueInput
+    update: XOR<MetaUpdateWithoutClienteInput, MetaUncheckedUpdateWithoutClienteInput>
+    create: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput>
+  }
+
+  export type MetaUpdateWithWhereUniqueWithoutClienteInput = {
+    where: MetaWhereUniqueInput
+    data: XOR<MetaUpdateWithoutClienteInput, MetaUncheckedUpdateWithoutClienteInput>
+  }
+
+  export type MetaUpdateManyWithWhereWithoutClienteInput = {
+    where: MetaScalarWhereInput
+    data: XOR<MetaUpdateManyMutationInput, MetaUncheckedUpdateManyWithoutClienteInput>
+  }
+
+  export type MetaScalarWhereInput = {
+    AND?: MetaScalarWhereInput | MetaScalarWhereInput[]
+    OR?: MetaScalarWhereInput[]
+    NOT?: MetaScalarWhereInput | MetaScalarWhereInput[]
+    id?: StringFilter<"Meta"> | string
+    clienteId?: StringFilter<"Meta"> | string
+    canal?: StringNullableFilter<"Meta"> | string | null
+    tipoMeta?: StringFilter<"Meta"> | string
+    periodicidade?: StringFilter<"Meta"> | string
+    ano?: IntFilter<"Meta"> | number
+    mes?: IntNullableFilter<"Meta"> | number | null
+    valorMeta?: DecimalFilter<"Meta"> | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFilter<"Meta"> | Date | string
+    updatedAt?: DateTimeFilter<"Meta"> | Date | string
   }
 
   export type MetaAdsCriativoUpsertWithWhereUniqueWithoutClienteInput = {
@@ -24043,38 +24113,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"MetaAdsCriativo"> | Date | string
   }
 
-  export type MetaUpsertWithWhereUniqueWithoutClienteInput = {
-    where: MetaWhereUniqueInput
-    update: XOR<MetaUpdateWithoutClienteInput, MetaUncheckedUpdateWithoutClienteInput>
-    create: XOR<MetaCreateWithoutClienteInput, MetaUncheckedCreateWithoutClienteInput>
-  }
-
-  export type MetaUpdateWithWhereUniqueWithoutClienteInput = {
-    where: MetaWhereUniqueInput
-    data: XOR<MetaUpdateWithoutClienteInput, MetaUncheckedUpdateWithoutClienteInput>
-  }
-
-  export type MetaUpdateManyWithWhereWithoutClienteInput = {
-    where: MetaScalarWhereInput
-    data: XOR<MetaUpdateManyMutationInput, MetaUncheckedUpdateManyWithoutClienteInput>
-  }
-
-  export type MetaScalarWhereInput = {
-    AND?: MetaScalarWhereInput | MetaScalarWhereInput[]
-    OR?: MetaScalarWhereInput[]
-    NOT?: MetaScalarWhereInput | MetaScalarWhereInput[]
-    id?: StringFilter<"Meta"> | string
-    clienteId?: StringFilter<"Meta"> | string
-    canal?: StringNullableFilter<"Meta"> | string | null
-    tipoMeta?: StringFilter<"Meta"> | string
-    periodicidade?: StringFilter<"Meta"> | string
-    ano?: IntFilter<"Meta"> | number
-    mes?: IntNullableFilter<"Meta"> | number | null
-    valorMeta?: DecimalFilter<"Meta"> | Decimal | DecimalJsLike | number | string
-    createdAt?: DateTimeFilter<"Meta"> | Date | string
-    updatedAt?: DateTimeFilter<"Meta"> | Date | string
-  }
-
   export type PautaReuniaoUpsertWithWhereUniqueWithoutClienteInput = {
     where: PautaReuniaoWhereUniqueInput
     update: XOR<PautaReuniaoUpdateWithoutClienteInput, PautaReuniaoUncheckedUpdateWithoutClienteInput>
@@ -24119,12 +24157,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24141,80 +24179,18 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
   export type ClienteCreateOrConnectWithoutContasInput = {
     where: ClienteWhereUniqueInput
     create: XOR<ClienteCreateWithoutContasInput, ClienteUncheckedCreateWithoutContasInput>
-  }
-
-  export type FatoMidiaDiarioCreateWithoutContaInput = {
-    id?: string
-    data: Date | string
-    canal: string
-    impressoes?: number
-    cliques?: number
-    leads?: number
-    conversoes?: number
-    investimento?: Decimal | DecimalJsLike | number | string
-    cpl?: Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    contacts?: number
-    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: number
-    onFacebookLeads?: number
-    purchases?: number
-    websiteLeads?: number
-    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
-    alcance?: number
-    checkoutIniciado?: number
-    cliente: ClienteCreateNestedOneWithoutFatosMidiaInput
-  }
-
-  export type FatoMidiaDiarioUncheckedCreateWithoutContaInput = {
-    id?: string
-    clienteId: string
-    data: Date | string
-    canal: string
-    impressoes?: number
-    cliques?: number
-    leads?: number
-    conversoes?: number
-    investimento?: Decimal | DecimalJsLike | number | string
-    cpl?: Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    contacts?: number
-    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: number
-    onFacebookLeads?: number
-    purchases?: number
-    websiteLeads?: number
-    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
-    alcance?: number
-    checkoutIniciado?: number
-  }
-
-  export type FatoMidiaDiarioCreateOrConnectWithoutContaInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    create: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput>
-  }
-
-  export type FatoMidiaDiarioCreateManyContaInputEnvelope = {
-    data: FatoMidiaDiarioCreateManyContaInput | FatoMidiaDiarioCreateManyContaInput[]
-    skipDuplicates?: boolean
   }
 
   export type FatoAnalyticsDiarioCreateWithoutContaInput = {
@@ -24256,6 +24232,70 @@ export namespace Prisma {
 
   export type FatoAnalyticsDiarioCreateManyContaInputEnvelope = {
     data: FatoAnalyticsDiarioCreateManyContaInput | FatoAnalyticsDiarioCreateManyContaInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FatoMidiaDiarioCreateWithoutContaInput = {
+    id?: string
+    data: Date | string
+    canal: string
+    impressoes?: number
+    cliques?: number
+    leads?: number
+    conversoes?: number
+    investimento?: Decimal | DecimalJsLike | number | string
+    cpl?: Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: number
+    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: number
+    onFacebookLeads?: number
+    purchases?: number
+    websiteLeads?: number
+    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
+    alcance?: number
+    checkoutIniciado?: number
+    profileVisits?: number
+    cliente: ClienteCreateNestedOneWithoutFatosMidiaInput
+  }
+
+  export type FatoMidiaDiarioUncheckedCreateWithoutContaInput = {
+    id?: string
+    clienteId: string
+    data: Date | string
+    canal: string
+    impressoes?: number
+    cliques?: number
+    leads?: number
+    conversoes?: number
+    investimento?: Decimal | DecimalJsLike | number | string
+    cpl?: Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: number
+    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: number
+    onFacebookLeads?: number
+    purchases?: number
+    websiteLeads?: number
+    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
+    alcance?: number
+    checkoutIniciado?: number
+    profileVisits?: number
+  }
+
+  export type FatoMidiaDiarioCreateOrConnectWithoutContaInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    create: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput>
+  }
+
+  export type FatoMidiaDiarioCreateManyContaInputEnvelope = {
+    data: FatoMidiaDiarioCreateManyContaInput | FatoMidiaDiarioCreateManyContaInput[]
     skipDuplicates?: boolean
   }
 
@@ -24399,12 +24439,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24421,29 +24461,13 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
-  }
-
-  export type FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    update: XOR<FatoMidiaDiarioUpdateWithoutContaInput, FatoMidiaDiarioUncheckedUpdateWithoutContaInput>
-    create: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput>
-  }
-
-  export type FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput = {
-    where: FatoMidiaDiarioWhereUniqueInput
-    data: XOR<FatoMidiaDiarioUpdateWithoutContaInput, FatoMidiaDiarioUncheckedUpdateWithoutContaInput>
-  }
-
-  export type FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput = {
-    where: FatoMidiaDiarioScalarWhereInput
-    data: XOR<FatoMidiaDiarioUpdateManyMutationInput, FatoMidiaDiarioUncheckedUpdateManyWithoutContaInput>
   }
 
   export type FatoAnalyticsDiarioUpsertWithWhereUniqueWithoutContaInput = {
@@ -24460,6 +24484,22 @@ export namespace Prisma {
   export type FatoAnalyticsDiarioUpdateManyWithWhereWithoutContaInput = {
     where: FatoAnalyticsDiarioScalarWhereInput
     data: XOR<FatoAnalyticsDiarioUpdateManyMutationInput, FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaInput>
+  }
+
+  export type FatoMidiaDiarioUpsertWithWhereUniqueWithoutContaInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    update: XOR<FatoMidiaDiarioUpdateWithoutContaInput, FatoMidiaDiarioUncheckedUpdateWithoutContaInput>
+    create: XOR<FatoMidiaDiarioCreateWithoutContaInput, FatoMidiaDiarioUncheckedCreateWithoutContaInput>
+  }
+
+  export type FatoMidiaDiarioUpdateWithWhereUniqueWithoutContaInput = {
+    where: FatoMidiaDiarioWhereUniqueInput
+    data: XOR<FatoMidiaDiarioUpdateWithoutContaInput, FatoMidiaDiarioUncheckedUpdateWithoutContaInput>
+  }
+
+  export type FatoMidiaDiarioUpdateManyWithWhereWithoutContaInput = {
+    where: FatoMidiaDiarioScalarWhereInput
+    data: XOR<FatoMidiaDiarioUpdateManyMutationInput, FatoMidiaDiarioUncheckedUpdateManyWithoutContaInput>
   }
 
   export type GoogleAdsCriativoUpsertWithWhereUniqueWithoutContaInput = {
@@ -24511,8 +24551,8 @@ export namespace Prisma {
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24533,8 +24573,8 @@ export namespace Prisma {
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24604,8 +24644,8 @@ export namespace Prisma {
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24626,8 +24666,8 @@ export namespace Prisma {
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24683,12 +24723,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24705,12 +24745,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24743,12 +24783,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24765,12 +24805,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24787,12 +24827,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24809,12 +24849,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24847,12 +24887,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24869,12 +24909,12 @@ export namespace Prisma {
     orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24892,9 +24932,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
@@ -24914,9 +24954,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
@@ -24952,9 +24992,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
@@ -24974,9 +25014,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
@@ -24996,12 +25036,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
   }
 
   export type ClienteUncheckedCreateWithoutPautasReuniaoInput = {
@@ -25018,12 +25058,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
   }
 
   export type ClienteCreateOrConnectWithoutPautasReuniaoInput = {
@@ -25056,12 +25096,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
   }
 
   export type ClienteUncheckedUpdateWithoutPautasReuniaoInput = {
@@ -25078,12 +25118,12 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
   export type ClienteCreateWithoutGoogleAdsCriativosInput = {
@@ -25100,11 +25140,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25122,11 +25162,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25144,8 +25184,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cliente: ClienteCreateNestedOneWithoutContasInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutContaInput
   }
 
@@ -25158,8 +25198,8 @@ export namespace Prisma {
     nomeConta?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutContaInput
   }
 
@@ -25193,11 +25233,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25215,11 +25255,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25243,8 +25283,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cliente?: ClienteUpdateOneRequiredWithoutContasNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutContaNestedInput
   }
 
@@ -25257,8 +25297,8 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
   }
 
@@ -25276,9 +25316,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
@@ -25298,9 +25338,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
@@ -25320,8 +25360,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     cliente: ClienteCreateNestedOneWithoutContasInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutContaInput
   }
 
@@ -25334,8 +25374,8 @@ export namespace Prisma {
     nomeConta?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutContaInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutContaInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutContaInput
   }
 
@@ -25369,9 +25409,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
@@ -25391,9 +25431,9 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
@@ -25419,8 +25459,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cliente?: ClienteUpdateOneRequiredWithoutContasNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutContaNestedInput
   }
 
@@ -25433,8 +25473,8 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
   }
 
@@ -25452,11 +25492,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25474,11 +25514,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25545,11 +25585,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25567,11 +25607,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25628,11 +25668,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
     contas?: ContaCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25650,11 +25690,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
     contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
-    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25688,11 +25728,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
     contas?: ContaUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25710,11 +25750,11 @@ export namespace Prisma {
     agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
-    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25756,32 +25796,6 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type FatoMidiaDiarioCreateManyClienteInput = {
-    id?: string
-    contaId?: string | null
-    data: Date | string
-    canal: string
-    impressoes?: number
-    cliques?: number
-    leads?: number
-    conversoes?: number
-    investimento?: Decimal | DecimalJsLike | number | string
-    cpl?: Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    contacts?: number
-    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: number
-    onFacebookLeads?: number
-    purchases?: number
-    websiteLeads?: number
-    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
-    alcance?: number
-    checkoutIniciado?: number
-  }
-
   export type FatoAnalyticsDiarioCreateManyClienteInput = {
     id?: string
     contaId?: string | null
@@ -25808,6 +25822,33 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type FatoMidiaDiarioCreateManyClienteInput = {
+    id?: string
+    contaId?: string | null
+    data: Date | string
+    canal: string
+    impressoes?: number
+    cliques?: number
+    leads?: number
+    conversoes?: number
+    investimento?: Decimal | DecimalJsLike | number | string
+    cpl?: Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: number
+    costPerPurchase?: Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: number
+    onFacebookLeads?: number
+    purchases?: number
+    websiteLeads?: number
+    websitePurchaseRoas?: Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
+    alcance?: number
+    checkoutIniciado?: number
+    profileVisits?: number
+  }
+
   export type GoogleAdsCriativoCreateManyClienteInput = {
     id?: string
     contaId?: string | null
@@ -25825,6 +25866,18 @@ export namespace Prisma {
     cliques?: number
     custoMicros?: bigint | number
     conversoes?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaCreateManyClienteInput = {
+    id?: string
+    canal?: string | null
+    tipoMeta: string
+    periodicidade: string
+    ano: number
+    mes?: number | null
+    valorMeta: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25852,18 +25905,6 @@ export namespace Prisma {
     clicks?: number
     ctr?: Decimal | DecimalJsLike | number | string | null
     cpc?: Decimal | DecimalJsLike | number | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type MetaCreateManyClienteInput = {
-    id?: string
-    canal?: string | null
-    tipoMeta: string
-    periodicidade: string
-    ano: number
-    mes?: number | null
-    valorMeta: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25971,8 +26012,8 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutContaNestedInput
   }
@@ -25985,8 +26026,8 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutContaNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutContaNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutContaNestedInput
   }
@@ -25999,84 +26040,6 @@ export namespace Prisma {
     nomeConta?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type FatoMidiaDiarioUpdateWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
-    conta?: ContaUpdateOneWithoutFatosMidiaNestedInput
-  }
-
-  export type FatoMidiaDiarioUncheckedUpdateWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    contaId?: NullableStringFieldUpdateOperationsInput | string | null
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type FatoMidiaDiarioUncheckedUpdateManyWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    contaId?: NullableStringFieldUpdateOperationsInput | string | null
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
   }
 
   export type FatoAnalyticsDiarioUpdateWithoutClienteInput = {
@@ -26157,6 +26120,87 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FatoMidiaDiarioUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
+    conta?: ContaUpdateOneWithoutFatosMidiaNestedInput
+  }
+
+  export type FatoMidiaDiarioUncheckedUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type FatoMidiaDiarioUncheckedUpdateManyWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
+  }
+
   export type GoogleAdsCriativoUpdateWithoutClienteInput = {
     id?: StringFieldUpdateOperationsInput | string
     adResourceName?: StringFieldUpdateOperationsInput | string
@@ -26216,6 +26260,42 @@ export namespace Prisma {
     cliques?: IntFieldUpdateOperationsInput | number
     custoMicros?: BigIntFieldUpdateOperationsInput | bigint | number
     conversoes?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canal?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoMeta?: StringFieldUpdateOperationsInput | string
+    periodicidade?: StringFieldUpdateOperationsInput | string
+    ano?: IntFieldUpdateOperationsInput | number
+    mes?: NullableIntFieldUpdateOperationsInput | number | null
+    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaUncheckedUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canal?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoMeta?: StringFieldUpdateOperationsInput | string
+    periodicidade?: StringFieldUpdateOperationsInput | string
+    ano?: IntFieldUpdateOperationsInput | number
+    mes?: NullableIntFieldUpdateOperationsInput | number | null
+    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaUncheckedUpdateManyWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    canal?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoMeta?: StringFieldUpdateOperationsInput | string
+    periodicidade?: StringFieldUpdateOperationsInput | string
+    ano?: IntFieldUpdateOperationsInput | number
+    mes?: NullableIntFieldUpdateOperationsInput | number | null
+    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26301,42 +26381,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type MetaUpdateWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    canal?: NullableStringFieldUpdateOperationsInput | string | null
-    tipoMeta?: StringFieldUpdateOperationsInput | string
-    periodicidade?: StringFieldUpdateOperationsInput | string
-    ano?: IntFieldUpdateOperationsInput | number
-    mes?: NullableIntFieldUpdateOperationsInput | number | null
-    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MetaUncheckedUpdateWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    canal?: NullableStringFieldUpdateOperationsInput | string | null
-    tipoMeta?: StringFieldUpdateOperationsInput | string
-    periodicidade?: StringFieldUpdateOperationsInput | string
-    ano?: IntFieldUpdateOperationsInput | number
-    mes?: NullableIntFieldUpdateOperationsInput | number | null
-    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type MetaUncheckedUpdateManyWithoutClienteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    canal?: NullableStringFieldUpdateOperationsInput | string | null
-    tipoMeta?: StringFieldUpdateOperationsInput | string
-    periodicidade?: StringFieldUpdateOperationsInput | string
-    ano?: IntFieldUpdateOperationsInput | number
-    mes?: NullableIntFieldUpdateOperationsInput | number | null
-    valorMeta?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type PautaReuniaoUpdateWithoutClienteInput = {
     id?: StringFieldUpdateOperationsInput | string
     semanaIso?: IntFieldUpdateOperationsInput | number
@@ -26370,6 +26414,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FatoAnalyticsDiarioCreateManyContaInput = {
+    id?: string
+    clienteId: string
+    data: Date | string
+    sessions?: number
+    activeUsers?: number
+    engagedSessions?: number
+    engagementRate?: Decimal | DecimalJsLike | number | string
+    bounceRate?: Decimal | DecimalJsLike | number | string
+    averageSessionDuration?: number
+    newUsers?: number
+    screenPageViews?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type FatoMidiaDiarioCreateManyContaInput = {
     id?: string
     clienteId: string
@@ -26394,22 +26454,7 @@ export namespace Prisma {
     websitePurchasesConversionValue?: Decimal | DecimalJsLike | number | string
     alcance?: number
     checkoutIniciado?: number
-  }
-
-  export type FatoAnalyticsDiarioCreateManyContaInput = {
-    id?: string
-    clienteId: string
-    data: Date | string
-    sessions?: number
-    activeUsers?: number
-    engagedSessions?: number
-    engagementRate?: Decimal | DecimalJsLike | number | string
-    bounceRate?: Decimal | DecimalJsLike | number | string
-    averageSessionDuration?: number
-    newUsers?: number
-    screenPageViews?: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
+    profileVisits?: number
   }
 
   export type GoogleAdsCriativoCreateManyContaInput = {
@@ -26460,84 +26505,6 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type FatoMidiaDiarioUpdateWithoutContaInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
-    cliente?: ClienteUpdateOneRequiredWithoutFatosMidiaNestedInput
-  }
-
-  export type FatoMidiaDiarioUncheckedUpdateWithoutContaInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clienteId?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
-  }
-
-  export type FatoMidiaDiarioUncheckedUpdateManyWithoutContaInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    clienteId?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    canal?: StringFieldUpdateOperationsInput | string
-    impressoes?: IntFieldUpdateOperationsInput | number
-    cliques?: IntFieldUpdateOperationsInput | number
-    leads?: IntFieldUpdateOperationsInput | number
-    conversoes?: IntFieldUpdateOperationsInput | number
-    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    contacts?: IntFieldUpdateOperationsInput | number
-    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
-    onFacebookLeads?: IntFieldUpdateOperationsInput | number
-    purchases?: IntFieldUpdateOperationsInput | number
-    websiteLeads?: IntFieldUpdateOperationsInput | number
-    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    alcance?: IntFieldUpdateOperationsInput | number
-    checkoutIniciado?: IntFieldUpdateOperationsInput | number
-  }
-
   export type FatoAnalyticsDiarioUpdateWithoutContaInput = {
     id?: StringFieldUpdateOperationsInput | string
     data?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26584,6 +26551,87 @@ export namespace Prisma {
     screenPageViews?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FatoMidiaDiarioUpdateWithoutContaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
+    cliente?: ClienteUpdateOneRequiredWithoutFatosMidiaNestedInput
+  }
+
+  export type FatoMidiaDiarioUncheckedUpdateWithoutContaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clienteId?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type FatoMidiaDiarioUncheckedUpdateManyWithoutContaInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clienteId?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    canal?: StringFieldUpdateOperationsInput | string
+    impressoes?: IntFieldUpdateOperationsInput | number
+    cliques?: IntFieldUpdateOperationsInput | number
+    leads?: IntFieldUpdateOperationsInput | number
+    conversoes?: IntFieldUpdateOperationsInput | number
+    investimento?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cpl?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    rawRowHash?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: IntFieldUpdateOperationsInput | number
+    costPerPurchase?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    messagingConversationsStarted?: IntFieldUpdateOperationsInput | number
+    onFacebookLeads?: IntFieldUpdateOperationsInput | number
+    purchases?: IntFieldUpdateOperationsInput | number
+    websiteLeads?: IntFieldUpdateOperationsInput | number
+    websitePurchaseRoas?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    websitePurchasesConversionValue?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    alcance?: IntFieldUpdateOperationsInput | number
+    checkoutIniciado?: IntFieldUpdateOperationsInput | number
+    profileVisits?: IntFieldUpdateOperationsInput | number
   }
 
   export type GoogleAdsCriativoUpdateWithoutContaInput = {

@@ -46,6 +46,7 @@ export interface MetaInsightPayload {
   websitePurchasesConversionValue: number;
   alcance: number;
   checkoutIniciado: number;
+  profileVisits: number;
 }
 
 /**
@@ -77,6 +78,24 @@ export function mapMetaInsightToFatoPayload(row: MetaInsightRow): MetaInsightPay
   );
   const contacts = getActionExact(actions, "onsite_conversion.messaging_conversation_started_7d");
   const checkoutIniciado = getActionExact(actions, "initiate_checkout");
+  const uniqueActions = row.unique_actions ?? [];
+  const getUniqueAction = (type: string) => getActionExact(uniqueActions, type);
+
+  // Campaign-level "results" field has structure: [{indicator: "profile_visit_view", values: [{value: "45"}]}]
+  // Indicators for profile visits: "profile_visit_view", "total_profile_visits"
+  const PROFILE_VISIT_INDICATORS = ["profile_visit_view", "total_profile_visits"];
+  const campaignResultVisits = (row.results ?? [])
+    .filter((r) => PROFILE_VISIT_INDICATORS.includes(r.indicator))
+    .reduce((sum, r) => sum + (parseFloat(r.values?.[0]?.value ?? "0") || 0), 0);
+
+  const profileVisits =
+    getActionExact(actions, "ig_profile_visit") ||
+    getActionExact(actions, "onsite_conversion.ig_profile_visit") ||
+    getActionExact(actions, "ig_profile_visits") ||
+    getUniqueAction("ig_profile_visit") ||
+    getUniqueAction("ig_profile_visits") ||
+    getUniqueAction("onsite_conversion.ig_profile_visit") ||
+    campaignResultVisits;
 
   const purchaseCount =
     getActionExact(actions, "purchase") ||
@@ -119,5 +138,6 @@ export function mapMetaInsightToFatoPayload(row: MetaInsightRow): MetaInsightPay
     websitePurchasesConversionValue: purchaseValue,
     alcance,
     checkoutIniciado,
+    profileVisits,
   };
 }

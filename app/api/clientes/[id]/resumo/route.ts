@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { findClienteById } from "@/lib/repositories/clientesRepository";
 import { outcomeCountForFato } from "@/lib/metrics/fatoMidiaOutcome";
+import { isFlorien } from "@/lib/clientProfiles";
 
 export async function GET(
   request: NextRequest,
@@ -54,8 +55,11 @@ export async function GET(
       impressoes: true,
       cliques: true,
       messagingConversationsStarted: true,
+      profileVisits: true,
     },
   });
+
+  const isVisitasCliente = isFlorien(cliente);
 
   let totalInvestimento = 0;
   let totalLeads = 0;
@@ -65,7 +69,9 @@ export async function GET(
   for (const r of rows) {
     totalInvestimento += Number(r.investimento);
     totalConversas += r.messagingConversationsStarted ?? 0;
-    totalLeads += outcomeCountForFato(r.canal, r.leads, r.conversoes);
+    totalLeads += isVisitasCliente
+      ? (r.profileVisits ?? 0)
+      : outcomeCountForFato(r.canal, r.leads, r.conversoes);
     totalImpressoes += r.impressoes;
     totalCliques += r.cliques;
   }

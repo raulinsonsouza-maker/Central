@@ -22,12 +22,12 @@ model Cliente {
   agregadosMensal            AgregadoMidiaMensal[]
   agregadosSemanal           AgregadoMidiaSemanal[]
   contas                     Conta[]
-  fatosMidia                 FatoMidiaDiario[]
   fatosAnalyticsDiario       FatoAnalyticsDiario[]
   fatosAnalyticsPorCanal     FatoAnalyticsPorCanal[]
+  fatosMidia                 FatoMidiaDiario[]
   googleAdsCriativos         GoogleAdsCriativo[]
-  metaAdsCriativos           MetaAdsCriativo[]
   metas                      Meta[]
+  metaAdsCriativos           MetaAdsCriativo[]
   pautasReuniao              PautaReuniao[]
 }
 
@@ -41,8 +41,8 @@ model Conta {
   createdAt                DateTime              @default(now())
   updatedAt                DateTime              @updatedAt
   cliente                  Cliente               @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  fatosMidia               FatoMidiaDiario[]
   fatosAnalyticsDiario     FatoAnalyticsDiario[]
+  fatosMidia               FatoMidiaDiario[]
   googleAdsCriativos       GoogleAdsCriativo[]
   metaAdsCriativos         MetaAdsCriativo[]
 
@@ -74,6 +74,7 @@ model FatoMidiaDiario {
   websitePurchasesConversionValue Decimal  @default(0) @db.Decimal(14, 2)
   alcance                         Int      @default(0)
   checkoutIniciado                Int      @default(0)
+  profileVisits                   Int      @default(0)
   cliente                         Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   conta                           Conta?   @relation(fields: [contaId], references: [id])
 
@@ -194,7 +195,7 @@ model MetaAdsCriativo {
   videoId           String?
   videoSourceUrl    String?
   videoPictureUrl   String?
-  videoEmbedHtml    String?  @db.Text
+  videoEmbedHtml    String?
   body              String?
   title             String?
   spend             Decimal  @default(0) @db.Decimal(14, 2)

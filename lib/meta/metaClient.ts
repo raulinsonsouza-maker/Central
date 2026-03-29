@@ -50,6 +50,13 @@ export interface MetaInsightRow {
   cpc?: string;
   actions?: Array<{ action_type: string; value: string }>;
   action_values?: Array<{ action_type: string; value: string }>;
+  unique_actions?: Array<{ action_type: string; value: string }>;
+  /**
+   * Campaign-level primary result KPI — present only when level=campaign.
+   * Structure: [{indicator: "profile_visit_view", values: [{value: "45"}]}, ...]
+   * Indicator names for profile visits: "profile_visit_view", "total_profile_visits"
+   */
+  results?: Array<{ indicator: string; values: Array<{ value: string; attribution_windows?: string[] }> }>;
 }
 
 export interface MetaInsightsResponse {
@@ -201,7 +208,7 @@ export async function fetchAccountInsights(
   const params = new URLSearchParams({
     access_token: token,
     level: "account",
-    fields: "spend,impressions,clicks,inline_link_clicks,reach,ctr,cpc,actions,action_values",
+    fields: "spend,impressions,clicks,inline_link_clicks,reach,ctr,cpc,actions,action_values,unique_actions",
     time_increment: "1",
     limit: "100",
     "time_range": JSON.stringify({ since: dateFrom, until: dateTo }),
@@ -226,6 +233,106 @@ export async function fetchAccountInsights(
   }
 
   return { data: all };
+}
+
+/**
+ * Fetch campaign-level daily insights.
+ * Used for accounts where account-level aggregation doesn't expose the right action types
+ * (e.g. profile-visit campaigns where ig_profile_visit is only available per campaign).
+ * Returns rows with the same shape as account-level insights but aggregated from all campaigns.
+ */
+export async function fetchCampaignInsightsAggregatedByDay(
+  accountId: string,
+  token: string,
+  dateFrom: string,
+  dateTo: string
+): Promise<MetaInsightsResponse> {
+  const actId = ensureActPrefix(accountId);
+  const params = new URLSearchParams({
+    access_token: token,
+    level: "campaign",
+    fields: "spend,impressions,clicks,inline_link_clicks,reach,ctr,cpc,actions,action_values,unique_actions,results",
+    time_increment: "1",
+    limit: "200",
+    "time_range": JSON.stringify({ since: dateFrom, until: dateTo }),
+  });
+
+  const campaignRows: MetaInsightRow[] = [];
+  let url: string | null = `${GRAPH_BASE}/${actId}/insights?${params.toString()}`;
+
+  while (url) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaInsightsResponse;
+    if (!res.ok) {
+      throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+    }
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+    if (data.data?.length) {
+      campaignRows.push(...data.data);
+    }
+    url = data.paging?.next ?? null;
+  }
+
+  // Aggregate campaign rows into single rows per day
+  const byDay = new Map<string, MetaInsightRow>();
+  for (const row of campaignRows) {
+    const day = row.date_start ?? row.date_stop;
+    if (!day) continue;
+    const existing = byDay.get(day);
+    if (!existing) {
+      byDay.set(day, {
+        ...row,
+        actions: [...(row.actions ?? [])],
+        unique_actions: [...(row.unique_actions ?? [])],
+        results: [...(row.results ?? [])],
+      });
+      continue;
+    }
+    // Merge numeric fields
+    const addNum = (a?: string, b?: string) => String((parseFloat(a ?? "0") || 0) + (parseFloat(b ?? "0") || 0));
+    existing.spend = addNum(existing.spend, row.spend);
+    existing.impressions = addNum(existing.impressions, row.impressions);
+    existing.clicks = addNum(existing.clicks, row.clicks);
+    existing.inline_link_clicks = addNum(existing.inline_link_clicks, row.inline_link_clicks);
+    existing.reach = addNum(existing.reach, row.reach);
+    // Merge actions by type
+    const mergeActions = (
+      base: Array<{ action_type: string; value: string }>,
+      incoming: Array<{ action_type: string; value: string }> | undefined
+    ) => {
+      if (!incoming?.length) return;
+      for (const a of incoming) {
+        const found = base.find((b) => b.action_type === a.action_type);
+        if (found) {
+          found.value = String((parseFloat(found.value) || 0) + (parseFloat(a.value) || 0));
+        } else {
+          base.push({ ...a });
+        }
+      }
+    };
+    mergeActions(existing.actions ?? [], row.actions);
+    mergeActions(existing.unique_actions ?? [], row.unique_actions);
+    // Merge results (different structure: [{indicator, values:[{value}]}])
+    if (!existing.results) existing.results = [];
+    for (const r of (row.results ?? [])) {
+      const found = existing.results.find((e) => e.indicator === r.indicator);
+      if (found) {
+        const existingVal = parseFloat(found.values?.[0]?.value ?? "0") || 0;
+        const incomingVal = parseFloat(r.values?.[0]?.value ?? "0") || 0;
+        if (found.values?.[0]) {
+          found.values[0].value = String(existingVal + incomingVal);
+        } else {
+          found.values = [{ value: String(existingVal + incomingVal) }];
+        }
+      } else {
+        existing.results.push({ ...r, values: [...(r.values ?? [])] });
+      }
+    }
+  }
+
+  return { data: Array.from(byDay.values()) };
 }
 
 async function fetchAdImagesByHash(
