@@ -3,6 +3,7 @@ export const TERTULIA_SLUG = "tertulia";
 export const VARELLA_MOTOS_SLUG = "varella-motos";
 export const MIGUEL_IMOVEIS_SLUG = "miguel-imoveis";
 export const DR_FERNANDO_GUENA_SLUG = "dr-fernando-guena";
+export const CLINICA_E_SPA_SLUG = "clinica-e-spa-vida-natural";
 
 type ClientIdentity = {
   nome?: string | null;
@@ -73,5 +74,18 @@ export function isDrFernandoGuena(client?: ClientIdentity | null) {
     nome === "dr. fernando guena" ||
     nome === "dr fernando guena" ||
     nome === "fernando guena"
+  );
+}
+
+export function isClinicaESpa(client?: ClientIdentity | null) {
+  if (!client) return false;
+
+  const slug = normalizeText(client.slug);
+  const nome = normalizeText(client.nome);
+
+  return (
+    slug === CLINICA_E_SPA_SLUG ||
+    nome === "clinica e spa vida natural" ||
+    (slug.includes("clinica") && slug.includes("spa"))
   );
 }
