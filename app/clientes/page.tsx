@@ -175,7 +175,8 @@ export default function CentralClientesPage() {
             </div>
           ) : (
             filteredClientes.map((c) => {
-              const semDados = c.totalLeads === 0 && c.conversao === 0;
+              const semDados = c.totalLeads === 0 && (c.totalCliques ?? 0) === 0;
+              const hasLeads = c.totalLeads > 0;
               const initials = c.nome.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
               return (
                 <Link
@@ -196,7 +197,7 @@ export default function CentralClientesPage() {
                     <span className="shrink-0 rounded-full bg-[var(--muted)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
                       Sem dados
                     </span>
-                  ) : (
+                  ) : hasLeads ? (
                     <div className="hidden shrink-0 items-center gap-6 sm:flex">
                       <div className="text-right">
                         <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">Leads</p>
@@ -206,6 +207,12 @@ export default function CentralClientesPage() {
                         <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">Conversão</p>
                         <p className="font-bold tabular-nums text-[var(--primary)]">{c.conversao > 100 ? "100%+" : `${c.conversao}%`}</p>
                       </div>
+                    </div>
+                  ) : (
+                    <div className="hidden shrink-0 items-center sm:flex">
+                      <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                        Ativo
+                      </span>
                     </div>
                   )}
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--muted-foreground)] transition-all group-hover:bg-[var(--primary)]/10 group-hover:text-[var(--primary)]">

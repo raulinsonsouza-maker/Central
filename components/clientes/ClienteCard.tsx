@@ -19,6 +19,7 @@ export interface ClienteCardData {
   segmentoCor?: string | null;
   totalLeads: number;
   conversao: number;
+  totalCliques?: number;
   ativo?: boolean;
   hasGoogleConta?: boolean;
   hasMetaConta?: boolean;
@@ -28,7 +29,7 @@ function getStatusConfig(
   conversao: number,
   totalLeads: number
 ): { label: string; bg: string; dot: string } | null {
-  if (totalLeads === 0 && conversao === 0) return null;
+  if (totalLeads === 0) return null;
   if (conversao < 0.5)
     return { label: "Crítico", bg: "var(--badge-critical)", dot: "#ef4444" };
   if (conversao < 2)
@@ -41,7 +42,8 @@ function getStatusConfig(
 }
 
 export function ClienteCard({ cliente }: { cliente: ClienteCardData }) {
-  const semDados = cliente.totalLeads === 0 && cliente.conversao === 0;
+  const semDados = cliente.totalLeads === 0 && (cliente.totalCliques ?? 0) === 0;
+  const hasLeads = cliente.totalLeads > 0;
 
   const statusConfig = getStatusConfig(cliente.conversao, cliente.totalLeads);
   const displayBadge = cliente.segmento?.trim()
@@ -107,7 +109,7 @@ export function ClienteCard({ cliente }: { cliente: ClienteCardData }) {
                   Aguardando sincronização de dados
                 </p>
               </div>
-            ) : (
+            ) : hasLeads ? (
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl bg-[var(--muted)]/50 px-4 py-3">
                   <div className="mb-1 flex items-center gap-1.5">
@@ -131,6 +133,13 @@ export function ClienteCard({ cliente }: { cliente: ClienteCardData }) {
                     {cliente.conversao > 100 ? "100%+" : `${cliente.conversao}%`}
                   </p>
                 </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 rounded-xl bg-[var(--muted)]/50 px-4 py-3">
+                <BarChart3 className="h-5 w-5 text-[var(--muted-foreground)]" />
+                <p className="text-xs font-medium text-[var(--muted-foreground)]">
+                  Veiculação ativa — sem rastreio de leads
+                </p>
               </div>
             )}
           </div>

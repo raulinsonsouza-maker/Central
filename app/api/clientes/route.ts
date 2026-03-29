@@ -38,6 +38,7 @@ export async function GET() {
         ativo: c.ativo,
         totalLeads,
         conversao,
+        totalCliques,
         hasGoogleConta,
         hasMetaConta,
       };
