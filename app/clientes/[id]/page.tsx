@@ -1480,8 +1480,9 @@ function MetaCriativosGrid({
         if (b.spend !== a.spend) return b.spend - a.spend;
         if (b.clicks !== a.clicks) return b.clicks - a.clicks;
         return b.impressions - a.impressions;
-      });
-  }, [ads, conversasMode]);
+      })
+      .filter((item) => !isVisitasPanel || item.spend > 0);
+  }, [ads, conversasMode, isVisitasPanel]);
 
   const [modalAdId, setModalAdId] = React.useState<string | null>(null);
   const [modalFallback, setModalFallback] = React.useState(false);
