@@ -1461,6 +1461,13 @@ function MetaCriativosGrid({
   const totalImpressions = sorted.reduce((acc, item) => acc + item.impressions, 0);
   const totalClicks = sorted.reduce((acc, item) => acc + item.clicks, 0);
   const averageCtr = totalImpressions > 0 ? (totalClicks / totalImpressions) * 100 : 0;
+  const avgFrequency = (() => {
+    const withFreq = sorted.filter((i) => i.frequency > 0);
+    if (!withFreq.length) return 0;
+    const totalImpr = withFreq.reduce((acc, i) => acc + i.impressions, 0);
+    if (!totalImpr) return 0;
+    return withFreq.reduce((acc, i) => acc + i.frequency * i.impressions, 0) / totalImpr;
+  })();
 
   const previewFormat = "MOBILE_FEED_STANDARD" as const;
 
@@ -1625,9 +1632,9 @@ function MetaCriativosGrid({
             accent: false,
           },
           {
-            label: conversasMode ? "Total de Conversas" : "Total de Leads",
-            value: totalLeads > 0 ? totalLeads.toLocaleString("pt-BR") : "—",
-            accent: true,
+            label: "Frequência Média",
+            value: avgFrequency > 0 ? avgFrequency.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—",
+            accent: false,
           },
           {
             label: conversasMode ? "Meta Custo/Conv." : "CPL Alvo",
