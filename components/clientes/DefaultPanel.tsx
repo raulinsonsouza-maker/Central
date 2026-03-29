@@ -130,6 +130,7 @@ export function DefaultPanel({
   visitasMode = false,
 }: DefaultPanelProps) {
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
+  const cplLabel = visitasMode ? "Custo/Visita" : comprasMode ? "Custo/Compra" : conversasMode ? "Custo/Conv." : "CPL";
 
   return (
     <>
@@ -231,7 +232,7 @@ export function DefaultPanel({
                   />
                   <Tooltip
                     formatter={(value: number, name: string) => {
-                      if (name === "Investimento" || name === "CPL") {
+                      if (name === "Investimento" || name === cplLabel) {
                         return [formatCurrency(Number(value)), name];
                       }
                       return [Number(value).toLocaleString("pt-BR"), name];
@@ -259,7 +260,7 @@ export function DefaultPanel({
                     dot={{ fill: "var(--primary)", r: 4, strokeWidth: 0 }}
                     activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
                   />
-                  <Line yAxisId="right" dataKey="CPL" stroke="transparent" dot={false} activeDot={false} />
+                  <Line yAxisId="right" dataKey="CPL" name={cplLabel} stroke="transparent" dot={false} activeDot={false} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
