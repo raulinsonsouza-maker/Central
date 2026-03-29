@@ -1634,15 +1634,10 @@ function MetaCriativosGrid({
             accent: false,
           },
           {
-            label: conversasMode ? "Custo Médio Conv." : "CPL Médio",
-            value: avgCpl ? formatCurrency(avgCpl) : "—",
-            valueColor: avgCpl
-              ? avgCpl <= cplAlvo
-                ? "text-green-500"
-                : avgCpl < cplLimite
-                  ? "text-amber-500"
-                  : "text-red-400"
-              : "text-[var(--muted-foreground)]",
+            label: "Verba em Escalar",
+            value: totalSpend > 0
+              ? `${Math.round((scoredItems.filter((i) => i.status === "ESCALAR").reduce((acc, i) => acc + i.spend, 0) / totalSpend) * 100)}%`
+              : "—",
             accent: false,
           },
         ] as const).map((kpi) => (
