@@ -1634,10 +1634,14 @@ function MetaCriativosGrid({
             accent: false,
           },
           {
-            label: "Verba em Escalar",
-            value: totalSpend > 0
-              ? `${Math.round((scoredItems.filter((i) => i.status === "ESCALAR").reduce((acc, i) => acc + i.spend, 0) / totalSpend) * 100)}%`
-              : "—",
+            label: "Retenção Vídeo",
+            value: (() => {
+              const videos = scoredItems.filter((i) => i.mediaType === "video" && i.video3sViews > 0 && i.holdRate > 0);
+              if (!videos.length) return "—";
+              const totalHooks = videos.reduce((acc, i) => acc + i.video3sViews, 0);
+              const weighted = videos.reduce((acc, i) => acc + i.holdRate * i.video3sViews, 0) / totalHooks;
+              return `${weighted.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+            })(),
             accent: false,
           },
         ] as const).map((kpi) => (
