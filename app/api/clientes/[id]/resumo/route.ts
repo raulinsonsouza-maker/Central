@@ -64,10 +64,10 @@ export async function GET(
   let totalConversas = 0;
   for (const r of rows) {
     totalInvestimento += Number(r.investimento);
+    totalConversas += r.messagingConversationsStarted ?? 0;
     totalLeads += outcomeCountForFato(r.canal, r.leads, r.conversoes);
     totalImpressoes += r.impressoes;
     totalCliques += r.cliques;
-    totalConversas += r.messagingConversationsStarted ?? 0;
   }
   const cpl = totalLeads > 0 ? totalInvestimento / totalLeads : 0;
   const cpm = totalImpressoes > 0 ? (totalInvestimento / totalImpressoes) * 1000 : 0;

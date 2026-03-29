@@ -69,8 +69,8 @@ export async function GET(
       const label = `${inicio.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}-${fim.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}`;
       const existing = byWeek.get(key);
       const inv = Number(f.investimento);
-      const leads = outcomeCountForFato(f.canal, f.leads, f.conversoes);
       const conversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
+      const leads = outcomeCountForFato(f.canal, f.leads, f.conversoes);
       const imp = f.impressoes;
       const clk = f.cliques;
       if (existing) {
@@ -99,14 +99,17 @@ export async function GET(
       canal,
       agrupamento: "semanal",
       series,
-      diario: fatos.map((f) => ({
-        data: f.data,
-        investimento: Number(f.investimento),
-        leads: outcomeCountForFato(f.canal, f.leads, f.conversoes),
-        conversas: (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0,
-        impressoes: f.impressoes,
-        cliques: f.cliques,
-      })),
+      diario: fatos.map((f) => {
+        const fConversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
+        return {
+          data: f.data,
+          investimento: Number(f.investimento),
+          leads: outcomeCountForFato(f.canal, f.leads, f.conversoes),
+          conversas: fConversas,
+          impressoes: f.impressoes,
+          cliques: f.cliques,
+        };
+      }),
     });
   }
 

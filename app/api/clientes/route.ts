@@ -12,7 +12,7 @@ export async function GET() {
     }
     const fatosRows = await prisma.fatoMidiaDiario.findMany({
       where: { clienteId: { in: ids } },
-      select: { clienteId: true, canal: true, leads: true, conversoes: true, cliques: true },
+      select: { clienteId: true, canal: true, leads: true, conversoes: true, cliques: true, messagingConversationsStarted: true },
     });
     const byCliente = new Map<string, { totalLeads: number; totalCliques: number }>();
     for (const r of fatosRows) {

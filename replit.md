@@ -58,8 +58,20 @@ Uses Replit's built-in PostgreSQL. Schema managed via Prisma.
 
 ### Logo Upload
 - API: `POST /api/admin/upload-logo` (multipart), `DELETE /api/admin/upload-logo` (removes file)
-- Files saved to `public/logos/` directory, served at `/logos/<filename>`
+- Uses `@vercel/blob` when `BLOB_READ_WRITE_TOKEN` is set (production), falls back to filesystem in dev
 - `LogoUploadField` component: shows preview + "Trocar"/"Remover" buttons when logo exists; shows dashed upload button when empty
+
+## Metrics / Data Layer
+
+### `outcomeCountForFato` (`lib/metrics/fatoMidiaOutcome.ts`)
+Core function used everywhere to compute "leads" (primary result metric).
+- Uses `Math.max(leads, conversoes)` for all canals — captures e-commerce purchases (conversoes) for META and primary conversions for GOOGLE that previously showed zero because only `leads` was used
+- Optional `conversas` param (messagingConversationsStarted) available as fallback but NOT passed at home page or summary level to avoid mixing messaging metrics with lead/purchase counts
+- Messaging-only clients (Clinica e Spa, Dr. Fernando, etc.) show "SEM DADOS" on the home overview intentionally — their metric is `custoPorConversa`, shown in their individual dashboards
+
+### Google Ads Mapper (`lib/mappers/googleAdsToDomain.ts`)
+- Uses `metrics.conversions` only (NOT `metrics.all_conversions`) — PMax was inflating with view-through events
+- `fetchPurchaseConversions` targets only PURCHASE category conversion actions
 
 ## Design System (InOut Standard)
 
