@@ -436,7 +436,7 @@ export default function ClienteDetailPage() {
   const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google";
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
-  const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente)) && canal === "meta";
+  const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente)) && canal !== "google";
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
