@@ -1620,8 +1620,8 @@ function MetaCriativosGrid({
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {([
           {
-            label: "Investimento",
-            value: formatCurrency(totalSpend),
+            label: "CTR Médio",
+            value: averageCtr > 0 ? `${averageCtr.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : "—",
             accent: false,
           },
           {
@@ -1692,8 +1692,8 @@ function MetaCriativosGrid({
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-xs">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[var(--muted)]/8">
-                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
+              <tr className="border-b border-[var(--border)]">
+                <th className="pl-5 pr-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Impr.</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
@@ -1705,18 +1705,20 @@ function MetaCriativosGrid({
                 <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Diagnóstico</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border)]/40">
+            <tbody>
               {scoredItems.map((item) => {
                 const cfg = statusConfig[item.status];
                 const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
                 const thumbUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
+                const statusBarColor = item.status === "ESCALAR" ? "bg-green-500" : item.status === "OTIMIZAR" ? "bg-amber-500" : item.status === "PAUSAR" ? "bg-red-500" : "bg-blue-400";
                 return (
                   <tr
                     key={item.ad.id}
-                    className="cursor-pointer transition-colors hover:bg-[var(--muted)]/15"
+                    className="group cursor-pointer transition-colors hover:bg-[var(--muted)]/10"
                     onClick={() => setModalAdId(item.ad.id)}
                   >
-                    <td className="px-4 py-3">
+                    <td className="relative pl-5 pr-4 py-3">
+                      <span className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full ${statusBarColor} opacity-70`} />
                       <div className="flex items-center gap-3">
                         <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-[var(--muted)]/30">
                           {thumbUrl ? (
@@ -1736,7 +1738,7 @@ function MetaCriativosGrid({
                         <span className="max-w-[160px] truncate font-medium text-[var(--foreground)]">{item.displayName}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{formatCurrency(item.spend)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">{formatCurrency(item.spend)}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
                       {item.impressions > 0 ? item.impressions.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
                     </td>
@@ -1755,7 +1757,7 @@ function MetaCriativosGrid({
                         <span className="text-[var(--muted-foreground)]/40">—</span>
                       )}
                     </td>
-                    <td className={`px-4 py-3 text-right tabular-nums font-semibold ${item.ctr >= averageCtr ? "text-green-500" : "text-red-400"}`}>{item.ctr.toFixed(2)}%</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.ctr.toFixed(2)}%</td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       {item.leads > 0 ? (
                         <span className="text-[var(--foreground)]">{item.cr.toFixed(1)}%</span>
@@ -1765,7 +1767,7 @@ function MetaCriativosGrid({
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${item.status === "ESCALAR" ? "bg-green-500" : item.status === "OTIMIZAR" ? "bg-amber-500" : item.status === "PAUSAR" ? "bg-red-500" : "bg-blue-400"}`} />
+                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusBarColor}`} />
                         {cfg.label}
                       </span>
                     </td>
@@ -1774,7 +1776,7 @@ function MetaCriativosGrid({
                         {item.alerts.length === 0 ? (
                           <span className="text-[var(--muted-foreground)]/40">—</span>
                         ) : item.alerts.map((a) => (
-                          <span key={a} className="inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/8 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
+                          <span key={a} className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-1.5 py-0.5 text-[10px] font-medium text-[var(--muted-foreground)]">
                             {a}
                           </span>
                         ))}
