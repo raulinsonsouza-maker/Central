@@ -9,42 +9,42 @@ datasource db {
 }
 
 model Cliente {
-  id                         String                 @id @default(cuid())
+  id                         String                  @id @default(cuid())
   nome                       String
-  slug                       String                 @unique
+  slug                       String                  @unique
   logoUrl                    String?
-  ativo                      Boolean                @default(true)
-  createdAt                  DateTime               @default(now())
-  updatedAt                  DateTime               @updatedAt
+  ativo                      Boolean                 @default(true)
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
   segmento                   String?
-  orcamentoMidiaGoogleMensal Decimal?               @db.Decimal(14, 2)
-  orcamentoMidiaMetaMensal   Decimal?               @db.Decimal(14, 2)
+  orcamentoMidiaGoogleMensal Decimal?                @db.Decimal(14, 2)
+  orcamentoMidiaMetaMensal   Decimal?                @db.Decimal(14, 2)
   agregadosMensal            AgregadoMidiaMensal[]
   agregadosSemanal           AgregadoMidiaSemanal[]
   contas                     Conta[]
-  fatosMidia                 FatoMidiaDiario[]
   fatosAnalyticsDiario       FatoAnalyticsDiario[]
   fatosAnalyticsPorCanal     FatoAnalyticsPorCanal[]
+  fatosMidia                 FatoMidiaDiario[]
   googleAdsCriativos         GoogleAdsCriativo[]
-  metaAdsCriativos           MetaAdsCriativo[]
   metas                      Meta[]
+  metaAdsCriativos           MetaAdsCriativo[]
   pautasReuniao              PautaReuniao[]
 }
 
 model Conta {
-  id                    String                 @id @default(cuid())
-  clienteId             String
-  plataforma            String
-  accountIdPlataforma   String?
+  id                       String                @id @default(cuid())
+  clienteId                String
+  plataforma               String
+  accountIdPlataforma      String?
   googleAdsLoginCustomerId String?
-  nomeConta             String?
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  cliente               Cliente                 @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  fatosMidia            FatoMidiaDiario[]
-  fatosAnalyticsDiario  FatoAnalyticsDiario[]
-  googleAdsCriativos    GoogleAdsCriativo[]
-  metaAdsCriativos      MetaAdsCriativo[]
+  nomeConta                String?
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  cliente                  Cliente               @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  fatosAnalyticsDiario     FatoAnalyticsDiario[]
+  fatosMidia               FatoMidiaDiario[]
+  googleAdsCriativos       GoogleAdsCriativo[]
+  metaAdsCriativos         MetaAdsCriativo[]
 
   @@unique([clienteId, plataforma])
 }
@@ -158,21 +158,21 @@ model GoogleAdsCriativo {
   adResourceName String
   campaignId     String?
   campaignName   String?
-  adGroupId     String?
-  adGroupName   String?
-  headline1     String?
-  headline2     String?
-  description   String?
+  adGroupId      String?
+  adGroupName    String?
+  headline1      String?
+  headline2      String?
+  description    String?
   finalUrls      String?
-  data          DateTime @db.Date
-  impressoes    Int      @default(0)
-  cliques       Int      @default(0)
-  custoMicros   BigInt   @default(0)
-  conversoes    Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  cliente       Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
-  conta         Conta?   @relation(fields: [contaId], references: [id])
+  data           DateTime @db.Date
+  impressoes     Int      @default(0)
+  cliques        Int      @default(0)
+  custoMicros    BigInt   @default(0)
+  conversoes     Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  cliente        Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  conta          Conta?   @relation(fields: [contaId], references: [id])
 
   @@unique([clienteId, adResourceName, data])
   @@index([clienteId, data])
@@ -194,7 +194,7 @@ model MetaAdsCriativo {
   videoId           String?
   videoSourceUrl    String?
   videoPictureUrl   String?
-  videoEmbedHtml    String?  @db.Text
+  videoEmbedHtml    String?
   body              String?
   title             String?
   spend             Decimal  @default(0) @db.Decimal(14, 2)
@@ -235,15 +235,15 @@ model FatoAnalyticsDiario {
 }
 
 model FatoAnalyticsPorCanal {
-  id           String   @id @default(cuid())
-  clienteId    String
-  data         DateTime @db.Date
-  canal        String
-  sessions     Int      @default(0)
-  activeUsers  Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  cliente      Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  clienteId   String
+  data        DateTime @db.Date
+  canal       String
+  sessions    Int      @default(0)
+  activeUsers Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cliente     Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
   @@unique([clienteId, data, canal])
   @@index([clienteId, data])

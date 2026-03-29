@@ -5,6 +5,7 @@ export const MIGUEL_IMOVEIS_SLUG = "miguel-imoveis";
 export const DR_FERNANDO_GUENA_SLUG = "dr-fernando-guena";
 export const CLINICA_E_SPA_SLUG = "clinica-e-spa-vida-natural";
 export const DOR_SLUG = "d-or";
+export const GRANAROLO_SLUG = "granarolo";
 
 type ClientIdentity = {
   nome?: string | null;
@@ -98,4 +99,13 @@ export function isDor(client?: ClientIdentity | null) {
   const nome = normalizeText(client.nome);
 
   return slug === DOR_SLUG || nome === "d'or" || nome === "dor";
+}
+
+export function isGranarolo(client?: ClientIdentity | null) {
+  if (!client) return false;
+
+  const slug = normalizeText(client.slug);
+  const nome = normalizeText(client.nome);
+
+  return slug === GRANAROLO_SLUG || nome === "granarolo";
 }

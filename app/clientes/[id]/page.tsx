@@ -11,7 +11,7 @@ import { AnalyticsGA4Section } from "@/components/clientes/AnalyticsGA4Section";
 import { HotelFazendaSaoJoaoPanel } from "@/components/clientes/HotelFazendaSaoJoaoPanel";
 import { TertuliaPanel } from "@/components/clientes/TertuliaPanel";
 import { VarellaMotosPanel } from "@/components/clientes/VarellaMotosPanel";
-import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis, isDrFernandoGuena, isClinicaESpa, isDor } from "@/lib/clientProfiles";
+import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis, isDrFernandoGuena, isClinicaESpa, isDor, isGranarolo } from "@/lib/clientProfiles";
 import {
   Bar,
   XAxis,
@@ -437,7 +437,7 @@ export default function ClienteDetailPage() {
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
   const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)) && canal !== "google";
-  const isComprasPanel = isDor(cliente) && canal !== "google";
+  const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
   const convLabels = React.useMemo(() => isComprasPanel
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
     : isMiguelPanel
