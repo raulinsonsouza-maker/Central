@@ -11,7 +11,7 @@ import { AnalyticsGA4Section } from "@/components/clientes/AnalyticsGA4Section";
 import { HotelFazendaSaoJoaoPanel } from "@/components/clientes/HotelFazendaSaoJoaoPanel";
 import { TertuliaPanel } from "@/components/clientes/TertuliaPanel";
 import { VarellaMotosPanel } from "@/components/clientes/VarellaMotosPanel";
-import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis, isDrFernandoGuena, isClinicaESpa, isDor, isGranarolo } from "@/lib/clientProfiles";
+import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis, isDrFernandoGuena, isClinicaESpa, isDor, isGranarolo, isFlorien } from "@/lib/clientProfiles";
 import {
   Bar,
   XAxis,
@@ -438,12 +438,15 @@ export default function ClienteDetailPage() {
   const isVarellaPanel = isVarellaMotos(cliente);
   const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)) && canal !== "google";
   const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
+  const isVisitasPanel = isFlorien(cliente) && canal !== "google";
   const convLabels = React.useMemo(() => isComprasPanel
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
+    : isVisitasPanel
+    ? { singular: "visita", plural: "visitas", metric: "Custo/Visita", metricFull: "Custo / Visita", kpi: "Meta Custo/Visita", dbKey: "VISITAS", taxa: "VISITAS / 1K", cust: "CUSTO / VISITA", semResult: "sem visitas", crLabel: "Visitas/1k impr.", chartKey: "Visitas", sub: "Visitas ao perfil do Instagram no período" }
     : isMiguelPanel
     ? { singular: "conv.", plural: "conversas", metric: "Custo/conv.", metricFull: "Custo / Conversa", kpi: "Meta Custo/Conv.", dbKey: "CONVERSAS", taxa: "TAXA CONVERSA", cust: "CUSTO / CONVERSA", semResult: "sem conversas", crLabel: "CR (clique→conv.)", chartKey: "Conversas", sub: "Conversas por mensagem iniciadas no período" }
     : { singular: "lead", plural: "leads", metric: "CPL", metricFull: "CPL", kpi: "CPL Alvo", dbKey: "LEADS", taxa: "TAXA CONV.", cust: "CPL", semResult: "sem leads", crLabel: "CR (clique→lead)", chartKey: "Leads", sub: "Total do período" }
-  , [isComprasPanel, isMiguelPanel]);
+  , [isComprasPanel, isVisitasPanel, isMiguelPanel]);
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -606,7 +609,7 @@ export default function ClienteDetailPage() {
         format: (value: number) => formatCurrency(value),
       },
     ];
-  }, [canal, isMiguelPanel, isComprasPanel, convLabels]);
+  }, [canal, isMiguelPanel, isComprasPanel, isVisitasPanel, convLabels]);
 
 function formatCurrency(value: number) {
   return `R$ ${value.toLocaleString("pt-BR", {
@@ -930,6 +933,7 @@ function formatPercentage(value: number) {
               formatCurrency={formatCurrency}
               conversasMode={isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)}
               isComprasPanel={isComprasPanel}
+              isVisitasPanel={isVisitasPanel}
               convLabels={convLabels}
             />
           ) : (
@@ -979,6 +983,7 @@ function formatPercentage(value: number) {
           formatCurrency={formatCurrency}
           conversasMode={isMiguelPanel}
           comprasMode={isComprasPanel}
+          visitasMode={isVisitasPanel}
         />
       )}
 
@@ -1379,12 +1384,14 @@ function MetaCriativosGrid({
   formatCurrency,
   conversasMode = false,
   isComprasPanel = false,
+  isVisitasPanel = false,
   convLabels,
 }: {
   ads: MetaAdItem[];
   formatCurrency: (v: number) => string;
   conversasMode?: boolean;
   isComprasPanel?: boolean;
+  isVisitasPanel?: boolean;
   convLabels: ConvLabels;
 }) {
   const sorted = React.useMemo(() => {
@@ -1422,13 +1429,18 @@ function MetaCriativosGrid({
         const comprasCount =
           getAction("offsite_conversion.fb_pixel_purchase") ||
           getAction("purchase");
-        const leads = isComprasPanel ? comprasCount : conversasMode ? conversasCount : conventionalLeads;
+        const visitasCount =
+          getAction("ig_profile_visit") ||
+          getAction("onsite_conversion.post_save");
+        const leads = isComprasPanel ? comprasCount : isVisitasPanel ? visitasCount : conversasMode ? conversasCount : conventionalLeads;
         const video3sViews = getAction("video_view");
         const video100Views = parseInt(
           insight?.video_p100_watched_actions?.[0]?.value ?? "0", 10
         ) || 0;
         const frequency = insight?.frequency ? parseFloat(insight.frequency) : 0;
-        const cr = clicks > 0 ? (leads / clicks) * 100 : 0;
+        const cr = isVisitasPanel
+          ? (impressions > 0 ? (leads / impressions) * 1000 : 0)
+          : clicks > 0 ? (leads / clicks) * 100 : 0;
         const hookRate = impressions > 0 && video3sViews > 0 ? (video3sViews / impressions) * 100 : 0;
         const holdRate = video3sViews > 0 && video100Views > 0 ? (video100Views / video3sViews) * 100 : 0;
         const nameKey = ad.name.toLowerCase().trim();
