@@ -108,6 +108,8 @@ type DefaultPanelProps = {
   formatCurrency: (value: number) => string;
   /** Quando true, troca labels de Leads/CPL para Conversas/Custo por Conversa */
   conversasMode?: boolean;
+  /** Quando true, troca labels de Leads/CPL para Compras/Custo por Compra */
+  comprasMode?: boolean;
 };
 
 export function DefaultPanel({
@@ -122,6 +124,7 @@ export function DefaultPanel({
   financeiro,
   formatCurrency,
   conversasMode = false,
+  comprasMode = false,
 }: DefaultPanelProps) {
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
 
@@ -136,21 +139,23 @@ export function DefaultPanel({
           icon={DollarSign}
         />
         <KpiCard
-          title={canal === "google" ? "Conversões (Google Ads)" : conversasMode ? "Conversas" : "Leads"}
+          title={canal === "google" ? "Conversões (Google Ads)" : comprasMode ? "Compras" : conversasMode ? "Conversas" : "Leads"}
           value={resumo.leads.toLocaleString("pt-BR")}
           sub={
             canal === "google"
               ? "Total do período (métrica principal do relatório de campanhas)"
-              : conversasMode
-                ? "Conversas por mensagem iniciadas no período"
-                : "Total do período"
+              : comprasMode
+                ? "Compras no site atribuídas ao período"
+                : conversasMode
+                  ? "Conversas por mensagem iniciadas no período"
+                  : "Total do período"
           }
           icon={Users}
         />
         <KpiCard
-          title={canal === "google" ? "Custo / conversão" : conversasMode ? "Custo / Conversa" : "CPL"}
+          title={canal === "google" ? "Custo / conversão" : comprasMode ? "Custo / Compra" : conversasMode ? "Custo / Conversa" : "CPL"}
           value={formatCurrency(resumo.cpl)}
-          sub={canal === "google" ? "Investimento ÷ conversões" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
+          sub={canal === "google" ? "Investimento ÷ conversões" : comprasMode ? "Investimento ÷ compras no site" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
           icon={Target}
           accentValue
         />
