@@ -11,7 +11,7 @@ import { AnalyticsGA4Section } from "@/components/clientes/AnalyticsGA4Section";
 import { HotelFazendaSaoJoaoPanel } from "@/components/clientes/HotelFazendaSaoJoaoPanel";
 import { TertuliaPanel } from "@/components/clientes/TertuliaPanel";
 import { VarellaMotosPanel } from "@/components/clientes/VarellaMotosPanel";
-import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis } from "@/lib/clientProfiles";
+import { isHotelFazendaSaoJoao, isTertulia, isVarellaMotos, isMiguelImoveis, isDrFernandoGuena } from "@/lib/clientProfiles";
 import {
   Bar,
   XAxis,
@@ -436,7 +436,7 @@ export default function ClienteDetailPage() {
   const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google";
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
-  const isMiguelPanel = isMiguelImoveis(cliente) && canal === "meta";
+  const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente)) && canal === "meta";
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -915,7 +915,7 @@ function formatPercentage(value: number) {
             <MetaCriativosGrid
               ads={metaAdsData.data}
               formatCurrency={formatCurrency}
-              conversasMode={isMiguelImoveis(cliente)}
+              conversasMode={isMiguelImoveis(cliente) || isDrFernandoGuena(cliente)}
             />
           ) : (
             <div className="flex items-center justify-center py-16">

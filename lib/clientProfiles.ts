@@ -2,6 +2,7 @@ export const HOTEL_FAZENDA_SAO_JOAO_SLUG = "hotel-fazenda-sao-joao";
 export const TERTULIA_SLUG = "tertulia";
 export const VARELLA_MOTOS_SLUG = "varella-motos";
 export const MIGUEL_IMOVEIS_SLUG = "miguel-imoveis";
+export const DR_FERNANDO_GUENA_SLUG = "dr-fernando-guena";
 
 type ClientIdentity = {
   nome?: string | null;
@@ -58,5 +59,19 @@ export function isMiguelImoveis(client?: ClientIdentity | null) {
     nome === "miguel imoveis" ||
     nome === "miguel imoveis anuncio" ||
     slug.includes("miguel") && slug.includes("imoveis")
+  );
+}
+
+export function isDrFernandoGuena(client?: ClientIdentity | null) {
+  if (!client) return false;
+
+  const slug = normalizeText(client.slug);
+  const nome = normalizeText(client.nome);
+
+  return (
+    slug === DR_FERNANDO_GUENA_SLUG ||
+    nome === "dr. fernando guena" ||
+    nome === "dr fernando guena" ||
+    nome === "fernando guena"
   );
 }
