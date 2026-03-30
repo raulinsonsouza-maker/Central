@@ -1751,18 +1751,18 @@ function MetaCriativosGrid({
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-xs">
+          <table className="w-full min-w-[760px] text-left text-xs">
             <thead>
-              <tr className="border-b border-[var(--border)]">
-                <th className="pl-5 pr-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Nome</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Invest.</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Impr.</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Cliques</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">{convLabels.chartKey}</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">{convLabels.metric}</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
-                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
-                <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
+              <tr className="border-b-2 border-[var(--border)]">
+                <th className="pl-6 pr-4 py-3 font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">Criativo</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">Invest.</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">Impr.</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">Cliques</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">{convLabels.chartKey}</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">{convLabels.metric}</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">CTR</th>
+                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">CR</th>
+                <th className="px-5 py-3 text-center font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--accent)] bg-[rgba(180,60,10,0.18)]">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -1770,17 +1770,17 @@ function MetaCriativosGrid({
                 const cfg = statusConfig[item.status];
                 const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
                 const thumbUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
-                const statusBarColor = item.status === "ESCALAR" ? "bg-green-500" : item.status === "OTIMIZAR" ? "bg-amber-500" : item.status === "PAUSAR" ? "bg-red-500" : "bg-blue-400";
                 return (
                   <tr
                     key={item.ad.id}
-                    className="group cursor-pointer transition-colors hover:bg-[var(--muted)]/10"
+                    className="group cursor-pointer border-b border-[var(--border)] transition-colors last:border-0 hover:bg-white/[0.03]"
                     onClick={() => setModalAdId(item.ad.id)}
                   >
-                    <td className="relative pl-5 pr-4 py-3">
-                      <span className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full ${statusBarColor} opacity-70`} />
+                    {/* Criativo — nome bold + descrição muted */}
+                    <td className="relative pl-6 pr-4 py-5">
+                      <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r-full bg-[var(--accent)] opacity-60" />
                       <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-[var(--muted)]/30">
+                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-[var(--muted)]/30">
                           {thumbUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={thumbUrl} alt={item.displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
@@ -1795,39 +1795,54 @@ function MetaCriativosGrid({
                             </div>
                           )}
                         </div>
-                        <span className="max-w-[160px] truncate font-medium text-[var(--foreground)]">{item.displayName}</span>
+                        <div className="min-w-0">
+                          <p className="max-w-[180px] truncate font-bold uppercase tracking-wide text-[var(--foreground)]">{item.displayName}</p>
+                          <p className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">
+                            {item.mediaType === "video" ? "Vídeo" : "Imagem"} · Clique para detalhes
+                          </p>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">{formatCurrency(item.spend)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
+                    {/* Invest. */}
+                    <td className="px-5 py-5 text-right tabular-nums text-[var(--foreground)]">
+                      <span className="font-semibold">{formatCurrency(item.spend)}</span>
+                    </td>
+                    {/* Impressões */}
+                    <td className="px-5 py-5 text-right tabular-nums text-[var(--muted-foreground)]">
                       {item.impressions > 0 ? item.impressions.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--muted-foreground)]">
+                    {/* Cliques */}
+                    <td className="px-5 py-5 text-right tabular-nums text-[var(--muted-foreground)]">
                       {item.clicks > 0 ? item.clicks.toLocaleString("pt-BR") : <span className="opacity-40">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums font-semibold text-[var(--foreground)]">
-                      {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="font-normal text-[var(--muted-foreground)]/40">—</span>}
+                    {/* Leads / resultado */}
+                    <td className="px-5 py-5 text-right tabular-nums font-bold text-[var(--foreground)]">
+                      {item.leads > 0 ? item.leads.toLocaleString("pt-BR") : <span className="font-normal opacity-40">—</span>}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
+                    {/* CPL / custo */}
+                    <td className="px-5 py-5 text-right tabular-nums">
                       {item.leads > 0 ? (
-                        <span className={`font-bold ${item.cpl <= cplAlvo ? "text-green-500" : item.cpl < cplLimite ? "text-amber-500" : "text-red-400"}`}>
+                        <span className={`font-bold ${item.cpl <= cplAlvo ? "text-green-400" : item.cpl < cplLimite ? "text-amber-400" : "text-red-400"}`}>
                           {formatCurrency(item.cpl)}
                         </span>
                       ) : (
-                        <span className="text-[var(--muted-foreground)]/40">—</span>
+                        <span className="opacity-40">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[var(--foreground)]">{item.ctr.toFixed(2)}%</td>
-                    <td className="px-4 py-3 text-right tabular-nums">
+                    {/* CTR */}
+                    <td className="px-5 py-5 text-right tabular-nums text-[var(--foreground)]">{item.ctr.toFixed(2)}%</td>
+                    {/* CR */}
+                    <td className="px-5 py-5 text-right tabular-nums">
                       {item.leads > 0 ? (
                         <span className="text-[var(--foreground)]">{item.cr.toFixed(1)}%</span>
                       ) : (
-                        <span className="text-[var(--muted-foreground)]/40">—</span>
+                        <span className="opacity-40">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cfg.color} ${cfg.bg} ${cfg.border}`}>
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusBarColor}`} />
+                    {/* Status — coluna destacada em laranja */}
+                    <td className="px-5 py-5 text-center bg-[rgba(180,60,10,0.15)] group-hover:bg-[rgba(180,60,10,0.22)] transition-colors">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${item.status === "ESCALAR" ? "bg-green-400" : item.status === "OTIMIZAR" ? "bg-amber-400" : item.status === "PAUSAR" ? "bg-red-400" : "bg-blue-400"}`} />
                         {cfg.label}
                       </span>
                     </td>
