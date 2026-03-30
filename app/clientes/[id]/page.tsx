@@ -1737,17 +1737,13 @@ function MetaCriativosGrid({
 
       {/* 3. Tabela de criativos */}
       <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
-        <div className="flex items-start gap-4 border-b border-[var(--border)]/60 px-6 py-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
-            <BarChart3 className="h-5 w-5" />
+        <div className="flex items-center gap-3 border-b border-[var(--border)]/60 px-6 py-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+            <BarChart3 className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Criativos META</p>
-            <h2 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
-              Performance{" "}
-              <span className="bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">por Criativo</span>
-            </h2>
-            <p className="mt-0.5 text-[12px] text-[var(--muted-foreground)]">Análise individual de cada anúncio no período selecionado.</p>
+            <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-[var(--foreground)]">Performance por Criativo</p>
+            <p className="text-[11px] text-[var(--muted-foreground)]">Análise individual de cada anúncio no período selecionado.</p>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -1855,34 +1851,43 @@ function MetaCriativosGrid({
       </div>
 
       {/* 4. Distribuição de verba */}
-      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-        <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
-          <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Distribuição de Verba</p>
+      <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+        <div className="flex items-start gap-4 border-b border-[var(--border)]/60 px-6 py-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
+            <SlidersHorizontal className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Criativos META</p>
+            <h2 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
+              Distribuição{" "}
+              <span className="bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">de Verba</span>
+            </h2>
+            <p className="mt-0.5 text-[12px] text-[var(--muted-foreground)]">Participação de cada criativo no investimento total do período.</p>
+          </div>
         </div>
-        <div className="space-y-2.5 p-4">
+        <div className="space-y-3 p-6">
           {[...scoredItems].sort((a, b) => b.spend - a.spend).map((item) => {
             const cfg = statusConfig[item.status];
             return (
               <div
                 key={item.ad.id}
-                className="group flex cursor-pointer items-center gap-3"
+                className="group flex cursor-pointer items-center gap-4"
                 onClick={() => setModalAdId(item.ad.id)}
               >
                 <span
-                  className="w-20 shrink-0 truncate text-[10px] text-[var(--muted-foreground)] transition-colors group-hover:text-[var(--foreground)] sm:w-32"
+                  className="w-24 shrink-0 truncate text-[11px] font-medium text-[var(--muted-foreground)] transition-colors group-hover:text-[var(--foreground)] sm:w-36"
                   title={item.displayName}
                 >
                   {item.displayName}
                 </span>
-                <div className="relative h-4 flex-1 overflow-hidden rounded-full bg-[var(--muted)]/20">
+                <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/5">
                   <div
-                    className={`h-full rounded-full transition-all ${cfg.bar} opacity-75 group-hover:opacity-100`}
+                    className={`h-full rounded-full transition-all ${cfg.bar} opacity-70 group-hover:opacity-100`}
                     style={{ width: `${item.spShare}%` }}
                   />
                 </div>
-                <span className="w-16 shrink-0 text-right text-[10px] tabular-nums text-[var(--foreground)] sm:w-20">{formatCurrency(item.spend)}</span>
-                <span className="w-7 shrink-0 text-right text-[10px] tabular-nums text-[var(--muted-foreground)]">{item.spShare.toFixed(0)}%</span>
+                <span className="w-20 shrink-0 text-right text-[12px] font-semibold tabular-nums text-[var(--foreground)] sm:w-24">{formatCurrency(item.spend)}</span>
+                <span className="w-8 shrink-0 text-right text-[11px] tabular-nums text-[var(--muted-foreground)]">{item.spShare.toFixed(0)}%</span>
               </div>
             );
           })}
@@ -1898,12 +1903,21 @@ function MetaCriativosGrid({
         const hasPlan = acaoEscalar.length > 0 || acaoPausar.length > 0 || acaoOtimizar.length > 0;
         if (!hasPlan) return null;
         return (
-          <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-            <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
-              <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Plano de Ação</p>
+          <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+            <div className="flex items-start gap-4 border-b border-[var(--border)]/60 px-6 py-5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Criativos META</p>
+                <h2 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
+                  Plano{" "}
+                  <span className="bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">de Ação</span>
+                </h2>
+                <p className="mt-0.5 text-[12px] text-[var(--muted-foreground)]">Recomendações automáticas baseadas na performance do período.</p>
+              </div>
             </div>
-              <div className="p-5 space-y-4">
+              <div className="p-6 space-y-5">
 
                 {/* Escalar */}
                 {acaoEscalar.length > 0 && (
