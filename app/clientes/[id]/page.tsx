@@ -1757,13 +1757,11 @@ function MetaCriativosGrid({
                 <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">{convLabels.chartKey}</th>
                 <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">{convLabels.metric}</th>
                 <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">CTR</th>
-                <th className="px-5 py-3 text-right font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--muted-foreground)]">CR</th>
-                <th className="px-5 py-3 text-center font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--accent)] bg-[rgba(180,60,10,0.18)]">Status</th>
+                <th className="px-5 py-3 text-center font-semibold uppercase tracking-[0.18em] text-[10px] text-[var(--accent)] bg-[rgba(180,60,10,0.18)]">Taxa Conv.</th>
               </tr>
             </thead>
             <tbody>
               {scoredItems.map((item) => {
-                const cfg = statusConfig[item.status];
                 const rawUrl = item.creative?.image_url_full || item.creative?.image_url || item.creative?.video_picture_url || item.creative?.thumbnail_url;
                 const thumbUrl = rawUrl ? upgradeFbCdnImageUrl(rawUrl) || rawUrl : null;
                 return (
@@ -1827,20 +1825,16 @@ function MetaCriativosGrid({
                     </td>
                     {/* CTR */}
                     <td className="px-5 py-5 text-right tabular-nums text-[var(--foreground)]">{item.ctr.toFixed(2)}%</td>
-                    {/* CR */}
-                    <td className="px-5 py-5 text-right tabular-nums">
+                    {/* Taxa de Conversão — coluna em destaque */}
+                    <td className="px-5 py-5 text-center tabular-nums bg-[rgba(180,60,10,0.15)] group-hover:bg-[rgba(180,60,10,0.22)] transition-colors">
                       {item.leads > 0 ? (
-                        <span className="text-[var(--foreground)]">{item.cr.toFixed(1)}%</span>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="text-lg font-black leading-none text-[var(--accent)]">{item.cr.toFixed(1)}%</span>
+                          <span className="text-[9px] font-medium uppercase tracking-wider text-[var(--accent)]/60">conv.</span>
+                        </div>
                       ) : (
-                        <span className="opacity-40">—</span>
+                        <span className="text-[var(--muted-foreground)] opacity-40">—</span>
                       )}
-                    </td>
-                    {/* Status — coluna destacada em laranja */}
-                    <td className="px-5 py-5 text-center bg-[rgba(180,60,10,0.15)] group-hover:bg-[rgba(180,60,10,0.22)] transition-colors">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${cfg.color} ${cfg.bg} ${cfg.border}`}>
-                        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${item.status === "ESCALAR" ? "bg-green-400" : item.status === "OTIMIZAR" ? "bg-amber-400" : item.status === "PAUSAR" ? "bg-red-400" : "bg-blue-400"}`} />
-                        {cfg.label}
-                      </span>
                     </td>
                   </tr>
                 );
