@@ -1430,6 +1430,7 @@ function MetaCriativosGrid({
         const websiteLeads = getAction("offsite_conversion.fb_pixel_lead") || getAction("website_lead");
         const conventionalLeads = leadCount || onFbLeads || websiteLeads;
         const conversasCount =
+          getAction("onsite_conversion.messaging_conversation_started_7d") ||
           getAction("messaging_conversation_started_7d") ||
           getAction("onsite_messaging_conversation_started_7d") ||
           getAction("messaging_first_reply");
