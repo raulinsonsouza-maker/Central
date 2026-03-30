@@ -2051,26 +2051,52 @@ function MetaCriativosGrid({
                 />
               </div>
 
-              <div className="flex min-w-0 flex-1 flex-col gap-4">
-                {/* Métricas principais */}
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { label: "Investimento", value: formatCurrency(modalItem.spend) },
-                    { label: convLabels.chartKey, value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—" },
-                    { label: convLabels.metric, value: modalItem.leads > 0 ? formatCurrency(modalItem.cpl) : "—" },
-                    { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%` },
-                    { label: convLabels.crLabel, value: modalItem.leads > 0 ? `${modalItem.cr.toFixed(1)}%` : "—" },
-                    { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—" },
-                    { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR") },
-                    { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency(modalItem.cpm) : "—" },
-                    { label: "Frequência", value: modalItem.frequency > 0 ? modalItem.frequency.toFixed(1) : "—" },
-                  ].map((m) => (
-                    <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-3 text-center">
-                      <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
-                      <p className="mt-1 text-sm font-bold tabular-nums text-[var(--foreground)]">{m.value}</p>
-                    </div>
-                  ))}
+              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                {/* Investimento — destaque */}
+                <div className="rounded-xl border border-[var(--primary)]/30 bg-[var(--primary)]/8 px-4 py-3 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--primary)]/80">Investimento</p>
+                  <p className="text-xl font-bold tabular-nums text-[var(--primary)]">{formatCurrency(modalItem.spend)}</p>
                 </div>
+
+                {/* Funil: Alcance → Engajamento → Resultado */}
+                {[
+                  {
+                    label: "Alcance",
+                    cols: [
+                      { label: "Impressões", value: modalItem.impressions.toLocaleString("pt-BR") },
+                      { label: "CPM", value: modalItem.impressions > 0 ? formatCurrency(modalItem.cpm) : "—" },
+                      { label: "Frequência", value: modalItem.frequency > 0 ? modalItem.frequency.toFixed(1) : "—" },
+                    ],
+                  },
+                  {
+                    label: "Engajamento",
+                    cols: [
+                      { label: "Cliques", value: modalItem.clicks > 0 ? modalItem.clicks.toLocaleString("pt-BR") : "—" },
+                      { label: "CTR", value: `${modalItem.ctr.toFixed(2)}%` },
+                      { label: "CPC", value: modalItem.clicks > 0 ? formatCurrency(modalItem.cpc) : "—" },
+                    ],
+                  },
+                  {
+                    label: "Resultado",
+                    cols: [
+                      { label: convLabels.chartKey, value: modalItem.leads > 0 ? modalItem.leads.toLocaleString("pt-BR") : "—" },
+                      { label: convLabels.crLabel, value: modalItem.leads > 0 ? `${modalItem.cr.toFixed(1)}%` : "—" },
+                      { label: convLabels.metric, value: modalItem.leads > 0 ? formatCurrency(modalItem.cpl) : "—" },
+                    ],
+                  },
+                ].map((section) => (
+                  <div key={section.label}>
+                    <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-widest text-[var(--muted-foreground)]/60">{section.label}</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {section.cols.map((m) => (
+                        <div key={m.label} className="rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-3 text-center">
+                          <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{m.label}</p>
+                          <p className="mt-1 text-sm font-bold tabular-nums text-[var(--foreground)]">{m.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
                 {/* Métricas de vídeo */}
                 {modalItem.mediaType === "video" && (modalItem.hookRate > 0 || modalItem.holdRate > 0) && (
                   <div>
