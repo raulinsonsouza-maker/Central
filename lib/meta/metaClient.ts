@@ -174,18 +174,34 @@ export interface MetaAccountBalance {
 /**
  * Fetch the current balance (credit available) for a Meta ad account.
  * Returns balance in the account's currency units (e.g. BRL R$).
- * Note: balance is only meaningful for pre-paid accounts; post-paid accounts typically return 0.
+ *
+ * Priority:
+ * 1. funding_source_details.amount — the "Saldo disponível" shown in Meta's billing UI
+ *    (available for prepaid/coupon accounts, stored in cents)
+ * 2. balance — the ad account's net rolling balance (deducted as spend accumulates
+ *    between daily charges; correct for most accounts but lags behind for prepaid ones)
  */
 export async function fetchAccountBalance(accountId: string, token: string): Promise<MetaAccountBalance> {
   const actId = ensureActPrefix(accountId);
-  const url = `${GRAPH_BASE}/${actId}?fields=balance,currency,spend_cap&access_token=${encodeURIComponent(token)}`;
+  const url = `${GRAPH_BASE}/${actId}?fields=balance,currency,spend_cap,funding_source_details&access_token=${encodeURIComponent(token)}`;
   const res = await fetch(url, { cache: "no-store" });
   const data = await res.json();
   if (!res.ok || data.error) {
     throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
   }
+
+  // funding_source_details.amount is in cents and represents the "Saldo disponível"
+  // shown in Meta's billing page for prepaid accounts.
+  const fsd = data.funding_source_details as { amount?: string | number; type?: number } | undefined;
+  const fsdAmount = fsd?.amount != null ? parseFloat(String(fsd.amount)) / 100 : null;
+
+  // Use funding source balance if available and non-zero; otherwise fall back to account balance
+  const balance = fsdAmount != null && fsdAmount > 0
+    ? fsdAmount
+    : data.balance ? parseFloat(data.balance) / 100 : 0;
+
   return {
-    balance: data.balance ? parseFloat(data.balance) / 100 : 0,
+    balance,
     currency: data.currency ?? "BRL",
     spendCap: data.spend_cap ? parseFloat(data.spend_cap) / 100 : null,
   };
