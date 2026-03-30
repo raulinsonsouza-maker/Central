@@ -1735,36 +1735,20 @@ function MetaCriativosGrid({
         ))}
       </div>
 
-      {/* 2. Decision strip */}
-      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))]">
-        <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border)]/60 sm:grid-cols-4 sm:divide-y-0">
-          {([
-            { count: countEscalar,   label: "Escalar",      dot: "bg-green-500",  color: "text-green-500",  border: "border-green-500/20"  },
-            { count: countOtimizar,  label: "Otimizar",     dot: "bg-amber-500",  color: "text-amber-500",  border: "border-amber-500/20"  },
-            { count: countValidando, label: "Em Validação", dot: "bg-blue-400",   color: "text-blue-400",   border: "border-blue-500/20"   },
-            { count: countPausar,    label: "Pausar",       dot: "bg-red-500",    color: "text-red-500",    border: "border-red-500/20"    },
-          ] as const).map((s) => (
-            <div key={s.label} className="flex flex-col items-center gap-1 px-5 py-4">
-              <div className="flex items-center gap-2">
-                <span className={`h-2 w-2 shrink-0 rounded-full ${s.dot}`} />
-                <span className={`text-3xl font-black tabular-nums leading-none ${s.color}`}>{s.count}</span>
-              </div>
-              <span className={`text-[11px] font-semibold ${s.color}`}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-        <div className="border-t border-[var(--border)] px-5 py-3">
-          <p className="text-center text-xs text-[var(--muted-foreground)]">{decisionInsight}</p>
-        </div>
-      </div>
-
       {/* 3. Tabela de criativos */}
       <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
-        <div className="flex items-center gap-3 border-b border-[var(--border)]/60 px-6 py-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
-            <BarChart3 className="h-4 w-4" />
+        <div className="flex items-start gap-4 border-b border-[var(--border)]/60 px-6 py-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
+            <BarChart3 className="h-5 w-5" />
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--foreground)]">Performance por criativo</p>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Criativos META</p>
+            <h2 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
+              Performance{" "}
+              <span className="bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">por Criativo</span>
+            </h2>
+            <p className="mt-0.5 text-[12px] text-[var(--muted-foreground)]">Análise individual de cada anúncio no período selecionado.</p>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-xs">
@@ -1779,7 +1763,6 @@ function MetaCriativosGrid({
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CTR</th>
                 <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">CR</th>
                 <th className="px-4 py-3 text-center font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Status</th>
-                <th className="px-4 py-3 font-semibold uppercase tracking-wider text-[10px] text-[var(--muted-foreground)]">Diagnóstico</th>
               </tr>
             </thead>
             <tbody>
@@ -1847,17 +1830,6 @@ function MetaCriativosGrid({
                         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${statusBarColor}`} />
                         {cfg.label}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {item.alerts.length === 0 ? (
-                          <span className="text-[var(--muted-foreground)]/40">—</span>
-                        ) : item.alerts.map((a) => (
-                          <span key={a} className="inline-flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/20 px-1.5 py-0.5 text-[10px] font-medium text-[var(--muted-foreground)]">
-                            {a}
-                          </span>
-                        ))}
-                      </div>
                     </td>
                   </tr>
                 );
