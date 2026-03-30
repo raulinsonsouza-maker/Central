@@ -22,7 +22,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X, Wallet, AlertTriangle } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X, Wallet, AlertTriangle, Zap, Target, Film, MousePointerClick } from "lucide-react";
 import { upgradeFbCdnImageUrl } from "@/lib/utils";
 
 /* ─── data fetchers (unchanged) ─── */
@@ -1662,31 +1662,42 @@ function MetaCriativosGrid({
   return (
     <div className="space-y-5">
 
-      {/* ── Section header InOut style ── */}
-      <div className="flex items-start gap-3">
-        <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+      {/* ── Section header — mesma linguagem visual do Semana a Semana ── */}
+      <div className="flex items-start gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white shadow-[0_12px_30px_rgba(220,38,38,0.25)]">
+          <BarChart3 className="h-5 w-5" />
+        </div>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">Análise de Criativos</p>
-          <h2 className="text-xl font-extrabold tracking-tight text-[var(--foreground)]">Criativos META</h2>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Análise de Criativos</p>
+          <h2 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
+            Criativos{" "}
+            <span className="bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">META</span>
+          </h2>
         </div>
       </div>
 
-      {/* 1. KPI tiles */}
+      {/* 1. KPI tiles — mesmo estilo do KpiCard do painel */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {([
           {
             label: "Em Veiculação",
             value: sorted.length.toLocaleString("pt-BR"),
+            sub: "Criativos ativos no período",
+            icon: Zap,
             accent: true,
           },
           {
             label: "CTR Médio",
             value: averageCtr > 0 ? `${averageCtr.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : "—",
+            sub: "Taxa de clique por impressão",
+            icon: MousePointerClick,
             accent: false,
           },
           {
             label: convLabels.kpi,
             value: totalLeads > 0 ? formatCurrency(cplAlvo) : "—",
+            sub: "Meta de custo por resultado",
+            icon: Target,
             accent: false,
           },
           {
@@ -1698,25 +1709,35 @@ function MetaCriativosGrid({
               const weighted = videos.reduce((acc, i) => acc + i.holdRate * i.video3sViews, 0) / totalHooks;
               return `${weighted.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
             })(),
+            sub: "Visualizações 100% / views 3s",
+            icon: Film,
             accent: false,
           },
         ] as const).map((kpi) => (
-          <div
+          <Card
             key={kpi.label}
-            className="group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]"
+            className="group relative overflow-hidden rounded-2xl border-[var(--border)] transition-all hover:border-[color-mix(in_srgb,var(--primary)_20%,var(--border))]"
           >
             <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-[0.05]" />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{kpi.label}</p>
-            <p className={`mt-1.5 text-2xl font-extrabold tabular-nums leading-none ${"valueColor" in kpi && kpi.valueColor ? kpi.valueColor : kpi.accent ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
-              {kpi.value}
-            </p>
-          </div>
+            <CardContent className="flex items-start gap-4 p-5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+                <kpi.icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{kpi.label}</p>
+                <p className={`mt-1 text-2xl font-extrabold tabular-nums leading-none ${kpi.accent ? "text-[var(--primary)]" : "text-[var(--foreground)]"}`}>
+                  {kpi.value}
+                </p>
+                <p className="mt-1.5 text-[11px] text-[var(--muted-foreground)]">{kpi.sub}</p>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       {/* 2. Decision strip */}
-      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-        <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border)] sm:grid-cols-4 sm:divide-y-0">
+      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))]">
+        <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border)]/60 sm:grid-cols-4 sm:divide-y-0">
           {([
             { count: countEscalar,   label: "Escalar",      dot: "bg-green-500",  color: "text-green-500",  border: "border-green-500/20"  },
             { count: countOtimizar,  label: "Otimizar",     dot: "bg-amber-500",  color: "text-amber-500",  border: "border-amber-500/20"  },
@@ -1738,10 +1759,12 @@ function MetaCriativosGrid({
       </div>
 
       {/* 3. Tabela de criativos */}
-      <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-        <div className="flex items-center gap-2.5 border-b border-[var(--border)] px-4 py-3">
-          <div className="h-4 w-0.5 rounded-full bg-[var(--primary)]" />
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">Performance por criativo</p>
+      <div className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
+        <div className="flex items-center gap-3 border-b border-[var(--border)]/60 px-6 py-4">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+            <BarChart3 className="h-4 w-4" />
+          </div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--foreground)]">Performance por criativo</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left text-xs">
