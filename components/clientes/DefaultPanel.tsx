@@ -291,13 +291,6 @@ export function DefaultPanel({
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(v: number) =>
-                      chartRevenueKey
-                        ? v >= 1000
-                          ? `R$${(v / 1000).toFixed(0)}k`
-                          : `R$${v}`
-                        : String(v)
-                    }
                   />
                   <YAxis
                     yAxisId="right"
@@ -307,6 +300,7 @@ export function DefaultPanel({
                     tickLine={false}
                     axisLine={false}
                   />
+                  {chartRevenueKey && <YAxis yAxisId="revenue" hide={true} />}
                   <Tooltip
                     formatter={(value: number, name: string) => {
                       if (name === "Investimento" || name === cplLabel || name === chartRevenueKey) {
@@ -329,15 +323,14 @@ export function DefaultPanel({
                   />
                   {chartRevenueKey && (
                     <Line
-                      yAxisId="left"
+                      yAxisId="revenue"
                       type="monotone"
                       dataKey={chartRevenueKey}
                       name={chartRevenueKey}
-                      stroke="#22c55e"
-                      strokeWidth={2.5}
-                      strokeDasharray="6 3"
-                      dot={{ fill: "#22c55e", r: 4, strokeWidth: 0 }}
-                      activeDot={{ r: 6, strokeWidth: 0, fill: "#22c55e" }}
+                      stroke="none"
+                      dot={false}
+                      activeDot={false}
+                      legendType="none"
                     />
                   )}
                   <Line
