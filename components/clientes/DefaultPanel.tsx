@@ -121,6 +121,8 @@ type DefaultPanelProps = {
   ecommerceGoogleMode?: boolean;
   /** "semanal" (padrão) ou "mensal" — controla títulos do gráfico e da tabela */
   agrupamento?: "semanal" | "mensal";
+  /** Chave de faturamento no chartData (ex.: "Faturamento"). Quando definido, adiciona linha verde ao gráfico. */
+  chartRevenueKey?: string;
 };
 
 export function DefaultPanel({
@@ -139,6 +141,7 @@ export function DefaultPanel({
   visitasMode = false,
   ecommerceGoogleMode = false,
   agrupamento = "semanal",
+  chartRevenueKey,
 }: DefaultPanelProps) {
   const isMensal = agrupamento === "mensal";
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
@@ -288,6 +291,13 @@ export function DefaultPanel({
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
+                    tickFormatter={(v: number) =>
+                      chartRevenueKey
+                        ? v >= 1000
+                          ? `R$${(v / 1000).toFixed(0)}k`
+                          : `R$${v}`
+                        : String(v)
+                    }
                   />
                   <YAxis
                     yAxisId="right"
@@ -299,7 +309,7 @@ export function DefaultPanel({
                   />
                   <Tooltip
                     formatter={(value: number, name: string) => {
-                      if (name === "Investimento" || name === cplLabel) {
+                      if (name === "Investimento" || name === cplLabel || name === chartRevenueKey) {
                         return [formatCurrency(Number(value)), name];
                       }
                       return [Number(value).toLocaleString("pt-BR"), name];
@@ -317,6 +327,19 @@ export function DefaultPanel({
                     fill="url(#barGrad)"
                     radius={[6, 6, 0, 0]}
                   />
+                  {chartRevenueKey && (
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey={chartRevenueKey}
+                      name={chartRevenueKey}
+                      stroke="#22c55e"
+                      strokeWidth={2.5}
+                      strokeDasharray="6 3"
+                      dot={{ fill: "#22c55e", r: 4, strokeWidth: 0 }}
+                      activeDot={{ r: 6, strokeWidth: 0, fill: "#22c55e" }}
+                    />
+                  )}
                   <Line
                     yAxisId="right"
                     type="monotone"

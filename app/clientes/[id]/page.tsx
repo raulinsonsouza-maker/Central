@@ -497,20 +497,25 @@ export default function ClienteDetailPage() {
   const series = midia?.series ?? [];
   const latestFiveSeries = series.slice(-5);
   const chartConversionKey = isEcommerceMode ? "Compras" : canal === "google" ? "Conversões" : convLabels.chartKey;
-  const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number; purchases?: number }) => {
+  const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number; purchases?: number; valorConversao?: number }) => {
     const inv = Math.round(s.investimento * 100) / 100;
     const conv = isMiguelPanel
       ? (s.conversas ?? 0)
       : isEcommerceMode
         ? (s.purchases ?? s.leads)
         : s.leads;
-    return {
+    const entry: Record<string, string | number> = {
       periodo: s.periodo,
       Investimento: inv,
       [chartConversionKey]: conv,
       CPL: conv > 0 ? Math.round((s.investimento / conv) * 100) / 100 : 0,
     };
+    if (isEcommerceMode) {
+      entry["Faturamento"] = Math.round((s.valorConversao ?? 0) * 100) / 100;
+    }
+    return entry;
   });
+  const chartRevenueKey = isEcommerceMode ? "Faturamento" : undefined;
 
   const canalLabels: Record<string, string> = {
     geral: "Geral",
@@ -1001,6 +1006,7 @@ function formatPercentage(value: number) {
           visitasMode={isVisitasPanel}
           ecommerceGoogleMode={isEcommerceMode}
           agrupamento={midia?.agrupamento ?? "semanal"}
+          chartRevenueKey={chartRevenueKey}
         />
       )}
 
