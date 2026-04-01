@@ -67,6 +67,7 @@ export async function GET(
         conversas: number;
         impressoes: number;
         cliques: number;
+        purchases: number;
         inicio: Date;
       }
     >();
@@ -80,6 +81,7 @@ export async function GET(
       const inv = Number(f.investimento);
       const conversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
       const leads = getLeads(f);
+      const purchases = (f as { purchases?: number }).purchases ?? 0;
       const imp = f.impressoes;
       const clk = f.cliques;
       if (existing) {
@@ -88,6 +90,7 @@ export async function GET(
         existing.conversas += conversas;
         existing.impressoes += imp;
         existing.cliques += clk;
+        existing.purchases += purchases;
       } else {
         byWeek.set(key, {
           periodo: label,
@@ -96,6 +99,7 @@ export async function GET(
           conversas,
           impressoes: imp,
           cliques: clk,
+          purchases,
           inicio,
         });
       }

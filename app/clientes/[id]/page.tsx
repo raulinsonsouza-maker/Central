@@ -439,7 +439,7 @@ export default function ClienteDetailPage() {
   const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)) && canal !== "google";
   const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
   const isVisitasPanel = isFlorien(cliente) && canal !== "google";
-  const isEcommerceGoogle = (isGranarolo(cliente) || isDor(cliente)) && canal === "google";
+  const isEcommerceMode = isGranarolo(cliente) || isDor(cliente);
   const convLabels = React.useMemo(() => isComprasPanel
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
     : isVisitasPanel
@@ -495,10 +495,14 @@ export default function ClienteDetailPage() {
 
   const series = midia?.series ?? [];
   const latestFiveSeries = series.slice(-5);
-  const chartConversionKey = canal === "google" ? "Conversões" : convLabels.chartKey;
-  const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number }) => {
+  const chartConversionKey = isEcommerceMode ? "Compras" : canal === "google" ? "Conversões" : convLabels.chartKey;
+  const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number; purchases?: number }) => {
     const inv = Math.round(s.investimento * 100) / 100;
-    const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+    const conv = isMiguelPanel
+      ? (s.conversas ?? 0)
+      : isEcommerceMode
+        ? (s.purchases ?? s.leads)
+        : s.leads;
     return {
       periodo: s.periodo,
       Investimento: inv,
@@ -514,12 +518,13 @@ export default function ClienteDetailPage() {
   };
 
   type MetricTrend = "higher" | "lower" | "neutral";
-  type MetricRow = { investimento: number; leads: number; conversas?: number; impressoes: number; cliques: number };
+  type MetricRow = { investimento: number; leads: number; conversas?: number; impressoes: number; cliques: number; purchases?: number };
 
   const metricDefinitions = React.useMemo(() => {
-    const conversionLabel = canal === "google" ? "CONVERSÕES" : convLabels.dbKey;
-    const conversionDesc =
-      canal === "google"
+    const conversionLabel = isEcommerceMode ? "COMPRAS" : canal === "google" ? "CONVERSÕES" : convLabels.dbKey;
+    const conversionDesc = isEcommerceMode
+      ? "Compras no site atribuídas ao período (pedidos confirmados)."
+      : canal === "google"
         ? "Total de conversões atribuídas (alinhado ao relatório de campanhas do Google Ads)."
         : isComprasPanel
           ? "Compras no site atribuídas ao período (objetivo principal das campanhas)."
@@ -538,9 +543,10 @@ export default function ClienteDetailPage() {
             : isMiguelPanel
               ? "Percentual de conversas iniciadas sobre os cliques gerados."
               : "Percentual de leads sobre cliques.";
-    const custoPorResultadoLabel = canal === "google" ? "CUSTO / CONV." : convLabels.cust;
-    const custoPorResultadoDesc =
-      canal === "google"
+    const custoPorResultadoLabel = isEcommerceMode ? "CUSTO / COMPRA" : canal === "google" ? "CUSTO / CONV." : convLabels.cust;
+    const custoPorResultadoDesc = isEcommerceMode
+      ? "Investimento ÷ compras no site da semana (custo de aquisição por pedido)."
+      : canal === "google"
         ? "Investimento ÷ conversões da semana (equivalente ao custo por conversão do Google)."
         : isComprasPanel
           ? "Investimento ÷ compras no site da semana."
@@ -585,15 +591,15 @@ export default function ClienteDetailPage() {
         label: conversionLabel,
         description: conversionDesc,
         trend: "higher" as MetricTrend,
-        value: (s: MetricRow) => isMiguelPanel ? (s.conversas ?? 0) : s.leads,
+        value: (s: MetricRow) => isMiguelPanel ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads,
         format: (value: number) => formatInteger(value),
       },
       {
-        label: convLabels.taxa,
-        description: taxaDesc,
+        label: isEcommerceMode ? "TAXA COMPRA" : convLabels.taxa,
+        description: isEcommerceMode ? "Percentual de compras sobre os cliques gerados." : taxaDesc,
         trend: "higher" as MetricTrend,
         value: (s: MetricRow) => {
-          const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+          const conv = isMiguelPanel ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
           if (isVisitasPanel) return s.impressoes > 0 ? (conv / s.impressoes) * 1000 : 0;
           return s.cliques > 0 ? (conv / s.cliques) * 100 : 0;
         },
@@ -611,13 +617,13 @@ export default function ClienteDetailPage() {
         description: custoPorResultadoDesc,
         trend: "lower" as MetricTrend,
         value: (s: MetricRow) => {
-          const conv = isMiguelPanel ? (s.conversas ?? 0) : s.leads;
+          const conv = isMiguelPanel ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
           return conv > 0 ? s.investimento / conv : 0;
         },
         format: (value: number) => formatCurrency(value),
       },
     ];
-  }, [canal, isMiguelPanel, isComprasPanel, isVisitasPanel, convLabels]);
+  }, [canal, isMiguelPanel, isComprasPanel, isVisitasPanel, isEcommerceMode, convLabels]);
 
 function formatCurrency(value: number) {
   return `R$ ${value.toLocaleString("pt-BR", {
@@ -992,7 +998,7 @@ function formatPercentage(value: number) {
           conversasMode={isMiguelPanel}
           comprasMode={isComprasPanel}
           visitasMode={isVisitasPanel}
-          ecommerceGoogleMode={isEcommerceGoogle}
+          ecommerceGoogleMode={isEcommerceMode}
         />
       )}
 

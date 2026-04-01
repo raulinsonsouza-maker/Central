@@ -75,7 +75,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
   );
 }
 
-type MetricRow = { investimento: number; leads: number; impressoes: number; cliques: number };
+type MetricRow = { investimento: number; leads: number; impressoes: number; cliques: number; purchases?: number };
 
 type MetricDefinition = {
   label: string;
@@ -148,12 +148,12 @@ export function DefaultPanel({
 
   return (
     <>
-      {/* KPI cards — modo e-commerce Google (Granarolo, D'or) */}
+      {/* KPI cards — modo e-commerce (Granarolo, D'or) */}
       {ecommerceGoogleMode ? (
         <>
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard
-              title="Investimento Google"
+              title={canal === "google" ? "Investimento Google" : canal === "meta" ? "Investimento Meta" : "Investimento Total"}
               value={formatCurrency(resumo.investimento)}
               sub={`${resumo.periodo ?? ""} selecionados`}
               icon={DollarSign}
@@ -161,7 +161,7 @@ export function DefaultPanel({
             <KpiCard
               title="Compras no Site"
               value={purchases.toLocaleString("pt-BR")}
-              sub="Pedidos atribuídos às campanhas Google no período"
+              sub={canal === "geral" ? "Pedidos atribuídos (Google + Meta) no período" : canal === "meta" ? "Pedidos atribuídos às campanhas Meta no período" : "Pedidos atribuídos às campanhas Google no período"}
               icon={ShoppingCart}
             />
             <KpiCard
@@ -182,7 +182,7 @@ export function DefaultPanel({
             <KpiCard
               title="Faturamento (Valor Conv.)"
               value={valorConversao > 0 ? formatCurrency(valorConversao) : "—"}
-              sub="Receita de compras atribuída às campanhas Google no período"
+              sub={canal === "geral" ? "Receita de compras atribuída (Google + Meta) no período" : canal === "meta" ? "Receita de compras atribuída às campanhas Meta no período" : "Receita de compras atribuída às campanhas Google no período"}
               icon={ReceiptText}
             />
             <KpiCard
@@ -242,10 +242,10 @@ export function DefaultPanel({
               <SectionHeader
                 title={canal === "google" ? "Performance Google" : "Volume geral de performance"}
                 subtitle={
-                  canal === "google"
-                    ? ecommerceGoogleMode
-                      ? "Investimento e compras por semana"
-                      : "Investimento e conversões por semana"
+                  ecommerceGoogleMode
+                    ? "Investimento e compras por semana"
+                    : canal === "google"
+                    ? "Investimento e conversões por semana"
                     : visitasMode
                       ? "Investimento e visitas ao perfil por semana"
                       : comprasMode
