@@ -4,6 +4,8 @@ import { findClienteById } from "@/lib/repositories/clientesRepository";
 import { outcomeCountForFato } from "@/lib/metrics/fatoMidiaOutcome";
 import { isFlorien, isDor, isGranarolo } from "@/lib/clientProfiles";
 import { startOfWeek, endOfWeek, getISOWeek, getYear } from "date-fns";
+
+const MONTH_ABBR = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -123,6 +125,62 @@ export async function GET(
           cliques: f.cliques,
         };
       }),
+    });
+  }
+
+  if (agrupamento === "mensal") {
+    const byMonth = new Map<
+      string,
+      {
+        periodo: string;
+        investimento: number;
+        leads: number;
+        conversas: number;
+        impressoes: number;
+        cliques: number;
+        purchases: number;
+        inicio: Date;
+      }
+    >();
+    for (const f of fatos) {
+      const d = new Date(f.data);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const inicio = new Date(d.getFullYear(), d.getMonth(), 1);
+      const label = `${MONTH_ABBR[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`;
+      const existing = byMonth.get(key);
+      const inv = Number(f.investimento);
+      const conversas = (f as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
+      const leads = getLeads(f);
+      const purchases = (f as { purchases?: number }).purchases ?? 0;
+      if (existing) {
+        existing.investimento += inv;
+        existing.leads += leads;
+        existing.conversas += conversas;
+        existing.impressoes += f.impressoes;
+        existing.cliques += f.cliques;
+        existing.purchases += purchases;
+      } else {
+        byMonth.set(key, {
+          periodo: label,
+          investimento: inv,
+          leads,
+          conversas,
+          impressoes: f.impressoes,
+          cliques: f.cliques,
+          purchases,
+          inicio,
+        });
+      }
+    }
+    const series = Array.from(byMonth.entries())
+      .map(([k, v]) => ({ key: k, ...v }))
+      .sort((a, b) => a.inicio.getTime() - b.inicio.getTime());
+    return NextResponse.json({
+      clienteId: id,
+      canal,
+      agrupamento: "mensal",
+      series,
+      diario: [],
     });
   }
 

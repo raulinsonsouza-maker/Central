@@ -55,10 +55,11 @@ async function fetchResumo(id: string, canal: "geral" | "meta" | "google", filte
   return res.json();
 }
 
-async function fetchMidia(id: string, canal: string, filter: DateFilter) {
+async function fetchMidia(id: string, canal: string, filter: DateFilter, preset?: string) {
   const params = buildQueryParams(filter);
+  const agrupamento = (preset === "ytd" || preset === "365d" || preset === "semestreAtual") ? "mensal" : "semanal";
   const res = await fetch(
-    `/api/clientes/${id}/midia?canal=${canal}&agrupamento=semanal&${params}`
+    `/api/clientes/${id}/midia?canal=${canal}&agrupamento=${agrupamento}&${params}`
   );
   if (!res.ok) throw new Error("Falha ao carregar mídia");
   return res.json();
@@ -413,8 +414,8 @@ export default function ClienteDetailPage() {
     enabled: !!id,
   });
   const { data: midia } = useQuery({
-    queryKey: ["midia", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
-    queryFn: () => fetchMidia(id, canal as string, dateFilter),
+    queryKey: ["midia", id, canal, presetPeriodo, dateFilter.dataInicio, dateFilter.dataFim],
+    queryFn: () => fetchMidia(id, canal as string, dateFilter, presetPeriodo),
     enabled: !!id,
   });
 
@@ -999,6 +1000,7 @@ function formatPercentage(value: number) {
           comprasMode={isComprasPanel}
           visitasMode={isVisitasPanel}
           ecommerceGoogleMode={isEcommerceMode}
+          agrupamento={midia?.agrupamento ?? "semanal"}
         />
       )}
 

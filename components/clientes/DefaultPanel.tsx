@@ -119,6 +119,8 @@ type DefaultPanelProps = {
   visitasMode?: boolean;
   /** Quando true (e-commerce no Google), exibe ROAS, compras, faturamento e ticket médio */
   ecommerceGoogleMode?: boolean;
+  /** "semanal" (padrão) ou "mensal" — controla títulos do gráfico e da tabela */
+  agrupamento?: "semanal" | "mensal";
 };
 
 export function DefaultPanel({
@@ -136,7 +138,9 @@ export function DefaultPanel({
   comprasMode = false,
   visitasMode = false,
   ecommerceGoogleMode = false,
+  agrupamento = "semanal",
 }: DefaultPanelProps) {
+  const isMensal = agrupamento === "mensal";
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
   const cplLabel = visitasMode ? "Custo/Visita" : comprasMode ? "Custo/Compra" : conversasMode ? "Custo/Conv." : "CPL";
 
@@ -243,16 +247,16 @@ export function DefaultPanel({
                 title={canal === "google" ? "Performance Google" : "Volume geral de performance"}
                 subtitle={
                   ecommerceGoogleMode
-                    ? "Investimento e compras por semana"
+                    ? `Investimento e compras por ${isMensal ? "mês" : "semana"}`
                     : canal === "google"
-                    ? "Investimento e conversões por semana"
+                    ? `Investimento e conversões por ${isMensal ? "mês" : "semana"}`
                     : visitasMode
-                      ? "Investimento e visitas ao perfil por semana"
+                      ? `Investimento e visitas ao perfil por ${isMensal ? "mês" : "semana"}`
                       : comprasMode
-                        ? "Investimento e compras por semana"
+                        ? `Investimento e compras por ${isMensal ? "mês" : "semana"}`
                         : conversasMode
-                          ? "Investimento e conversas por semana"
-                          : "Investimento e leads por semana"
+                          ? `Investimento e conversas por ${isMensal ? "mês" : "semana"}`
+                          : `Investimento e leads por ${isMensal ? "mês" : "semana"}`
                 }
               />
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
@@ -345,7 +349,7 @@ export function DefaultPanel({
                     <h3 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)] sm:text-2xl">
                       {canal === "google" ? "Resultado Google" : `Resultado ${canalLabels[canal] ?? canal}`}
                       <span className="ml-2 bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">
-                        Semana a semana
+                        {isMensal ? "Mês a mês" : "Semana a semana"}
                       </span>
                     </h3>
                     <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
@@ -353,14 +357,14 @@ export function DefaultPanel({
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                    Visão comparativa com leitura rápida das principais métricas por semana.
+                    Visão comparativa com leitura rápida das principais métricas por {isMensal ? "mês" : "semana"}.
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-[var(--border)] bg-white/[0.02] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  {latestFiveSeries.length} semanas
+                  {latestFiveSeries.length} {isMensal ? "meses" : "semanas"}
                 </span>
                 {latestPeriod && (
                   <span className="rounded-full border border-[var(--primary)]/25 bg-[var(--primary)]/12 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--foreground)]">
