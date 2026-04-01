@@ -13,7 +13,7 @@ import {
   Line,
   ComposedChart,
 } from "recharts";
-import { DollarSign, Target, TrendingUp, Users, Zap, BarChart3 } from "lucide-react";
+import { DollarSign, Target, TrendingUp, Users, Zap, BarChart3, ShoppingCart, ReceiptText, Repeat2 } from "lucide-react";
 
 const tooltipStyle = {
   contentStyle: {
@@ -91,6 +91,11 @@ type DefaultPanelProps = {
     cpl: number;
     cpm: number;
     periodo?: string;
+    purchases?: number;
+    valorConversao?: number;
+    custoPorCompra?: number;
+    roas?: number;
+    ticketMedio?: number;
   };
   chartData: Record<string, string | number>[];
   /** Nome da série de conversões/leads no gráfico (ex.: "Conversões" no Google). */
@@ -112,6 +117,8 @@ type DefaultPanelProps = {
   comprasMode?: boolean;
   /** Quando true, troca labels de Leads/CPL para Visitas/Custo por Visita */
   visitasMode?: boolean;
+  /** Quando true (e-commerce no Google), exibe ROAS, compras, faturamento e ticket médio */
+  ecommerceGoogleMode?: boolean;
 };
 
 export function DefaultPanel({
@@ -128,50 +135,104 @@ export function DefaultPanel({
   conversasMode = false,
   comprasMode = false,
   visitasMode = false,
+  ecommerceGoogleMode = false,
 }: DefaultPanelProps) {
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
   const cplLabel = visitasMode ? "Custo/Visita" : comprasMode ? "Custo/Compra" : conversasMode ? "Custo/Conv." : "CPL";
 
+  const purchases = resumo.purchases ?? 0;
+  const valorConversao = resumo.valorConversao ?? 0;
+  const custoPorCompra = resumo.custoPorCompra ?? 0;
+  const roas = resumo.roas ?? 0;
+  const ticketMedio = resumo.ticketMedio ?? 0;
+
   return (
     <>
-      {/* KPI cards */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
-          title={canal === "google" ? "Investimento Google" : "Investimento"}
-          value={formatCurrency(resumo.investimento)}
-          sub={`${resumo.periodo ?? ""} selecionados`}
-          icon={DollarSign}
-        />
-        <KpiCard
-          title={canal === "google" ? "Conversões (Google Ads)" : comprasMode ? "Compras" : visitasMode ? "Visitas ao perfil" : conversasMode ? "Conversas" : "Leads"}
-          value={resumo.leads.toLocaleString("pt-BR")}
-          sub={
-            canal === "google"
-              ? "Total do período (métrica principal do relatório de campanhas)"
-              : comprasMode
-                ? "Compras no site atribuídas ao período"
-                : visitasMode
-                  ? "Visitas ao perfil do Instagram no período"
-                  : conversasMode
-                    ? "Conversas por mensagem iniciadas no período"
-                    : "Total do período"
-          }
-          icon={Users}
-        />
-        <KpiCard
-          title={canal === "google" ? "Custo / conversão" : comprasMode ? "Custo / Compra" : visitasMode ? "Custo / Visita" : conversasMode ? "Custo / Conversa" : "CPL"}
-          value={formatCurrency(resumo.cpl)}
-          sub={canal === "google" ? "Investimento ÷ conversões" : comprasMode ? "Investimento ÷ compras no site" : visitasMode ? "Investimento ÷ visitas ao perfil" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
-          icon={Target}
-          accentValue
-        />
-        <KpiCard
-          title={canal === "google" ? "CPM Google" : "CPM"}
-          value={formatCurrency(resumo.cpm)}
-          sub="Custo por mil impressões"
-          icon={Zap}
-        />
-      </section>
+      {/* KPI cards — modo e-commerce Google (Granarolo, D'or) */}
+      {ecommerceGoogleMode ? (
+        <>
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <KpiCard
+              title="Investimento Google"
+              value={formatCurrency(resumo.investimento)}
+              sub={`${resumo.periodo ?? ""} selecionados`}
+              icon={DollarSign}
+            />
+            <KpiCard
+              title="Compras no Site"
+              value={purchases.toLocaleString("pt-BR")}
+              sub="Pedidos atribuídos às campanhas Google no período"
+              icon={ShoppingCart}
+            />
+            <KpiCard
+              title="Custo por Compra"
+              value={custoPorCompra > 0 ? formatCurrency(custoPorCompra) : "—"}
+              sub="Investimento ÷ compras atribuídas"
+              icon={Target}
+              accentValue
+            />
+            <KpiCard
+              title="ROAS"
+              value={roas > 0 ? `${roas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}x` : "—"}
+              sub="Retorno sobre investimento em anúncios (receita ÷ custo)"
+              icon={Repeat2}
+            />
+          </section>
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            <KpiCard
+              title="Faturamento (Valor Conv.)"
+              value={valorConversao > 0 ? formatCurrency(valorConversao) : "—"}
+              sub="Receita de compras atribuída às campanhas Google no período"
+              icon={ReceiptText}
+            />
+            <KpiCard
+              title="Ticket Médio"
+              value={ticketMedio > 0 ? formatCurrency(ticketMedio) : "—"}
+              sub="Valor médio por pedido (faturamento ÷ compras)"
+              icon={TrendingUp}
+            />
+          </section>
+        </>
+      ) : (
+        /* KPI cards — modo padrão */
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard
+            title={canal === "google" ? "Investimento Google" : "Investimento"}
+            value={formatCurrency(resumo.investimento)}
+            sub={`${resumo.periodo ?? ""} selecionados`}
+            icon={DollarSign}
+          />
+          <KpiCard
+            title={canal === "google" ? "Conversões (Google Ads)" : comprasMode ? "Compras" : visitasMode ? "Visitas ao perfil" : conversasMode ? "Conversas" : "Leads"}
+            value={resumo.leads.toLocaleString("pt-BR")}
+            sub={
+              canal === "google"
+                ? "Total do período (métrica principal do relatório de campanhas)"
+                : comprasMode
+                  ? "Compras no site atribuídas ao período"
+                  : visitasMode
+                    ? "Visitas ao perfil do Instagram no período"
+                    : conversasMode
+                      ? "Conversas por mensagem iniciadas no período"
+                      : "Total do período"
+            }
+            icon={Users}
+          />
+          <KpiCard
+            title={canal === "google" ? "Custo / conversão" : comprasMode ? "Custo / Compra" : visitasMode ? "Custo / Visita" : conversasMode ? "Custo / Conversa" : "CPL"}
+            value={formatCurrency(resumo.cpl)}
+            sub={canal === "google" ? "Investimento ÷ conversões" : comprasMode ? "Investimento ÷ compras no site" : visitasMode ? "Investimento ÷ visitas ao perfil" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
+            icon={Target}
+            accentValue
+          />
+          <KpiCard
+            title={canal === "google" ? "CPM Google" : "CPM"}
+            value={formatCurrency(resumo.cpm)}
+            sub="Custo por mil impressões"
+            icon={Zap}
+          />
+        </section>
+      )}
 
       {/* Performance chart */}
       {chartData.length > 0 && (
@@ -182,7 +243,9 @@ export function DefaultPanel({
                 title={canal === "google" ? "Performance Google" : "Volume geral de performance"}
                 subtitle={
                   canal === "google"
-                    ? "Investimento e conversões por semana"
+                    ? ecommerceGoogleMode
+                      ? "Investimento e compras por semana"
+                      : "Investimento e conversões por semana"
                     : visitasMode
                       ? "Investimento e visitas ao perfil por semana"
                       : comprasMode

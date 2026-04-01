@@ -56,6 +56,8 @@ export async function GET(
       cliques: true,
       messagingConversationsStarted: true,
       profileVisits: true,
+      purchases: true,
+      websitePurchasesConversionValue: true,
     },
   });
 
@@ -67,6 +69,8 @@ export async function GET(
   let totalImpressoes = 0;
   let totalCliques = 0;
   let totalConversas = 0;
+  let totalPurchases = 0;
+  let totalValorConversao = 0;
   for (const r of rows) {
     totalInvestimento += Number(r.investimento);
     totalConversas += r.messagingConversationsStarted ?? 0;
@@ -75,10 +79,15 @@ export async function GET(
       : outcomeCountForFato(r.canal, r.leads, r.conversoes, undefined, isComprasCliente && r.canal !== "GOOGLE");
     totalImpressoes += r.impressoes;
     totalCliques += r.cliques;
+    totalPurchases += r.purchases ?? 0;
+    totalValorConversao += Number(r.websitePurchasesConversionValue ?? 0);
   }
   const cpl = totalLeads > 0 ? totalInvestimento / totalLeads : 0;
   const cpm = totalImpressoes > 0 ? (totalInvestimento / totalImpressoes) * 1000 : 0;
   const custoPorConversa = totalConversas > 0 ? totalInvestimento / totalConversas : 0;
+  const custoPorCompra = totalPurchases > 0 ? totalInvestimento / totalPurchases : 0;
+  const roas = totalInvestimento > 0 ? totalValorConversao / totalInvestimento : 0;
+  const ticketMedio = totalPurchases > 0 ? totalValorConversao / totalPurchases : 0;
   const diasSelecionados = Math.max(
     1,
     Math.floor((dataFim.getTime() - dataInicio.getTime()) / (24 * 60 * 60 * 1000)) + 1
@@ -95,5 +104,10 @@ export async function GET(
     cpm: Math.round(cpm * 100) / 100,
     messagingConversationsStarted: totalConversas,
     custoPorConversa: Math.round(custoPorConversa * 100) / 100,
+    purchases: totalPurchases,
+    valorConversao: Math.round(totalValorConversao * 100) / 100,
+    custoPorCompra: Math.round(custoPorCompra * 100) / 100,
+    roas: Math.round(roas * 100) / 100,
+    ticketMedio: Math.round(ticketMedio * 100) / 100,
   });
 }

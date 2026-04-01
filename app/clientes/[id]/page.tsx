@@ -439,6 +439,7 @@ export default function ClienteDetailPage() {
   const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente) || isClinicaESpa(cliente)) && canal !== "google";
   const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
   const isVisitasPanel = isFlorien(cliente) && canal !== "google";
+  const isEcommerceGoogle = (isGranarolo(cliente) || isDor(cliente)) && canal === "google";
   const convLabels = React.useMemo(() => isComprasPanel
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
     : isVisitasPanel
@@ -991,6 +992,7 @@ function formatPercentage(value: number) {
           conversasMode={isMiguelPanel}
           comprasMode={isComprasPanel}
           visitasMode={isVisitasPanel}
+          ecommerceGoogleMode={isEcommerceGoogle}
         />
       )}
 
