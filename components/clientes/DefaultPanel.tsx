@@ -96,6 +96,7 @@ type DefaultPanelProps = {
     custoPorCompra?: number;
     roas?: number;
     ticketMedio?: number;
+    cliques?: number;
   };
   chartData: Record<string, string | number>[];
   /** Nome da série de conversões/leads no gráfico (ex.: "Conversões" no Google). */
