@@ -13,7 +13,7 @@ import {
   Line,
   ComposedChart,
 } from "recharts";
-import { DollarSign, Target, TrendingUp, Users, Zap, BarChart3, ShoppingCart, ReceiptText, Repeat2 } from "lucide-react";
+import { DollarSign, Target, TrendingUp, Users, Zap, BarChart3, ShoppingCart, ReceiptText, Repeat2, MousePointerClick, MessageCircle } from "lucide-react";
 
 const tooltipStyle = {
   contentStyle: {
@@ -123,6 +123,8 @@ type DefaultPanelProps = {
   agrupamento?: "semanal" | "mensal";
   /** Chave de faturamento no chartData (ex.: "Faturamento"). Quando definido, adiciona linha verde ao gráfico. */
   chartRevenueKey?: string;
+  /** Quando true (Clínica e Spa), exibe 2ª linha de KPIs com Cliques e Taxa Conversa (engajamento). */
+  conversasEngajamentoMode?: boolean;
 };
 
 export function DefaultPanel({
@@ -142,6 +144,7 @@ export function DefaultPanel({
   ecommerceGoogleMode = false,
   agrupamento = "semanal",
   chartRevenueKey,
+  conversasEngajamentoMode = false,
 }: DefaultPanelProps) {
   const isMensal = agrupamento === "mensal";
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
@@ -237,6 +240,28 @@ export function DefaultPanel({
             value={formatCurrency(resumo.cpm)}
             sub="Custo por mil impressões"
             icon={Zap}
+          />
+        </section>
+      )}
+
+      {/* KPI row extra — modo conversas + engajamento (Clínica e Spa) */}
+      {!ecommerceGoogleMode && conversasEngajamentoMode && (
+        <section className="grid gap-4 sm:grid-cols-2">
+          <KpiCard
+            title="Cliques (Engajamento)"
+            value={(resumo.cliques ?? 0).toLocaleString("pt-BR")}
+            sub="Total de interações geradas pelos anúncios no período"
+            icon={MousePointerClick}
+          />
+          <KpiCard
+            title="Taxa Clique → Conversa"
+            value={
+              (resumo.leads ?? 0) > 0 && (resumo.cliques ?? 0) > 0
+                ? `${(((resumo.leads ?? 0) / (resumo.cliques ?? 0)) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`
+                : "—"
+            }
+            sub="Percentual de cliques que converteram em conversas iniciadas"
+            icon={MessageCircle}
           />
         </section>
       )}
