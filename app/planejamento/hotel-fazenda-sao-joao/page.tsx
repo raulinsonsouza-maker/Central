@@ -169,7 +169,7 @@ export default function HotelFazendaSaoJoaoPlanoPage() {
               </div>
               <h3 className="text-2xl font-bold mb-4 text-white">O Problema de Estrutura</h3>
               <p className="text-neutral-400 leading-relaxed mb-6">
-                Hoje a conta possui <strong>23 conjuntos de anúncios</strong> rodando simultaneamente. Isso pulveriza a verba, força campanhas a entrarem em "Aprendizado Limitado" e eleva o CPA em públicos abertos (chegando a R$ 658/compra).
+                Hoje a conta possui <strong>23 conjuntos de anúncios</strong> rodando simultaneamente. Isso pulveriza a verba, força campanhas a entrarem em &quot;Aprendizado Limitado&quot; e eleva o CPA em públicos abertos (chegando a R$ 658/compra).
               </p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3 text-neutral-300">
@@ -389,7 +389,7 @@ export default function HotelFazendaSaoJoaoPlanoPage() {
             <div className="relative z-10">
               <h3 className="text-3xl font-bold mb-4 text-white">Prontos para Escalar?</h3>
               <p className="text-neutral-400 text-lg mb-8 max-w-2xl mx-auto">
-                A reestruturação inout elimina o desperdício no "aprendizado limitado" e cria a máquina de aquisição necessária para que o hotel evolua com estabilidade e volume.
+                A reestruturação inout elimina o desperdício no &quot;aprendizado limitado&quot; e cria a máquina de aquisição necessária para que o hotel evolua com estabilidade e volume.
               </p>
             </div>
           </div>
