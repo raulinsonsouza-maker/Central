@@ -9,8 +9,6 @@ export function Header() {
   const pathname = usePathname();
   const isAdminClientes = pathname.startsWith("/admin/clientes");
   const isAdminConfig = pathname.startsWith("/admin/configuracoes");
-  const isPlanejamento = pathname.startsWith("/planejamento");
-  const isClientes = pathname.startsWith("/clientes") || pathname === "/";
 
   const iconClass = (active: boolean) =>
     `flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
@@ -31,21 +29,6 @@ export function Header() {
             className="h-8 w-auto object-contain"
           />
         </Link>
-
-        <div className="flex items-center gap-6 text-sm font-semibold">
-          <Link
-            href="/clientes"
-            className={`transition-colors ${isClientes ? "text-[var(--primary)]" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"}`}
-          >
-            Clientes
-          </Link>
-          <Link
-            href="/planejamento"
-            className={`transition-colors ${isPlanejamento ? "text-[var(--primary)]" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"}`}
-          >
-            Planejamento
-          </Link>
-        </div>
 
         <nav className="flex items-center gap-1">
           <Link
