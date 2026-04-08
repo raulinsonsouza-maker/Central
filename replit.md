@@ -1,7 +1,12 @@
 # Central de Clientes - inout
 
 ## Overview
-Dashboard de performance para clientes de consultoria estratégica. Hub consolidado que permite analisar funil, investimento e resultados de campanhas de mídia (Meta Ads, Google Ads, Google Analytics) por cliente.
+Dashboard de performance e planejamento para clientes de consultoria estratégica. Hub consolidado que permite analisar funil, investimento e resultados de campanhas de mídia (Meta Ads, Google Ads, Google Analytics) por cliente, além de apresentar planos estratégicos táticos para apresentação.
+
+## Main Sections
+- `/clientes` — Central de Clientes: performance de campanhas por cliente
+- `/planejamento` — Central de Planejamento: planos táticos/estratégicos para apresentação a clientes
+  - `/planejamento/hotel-fazenda-sao-joao` — Plano "Máquina de Aquisição" (Meta Ads)
 
 ## Tech Stack
 - **Framework**: Next.js 15 (App Router)
