@@ -437,7 +437,8 @@ export default function ClienteDetailPage() {
   const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google";
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
-  const isMiguelPanel = (isMiguelImoveis(cliente) || isDrFernandoGuena(cliente)) && canal !== "google";
+  const isMiguelImoveisPanel = isMiguelImoveis(cliente) && canal !== "google";
+  const isMiguelPanel = isDrFernandoGuena(cliente) && canal !== "google";
   const isClinicaESpaPanel = isClinicaESpa(cliente) && canal !== "google";
   const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
   const isVisitasPanel = isFlorien(cliente) && canal !== "google";
@@ -446,10 +447,12 @@ export default function ClienteDetailPage() {
     ? { singular: "compra", plural: "compras", metric: "Custo/Compra", metricFull: "Custo / Compra", kpi: "Meta Custo/Compra", dbKey: "COMPRAS", taxa: "TAXA COMPRA", cust: "CUSTO / COMPRA", semResult: "sem compras", crLabel: "CR (clique→compra)", chartKey: "Compras", sub: "Total do período" }
     : isVisitasPanel
     ? { singular: "visita", plural: "visitas", metric: "Custo/Visita", metricFull: "Custo / Visita", kpi: "Meta Custo/Visita", dbKey: "VISITAS", taxa: "VISITAS / 1K", cust: "CUSTO / VISITA", semResult: "sem visitas", crLabel: "Visitas/1k impr.", chartKey: "Visitas", sub: "Visitas ao perfil do Instagram no período" }
+    : isMiguelImoveisPanel
+    ? { singular: "resultado", plural: "resultados", metric: "Custo/Result.", metricFull: "Custo / Resultado", kpi: "Meta Custo/Result.", dbKey: "RESULTADOS", taxa: "TAXA RESULT.", cust: "CUSTO / RESULT.", semResult: "sem resultados", crLabel: "CR (clique→result.)", chartKey: "Resultados", sub: "Total de conversas iniciadas e cadastros no período" }
     : (isMiguelPanel || isClinicaESpaPanel)
     ? { singular: "conv.", plural: "conversas", metric: "Custo/conv.", metricFull: "Custo / Conversa", kpi: "Meta Custo/Conv.", dbKey: "CONVERSAS", taxa: "TAXA CONVERSA", cust: "CUSTO / CONVERSA", semResult: "sem conversas", crLabel: "CR (clique→conv.)", chartKey: "Conversas", sub: "Conversas por mensagem iniciadas no período" }
     : { singular: "lead", plural: "leads", metric: "CPL", metricFull: "CPL", kpi: "CPL Alvo", dbKey: "LEADS", taxa: "TAXA CONV.", cust: "CPL", semResult: "sem leads", crLabel: "CR (clique→lead)", chartKey: "Leads", sub: "Total do período" }
-  , [isComprasPanel, isVisitasPanel, isMiguelPanel, isClinicaESpaPanel]);
+  , [isComprasPanel, isVisitasPanel, isMiguelImoveisPanel, isMiguelPanel, isClinicaESpaPanel]);
   const isSpecialPanel = isHotelPanel || isTertuliaPanel || isVarellaPanel;
   const { data: painelEspecial } = useQuery({
     queryKey: ["painel-especial", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
@@ -500,7 +503,9 @@ export default function ClienteDetailPage() {
   const chartConversionKey = isEcommerceMode ? "Compras" : canal === "google" ? "Conversões" : convLabels.chartKey;
   const chartData = series.map((s: { periodo: string; investimento: number; leads: number; conversas?: number; purchases?: number; valorConversao?: number }) => {
     const inv = Math.round(s.investimento * 100) / 100;
-    const conv = (isMiguelPanel || isClinicaESpaPanel)
+    const conv = isMiguelImoveisPanel
+      ? (s.conversas ?? 0) + s.leads
+      : (isMiguelPanel || isClinicaESpaPanel)
       ? (s.conversas ?? 0)
       : isEcommerceMode
         ? (s.purchases ?? s.leads)
@@ -537,7 +542,9 @@ export default function ClienteDetailPage() {
           ? "Compras no site atribuídas ao período (objetivo principal das campanhas)."
           : isVisitasPanel
             ? "Visitas ao perfil do Instagram geradas no período."
-            : (isMiguelPanel || isClinicaESpaPanel)
+            : isMiguelImoveisPanel
+              ? "Total de conversas iniciadas via mensagem + cadastros via formulário no período."
+              : (isMiguelPanel || isClinicaESpaPanel)
               ? "Conversas por mensagem iniciadas no período (objetivo principal das campanhas)."
               : "Conversões atribuídas ao período.";
     const taxaDesc =
@@ -547,7 +554,9 @@ export default function ClienteDetailPage() {
           ? "Percentual de compras sobre os cliques gerados."
           : isVisitasPanel
             ? "Visitas ao perfil por mil impressões (taxa de entrega de visitas)."
-            : (isMiguelPanel || isClinicaESpaPanel)
+            : isMiguelImoveisPanel
+              ? "Percentual do total de resultados (conversas + cadastros) sobre os cliques gerados."
+              : (isMiguelPanel || isClinicaESpaPanel)
               ? "Percentual de conversas iniciadas sobre os cliques gerados."
               : "Percentual de leads sobre cliques.";
     const custoPorResultadoLabel = isEcommerceMode ? "CUSTO / COMPRA" : canal === "google" ? "CUSTO / CONV." : convLabels.cust;
@@ -559,7 +568,9 @@ export default function ClienteDetailPage() {
           ? "Investimento ÷ compras no site da semana."
           : isVisitasPanel
             ? "Investimento ÷ visitas ao perfil da semana."
-            : (isMiguelPanel || isClinicaESpaPanel)
+            : isMiguelImoveisPanel
+              ? "Investimento ÷ total de resultados (conversas + cadastros) da semana."
+              : (isMiguelPanel || isClinicaESpaPanel)
               ? "Investimento ÷ conversas iniciadas da semana."
               : "Custo médio por lead da semana.";
     return [
@@ -598,7 +609,7 @@ export default function ClienteDetailPage() {
         label: conversionLabel,
         description: conversionDesc,
         trend: "higher" as MetricTrend,
-        value: (s: MetricRow) => (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads,
+        value: (s: MetricRow) => isMiguelImoveisPanel ? (s.conversas ?? 0) + s.leads : (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads,
         format: (value: number) => formatInteger(value),
       },
       {
@@ -606,7 +617,7 @@ export default function ClienteDetailPage() {
         description: isEcommerceMode ? "Percentual de compras sobre os cliques gerados." : taxaDesc,
         trend: "higher" as MetricTrend,
         value: (s: MetricRow) => {
-          const conv = (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
+          const conv = isMiguelImoveisPanel ? (s.conversas ?? 0) + s.leads : (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
           if (isVisitasPanel) return s.impressoes > 0 ? (conv / s.impressoes) * 1000 : 0;
           return s.cliques > 0 ? (conv / s.cliques) * 100 : 0;
         },
@@ -624,7 +635,7 @@ export default function ClienteDetailPage() {
         description: custoPorResultadoDesc,
         trend: "lower" as MetricTrend,
         value: (s: MetricRow) => {
-          const conv = (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
+          const conv = isMiguelImoveisPanel ? (s.conversas ?? 0) + s.leads : (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads;
           return conv > 0 ? s.investimento / conv : 0;
         },
         format: (value: number) => formatCurrency(value),
@@ -637,7 +648,7 @@ export default function ClienteDetailPage() {
         format: (value: number) => formatCurrency(value),
       }] : []),
     ];
-  }, [canal, isMiguelPanel, isClinicaESpaPanel, isComprasPanel, isVisitasPanel, isEcommerceMode, convLabels]);
+  }, [canal, isMiguelImoveisPanel, isMiguelPanel, isClinicaESpaPanel, isComprasPanel, isVisitasPanel, isEcommerceMode, convLabels]);
 
 function formatCurrency(value: number) {
   return `R$ ${value.toLocaleString("pt-BR", {
@@ -992,7 +1003,20 @@ function formatPercentage(value: number) {
       {(canal === "geral" || subView === "dados") && !isSpecialPanel && resumo && (
         <DefaultPanel
           resumo={
-            (isMiguelPanel || isClinicaESpaPanel)
+            isMiguelImoveisPanel
+              ? (() => {
+                  const conversas = (resumo as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? 0;
+                  const formLeads = resumo.leads;
+                  const total = conversas + formLeads;
+                  return {
+                    ...resumo,
+                    leads: total,
+                    cpl: total > 0 ? Math.round((resumo.investimento / total) * 100) / 100 : 0,
+                    conversasMensagem: conversas,
+                    leadsForm: formLeads,
+                  };
+                })()
+              : (isMiguelPanel || isClinicaESpaPanel)
               ? {
                   ...resumo,
                   leads: (resumo as { messagingConversationsStarted?: number }).messagingConversationsStarted ?? resumo.leads,
@@ -1010,6 +1034,7 @@ function formatPercentage(value: number) {
           financeiro={financeiro ?? undefined}
           formatCurrency={formatCurrency}
           conversasMode={isMiguelPanel || isClinicaESpaPanel}
+          miguelImoveisMode={isMiguelImoveisPanel}
           comprasMode={isComprasPanel}
           visitasMode={isVisitasPanel}
           ecommerceGoogleMode={isEcommerceMode}

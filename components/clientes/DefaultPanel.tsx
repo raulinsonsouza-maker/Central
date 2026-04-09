@@ -97,6 +97,8 @@ type DefaultPanelProps = {
     roas?: number;
     ticketMedio?: number;
     cliques?: number;
+    conversasMensagem?: number;
+    leadsForm?: number;
   };
   chartData: Record<string, string | number>[];
   /** Nome da série de conversões/leads no gráfico (ex.: "Conversões" no Google). */
@@ -126,6 +128,8 @@ type DefaultPanelProps = {
   chartRevenueKey?: string;
   /** Quando true (Clínica e Spa), exibe 2ª linha de KPIs com Cliques e Taxa Conversa (engajamento). */
   conversasEngajamentoMode?: boolean;
+  /** Quando true (Miguel Imóveis), exibe KPIs de Resultados totais + 2ª linha com breakdown Conversas vs Cadastros. */
+  miguelImoveisMode?: boolean;
 };
 
 export function DefaultPanel({
@@ -146,10 +150,11 @@ export function DefaultPanel({
   agrupamento = "semanal",
   chartRevenueKey,
   conversasEngajamentoMode = false,
+  miguelImoveisMode = false,
 }: DefaultPanelProps) {
   const isMensal = agrupamento === "mensal";
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
-  const cplLabel = visitasMode ? "Custo/Visita" : comprasMode ? "Custo/Compra" : conversasMode ? "Custo/Conv." : "CPL";
+  const cplLabel = visitasMode ? "Custo/Visita" : comprasMode ? "Custo/Compra" : miguelImoveisMode ? "Custo/Result." : conversasMode ? "Custo/Conv." : "CPL";
 
   const purchases = resumo.purchases ?? 0;
   const valorConversao = resumo.valorConversao ?? 0;
@@ -214,7 +219,7 @@ export function DefaultPanel({
             icon={DollarSign}
           />
           <KpiCard
-            title={canal === "google" ? "Conversões (Google Ads)" : comprasMode ? "Compras" : visitasMode ? "Visitas ao perfil" : conversasMode ? "Conversas" : "Leads"}
+            title={canal === "google" ? "Conversões (Google Ads)" : comprasMode ? "Compras" : visitasMode ? "Visitas ao perfil" : miguelImoveisMode ? "Resultados (Total)" : conversasMode ? "Conversas" : "Leads"}
             value={resumo.leads.toLocaleString("pt-BR")}
             sub={
               canal === "google"
@@ -223,16 +228,18 @@ export function DefaultPanel({
                   ? "Compras no site atribuídas ao período"
                   : visitasMode
                     ? "Visitas ao perfil do Instagram no período"
-                    : conversasMode
-                      ? "Conversas por mensagem iniciadas no período"
-                      : "Total do período"
+                    : miguelImoveisMode
+                      ? "Conversas iniciadas + cadastros via formulário no período"
+                      : conversasMode
+                        ? "Conversas por mensagem iniciadas no período"
+                        : "Total do período"
             }
             icon={Users}
           />
           <KpiCard
-            title={canal === "google" ? "Custo / conversão" : comprasMode ? "Custo / Compra" : visitasMode ? "Custo / Visita" : conversasMode ? "Custo / Conversa" : "CPL"}
+            title={canal === "google" ? "Custo / conversão" : comprasMode ? "Custo / Compra" : visitasMode ? "Custo / Visita" : miguelImoveisMode ? "Custo / Resultado" : conversasMode ? "Custo / Conversa" : "CPL"}
             value={formatCurrency(resumo.cpl)}
-            sub={canal === "google" ? "Investimento ÷ conversões" : comprasMode ? "Investimento ÷ compras no site" : visitasMode ? "Investimento ÷ visitas ao perfil" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
+            sub={canal === "google" ? "Investimento ÷ conversões" : comprasMode ? "Investimento ÷ compras no site" : visitasMode ? "Investimento ÷ visitas ao perfil" : miguelImoveisMode ? "Investimento ÷ total de resultados (conversas + cadastros)" : conversasMode ? "Investimento ÷ conversas iniciadas" : "Custo por lead"}
             icon={Target}
             accentValue
           />
@@ -267,6 +274,24 @@ export function DefaultPanel({
         </section>
       )}
 
+      {/* KPI row extra — breakdown de resultados (Miguel Imóveis) */}
+      {!ecommerceGoogleMode && miguelImoveisMode && (
+        <section className="grid gap-4 sm:grid-cols-2">
+          <KpiCard
+            title="Conversas (Mensagem)"
+            value={(resumo.conversasMensagem ?? 0).toLocaleString("pt-BR")}
+            sub="WhatsApp e mensagens diretas iniciadas no período"
+            icon={MessageCircle}
+          />
+          <KpiCard
+            title="Cadastros (Formulário)"
+            value={(resumo.leadsForm ?? 0).toLocaleString("pt-BR")}
+            sub="Leads via formulário e contato no site no período"
+            icon={Users}
+          />
+        </section>
+      )}
+
       {/* Performance chart */}
       {chartData.length > 0 && (
         <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
@@ -283,7 +308,9 @@ export function DefaultPanel({
                       ? `Investimento e visitas ao perfil por ${isMensal ? "mês" : "semana"}`
                       : comprasMode
                         ? `Investimento e compras por ${isMensal ? "mês" : "semana"}`
-                        : conversasMode
+                        : miguelImoveisMode
+                          ? `Investimento e resultados por ${isMensal ? "mês" : "semana"}`
+                          : conversasMode
                           ? `Investimento e conversas por ${isMensal ? "mês" : "semana"}`
                           : `Investimento e leads por ${isMensal ? "mês" : "semana"}`
                 }
