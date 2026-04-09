@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DefaultPanel } from "@/components/clientes/DefaultPanel";
 import { GoogleKeywordsPanel } from "@/components/clientes/GoogleKeywordsPanel";
 import { AnalyticsGA4Section } from "@/components/clientes/AnalyticsGA4Section";
+import { ImoveisPanel } from "@/components/clientes/ImoveisPanel";
 import { HotelFazendaSaoJoaoPanel } from "@/components/clientes/HotelFazendaSaoJoaoPanel";
 import { TertuliaPanel } from "@/components/clientes/TertuliaPanel";
 import { VarellaMotosPanel } from "@/components/clientes/VarellaMotosPanel";
@@ -317,7 +318,7 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 export default function ClienteDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const [canal, setCanal] = React.useState<"geral" | "meta" | "google">("geral");
+  const [canal, setCanal] = React.useState<"geral" | "meta" | "google" | "imoveis">("geral");
   const [subView, setSubView] = React.useState<"dados" | "criativos">("dados");
   const [saldoVisible, setSaldoVisible] = React.useState(false);
   const [presetPeriodo, setPresetPeriodo] = React.useState<PresetPeriodo>(() => {
@@ -412,12 +413,12 @@ export default function ClienteDetailPage() {
   const { data: resumo } = useQuery({
     queryKey: ["resumo", id, canal, dateFilter.periodo, dateFilter.dataInicio, dateFilter.dataFim],
     queryFn: () => fetchResumo(id, canal as "geral" | "meta" | "google", dateFilter),
-    enabled: !!id,
+    enabled: !!id && canal !== "imoveis",
   });
   const { data: midia } = useQuery({
     queryKey: ["midia", id, canal, presetPeriodo, dateFilter.dataInicio, dateFilter.dataFim],
     queryFn: () => fetchMidia(id, canal as string, dateFilter, presetPeriodo),
-    enabled: !!id,
+    enabled: !!id && canal !== "imoveis",
   });
 
   const { data: financeiro } = useQuery({
@@ -435,10 +436,10 @@ export default function ClienteDetailPage() {
     queryFn: () => fetchGoogleKeywords(id, dateFilter),
     enabled: !!id && canal === "google" && subView === "criativos",
   });
-  const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google";
-  const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
-  const isVarellaPanel = isVarellaMotos(cliente);
-  const isMiguelImoveisPanel = isMiguelImoveis(cliente) && canal !== "google";
+  const isHotelPanel = isHotelFazendaSaoJoao(cliente) && canal !== "google" && canal !== "imoveis";
+  const isTertuliaPanel = isTertulia(cliente) && canal !== "google" && canal !== "imoveis";
+  const isVarellaPanel = isVarellaMotos(cliente) && canal !== "imoveis";
+  const isMiguelImoveisPanel = isMiguelImoveis(cliente) && canal !== "google" && canal !== "imoveis";
   const isMiguelGooglePanel = isMiguelImoveis(cliente) && canal === "google";
   const isMiguelPanel = isDrFernandoGuena(cliente) && canal !== "google";
   const isClinicaESpaPanel = isClinicaESpa(cliente) && canal !== "google";
@@ -712,11 +713,11 @@ function formatPercentage(value: number) {
           </div>
 
           <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
-            {(["geral", "meta", "google"] as const).map((c) => (
+            {(["geral", "meta", "google", ...(isMiguelImoveis(cliente) ? ["imoveis"] : [])] as const).map((c) => (
               <button
                 key={c}
                 onClick={() => {
-                  setCanal(c);
+                  setCanal(c as typeof canal);
                   setSubView("dados");
                   setSaldoVisible(false);
                 }}
@@ -726,7 +727,7 @@ function formatPercentage(value: number) {
                     : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
                 }`}
               >
-                {c === "geral" ? "Geral" : c === "meta" ? "META" : "Google"}
+                {c === "geral" ? "Geral" : c === "meta" ? "META" : c === "google" ? "Google" : "Imóveis"}
               </button>
             ))}
           </div>
@@ -738,7 +739,7 @@ function formatPercentage(value: number) {
         {/* Linha 1: Saldo chip (esquerda) + Filtro de data (direita) */}
         <div className="flex items-center gap-2">
           {/* Saldo chip — só em Meta/Google */}
-          {canal !== "geral" && (() => {
+          {canal !== "geral" && canal !== "imoveis" && (() => {
             const saldo = canal === "meta" ? saldoMeta : saldoGoogle;
             const plataforma = canal === "meta" ? "META" : "Google";
             const value = saldo?.saldo;
@@ -1029,8 +1030,13 @@ function formatPercentage(value: number) {
         />
       )}
 
+      {/* ── Imóveis panel (only for Miguel Imóveis on the imoveis tab) ── */}
+      {canal === "imoveis" && isMiguelImoveis(cliente) && (
+        <ImoveisPanel clienteId={id} dateFilter={dateFilter} />
+      )}
+
       {/* ── Default panel (KPIs, chart, weekly table, financial) ── */}
-      {(canal === "geral" || subView === "dados") && !isSpecialPanel && resumo && (
+      {canal !== "imoveis" && (canal === "geral" || subView === "dados") && !isSpecialPanel && resumo && (
         <DefaultPanel
           resumo={
             isMiguelImoveisPanel
@@ -1097,12 +1103,12 @@ function formatPercentage(value: number) {
       )}
 
       {/* ── Comportamento GA4 (todos os painéis quando configurado) ── */}
-      {(canal === "geral" || subView === "dados") && analytics?.hasAnalytics && (
+      {canal !== "imoveis" && (canal === "geral" || subView === "dados") && analytics?.hasAnalytics && (
         <AnalyticsGA4Section data={analytics} />
       )}
 
       {/* ── Financial tracking (para painéis customizados) ── */}
-      {(canal === "geral" || subView === "dados") && isSpecialPanel && financeiro && financeiro.meses && (
+      {canal !== "imoveis" && (canal === "geral" || subView === "dados") && isSpecialPanel && financeiro && financeiro.meses && (
         <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
           <CardHeader>
             <div className="flex flex-wrap items-start justify-between gap-4">

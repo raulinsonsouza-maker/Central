@@ -768,3 +768,63 @@ export async function fetchAdsWithCreatives(
 
   return allAds;
 }
+
+/**
+ * Row returned from the Meta ad-level insights endpoint.
+ * Used to analyse per-property-ID performance for Miguel Imóveis.
+ */
+export interface MetaAdLevelInsightRow {
+  ad_id: string;
+  ad_name: string;
+  spend?: string;
+  impressions?: string;
+  clicks?: string;
+  actions?: Array<{ action_type: string; value: string }>;
+}
+
+interface MetaAdLevelInsightsResponse {
+  data: MetaAdLevelInsightRow[];
+  paging?: { cursors?: { before: string; after: string }; next?: string };
+  error?: { message: string; type: string; code: number };
+}
+
+/**
+ * Fetch ad-level insights (all ads, including inactive ones) for a date range.
+ * Unlike fetchAdsWithCreatives this endpoint is not filtered to active ads and
+ * returns all ads that had delivery in the period — ideal for historical reporting.
+ */
+export async function fetchAdLevelInsights(
+  accountId: string,
+  token: string,
+  dateFrom: string,
+  dateTo: string
+): Promise<MetaAdLevelInsightRow[]> {
+  const actId = ensureActPrefix(accountId);
+  const params = new URLSearchParams({
+    access_token: token,
+    level: "ad",
+    fields: "ad_id,ad_name,spend,impressions,clicks,actions",
+    time_range: JSON.stringify({ since: dateFrom, until: dateTo }),
+    limit: "500",
+  });
+
+  const all: MetaAdLevelInsightRow[] = [];
+  let url: string | null = `${GRAPH_BASE}/${actId}/insights?${params.toString()}`;
+
+  while (url) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaAdLevelInsightsResponse;
+    if (!res.ok) {
+      throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+    }
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+    if (data.data?.length) {
+      all.push(...data.data);
+    }
+    url = data.paging?.next ?? null;
+  }
+
+  return all;
+}
