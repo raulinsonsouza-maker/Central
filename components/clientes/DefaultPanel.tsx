@@ -255,6 +255,13 @@ export function DefaultPanel({
               sub="Total de cliques nos anúncios de pesquisa no período"
               icon={MousePointerClick}
             />
+          ) : miguelImoveisMode ? (
+            <KpiCard
+              title="Cliques"
+              value={(resumo.cliques ?? 0).toLocaleString("pt-BR")}
+              sub="Total de cliques gerados pelos anúncios no período (Meta + Google)"
+              icon={MousePointerClick}
+            />
           ) : (
             <KpiCard
               title={canal === "google" ? "CPM Google" : "CPM"}

@@ -22,7 +22,7 @@ import {
   ResponsiveContainer,
   ComposedChart,
 } from "recharts";
-import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X, Wallet, AlertTriangle, Zap, Target, Film, MousePointerClick } from "lucide-react";
+import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, SlidersHorizontal, BarChart3, Play, TrendingUp, X, Wallet, AlertTriangle, Zap, Target, Film, MousePointerClick, Eye, EyeOff } from "lucide-react";
 import { upgradeFbCdnImageUrl } from "@/lib/utils";
 
 /* ─── data fetchers (unchanged) ─── */
@@ -319,6 +319,7 @@ export default function ClienteDetailPage() {
   const id = params.id as string;
   const [canal, setCanal] = React.useState<"geral" | "meta" | "google">("geral");
   const [subView, setSubView] = React.useState<"dados" | "criativos">("dados");
+  const [saldoVisible, setSaldoVisible] = React.useState(false);
   const [presetPeriodo, setPresetPeriodo] = React.useState<PresetPeriodo>(() => {
     if (typeof window === "undefined") return "mesAtual";
     return (localStorage.getItem("inout-date-preset") as PresetPeriodo) ?? "mesAtual";
@@ -717,6 +718,7 @@ function formatPercentage(value: number) {
                 onClick={() => {
                   setCanal(c);
                   setSubView("dados");
+                  setSaldoVisible(false);
                 }}
                 className={`rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-all sm:px-4 ${
                   canal === c
@@ -770,14 +772,23 @@ function formatPercentage(value: number) {
                   {isLoading ? (
                     <span className="text-xs animate-pulse text-[var(--muted-foreground)]">carregando…</span>
                   ) : displayValue != null ? (
-                    <span className="text-sm font-bold tabular-nums">{formatCurrency(displayValue)}</span>
+                    <span className="text-sm font-bold tabular-nums">
+                      {saldoVisible ? formatCurrency(displayValue) : "R$ ••••••"}
+                    </span>
                   ) : (
                     <span className="text-xs text-[var(--muted-foreground)]">—</span>
                   )}
                 </div>
-                {(isCritical || isWarning) && (
+                {(isCritical || isWarning) && saldoVisible && (
                   <AlertTriangle className={`h-3.5 w-3.5 shrink-0 ${isCritical ? "text-red-400" : "text-amber-400"}`} />
                 )}
+                <button
+                  onClick={() => setSaldoVisible((v) => !v)}
+                  className={`ml-1 flex h-6 w-6 items-center justify-center rounded-md transition-colors hover:bg-black/10 ${labelClass}`}
+                  title={saldoVisible ? "Ocultar saldo" : "Revelar saldo"}
+                >
+                  {saldoVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </button>
               </div>
             );
           })()}
