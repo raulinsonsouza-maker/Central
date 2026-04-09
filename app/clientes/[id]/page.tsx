@@ -438,6 +438,7 @@ export default function ClienteDetailPage() {
   const isTertuliaPanel = isTertulia(cliente) && canal !== "google";
   const isVarellaPanel = isVarellaMotos(cliente);
   const isMiguelImoveisPanel = isMiguelImoveis(cliente) && canal !== "google";
+  const isMiguelGooglePanel = isMiguelImoveis(cliente) && canal === "google";
   const isMiguelPanel = isDrFernandoGuena(cliente) && canal !== "google";
   const isClinicaESpaPanel = isClinicaESpa(cliente) && canal !== "google";
   const isComprasPanel = (isDor(cliente) || isGranarolo(cliente)) && canal !== "google";
@@ -1053,6 +1054,7 @@ function formatPercentage(value: number) {
           formatCurrency={formatCurrency}
           conversasMode={isMiguelPanel || isClinicaESpaPanel}
           miguelImoveisMode={isMiguelImoveisPanel}
+          miguelGoogleMode={isMiguelGooglePanel}
           comprasMode={isComprasPanel}
           visitasMode={isVisitasPanel}
           ecommerceGoogleMode={isEcommerceMode}

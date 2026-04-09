@@ -98,6 +98,7 @@ type DefaultPanelProps = {
     roas?: number;
     ticketMedio?: number;
     cliques?: number;
+    impressoes?: number;
     conversasMensagem?: number;
     leadsForm?: number;
   };
@@ -131,6 +132,8 @@ type DefaultPanelProps = {
   conversasEngajamentoMode?: boolean;
   /** Quando true (Miguel Imóveis), exibe KPIs de Resultados totais + 2ª linha com breakdown Conversas vs Cadastros. */
   miguelImoveisMode?: boolean;
+  /** Quando true (Miguel Imóveis canal Google), substitui CPM por Cliques e exibe linha extra com CTR e Taxa de Conversão. */
+  miguelGoogleMode?: boolean;
 };
 
 export function DefaultPanel({
@@ -152,6 +155,7 @@ export function DefaultPanel({
   chartRevenueKey,
   conversasEngajamentoMode = false,
   miguelImoveisMode = false,
+  miguelGoogleMode = false,
 }: DefaultPanelProps) {
   const isMensal = agrupamento === "mensal";
   const latestPeriod = latestFiveSeries[latestFiveSeries.length - 1]?.periodo;
@@ -244,11 +248,46 @@ export function DefaultPanel({
             icon={Target}
             accentValue
           />
+          {miguelGoogleMode ? (
+            <KpiCard
+              title="Cliques"
+              value={(resumo.cliques ?? 0).toLocaleString("pt-BR")}
+              sub="Total de cliques nos anúncios de pesquisa no período"
+              icon={MousePointerClick}
+            />
+          ) : (
+            <KpiCard
+              title={canal === "google" ? "CPM Google" : "CPM"}
+              value={formatCurrency(resumo.cpm)}
+              sub="Custo por mil impressões"
+              icon={Zap}
+            />
+          )}
+        </section>
+      )}
+
+      {/* KPI row extra — modo Miguel Google (CTR + Taxa de Conversão) */}
+      {!ecommerceGoogleMode && miguelGoogleMode && (
+        <section className="grid gap-4 sm:grid-cols-2">
           <KpiCard
-            title={canal === "google" ? "CPM Google" : "CPM"}
-            value={formatCurrency(resumo.cpm)}
-            sub="Custo por mil impressões"
-            icon={Zap}
+            title="CTR (Cliques / Impressões)"
+            value={
+              (resumo.impressoes ?? 0) > 0
+                ? `${(((resumo.cliques ?? 0) / (resumo.impressoes ?? 1)) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+                : "—"
+            }
+            sub="Percentual de impressões que geraram cliques nos anúncios"
+            icon={BarChart3}
+          />
+          <KpiCard
+            title="Taxa de Conversão"
+            value={
+              (resumo.cliques ?? 0) > 0
+                ? `${((resumo.leads / (resumo.cliques ?? 1)) * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+                : "—"
+            }
+            sub="Percentual de cliques que resultaram em conversões (formulários, chamadas, contatos)"
+            icon={Target}
           />
         </section>
       )}
