@@ -612,6 +612,24 @@ export default function ClienteDetailPage() {
         value: (s: MetricRow) => isMiguelImoveisPanel ? (s.conversas ?? 0) + s.leads : (isMiguelPanel || isClinicaESpaPanel) ? (s.conversas ?? 0) : isEcommerceMode ? (s.purchases ?? s.leads) : s.leads,
         format: (value: number) => formatInteger(value),
       },
+      ...(isMiguelImoveisPanel ? [
+        {
+          label: "CONVERSAS MENSAGEM",
+          description: "Conversas iniciadas via WhatsApp e mensagens diretas.",
+          trend: "higher" as MetricTrend,
+          value: (s: MetricRow) => s.conversas ?? 0,
+          format: (value: number) => formatInteger(value),
+          isSubRow: true,
+        },
+        {
+          label: "CADASTROS FORMULÁRIO",
+          description: "Leads via formulário de cadastro e contato no site.",
+          trend: "higher" as MetricTrend,
+          value: (s: MetricRow) => s.leads,
+          format: (value: number) => formatInteger(value),
+          isSubRow: true,
+        },
+      ] : []),
       {
         label: isEcommerceMode ? "TAXA COMPRA" : convLabels.taxa,
         description: isEcommerceMode ? "Percentual de compras sobre os cliques gerados." : taxaDesc,

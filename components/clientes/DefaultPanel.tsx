@@ -75,13 +75,14 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle: string })
   );
 }
 
-type MetricRow = { investimento: number; leads: number; impressoes: number; cliques: number; purchases?: number };
+type MetricRow = { investimento: number; leads: number; conversas?: number; impressoes: number; cliques: number; purchases?: number };
 
 type MetricDefinition = {
   label: string;
   description: string;
   value: (s: MetricRow) => number;
   format: (value: number) => string;
+  isSubRow?: boolean;
 };
 
 type DefaultPanelProps = {
@@ -478,17 +479,17 @@ export function DefaultPanel({
                 <tbody>
                   {metricDefinitions.map((metric, metricIdx) => (
                     <tr key={metric.label} className="group">
-                      <td className="rounded-l-2xl bg-white/[0.03] px-4 py-4">
+                      <td className={`rounded-l-2xl px-4 py-4 ${metric.isSubRow ? "bg-white/[0.015] pl-7" : "bg-white/[0.03]"}`}>
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--foreground)]">
-                              {metric.label}
+                            <p className={`font-bold uppercase tracking-[0.18em] ${metric.isSubRow ? "text-[10px] text-[var(--muted-foreground)]" : "text-[11px] text-[var(--foreground)]"}`}>
+                              {metric.isSubRow ? `↳ ${metric.label}` : metric.label}
                             </p>
                             <p className="mt-1 text-[11px] text-[var(--muted-foreground)]">
                               {metric.description}
                             </p>
                           </div>
-                          <span className="hidden h-6 w-[2px] rounded-full bg-[linear-gradient(180deg,var(--accent),var(--primary))] opacity-70 md:block" />
+                          {!metric.isSubRow && <span className="hidden h-6 w-[2px] rounded-full bg-[linear-gradient(180deg,var(--accent),var(--primary))] opacity-70 md:block" />}
                         </div>
                       </td>
                       {latestFiveSeries.map((s: MetricRow & { periodo: string }, periodIdx: number) => {
@@ -499,13 +500,15 @@ export function DefaultPanel({
                             className={`px-4 py-4 text-center ${
                               isLatest
                                 ? "bg-[linear-gradient(180deg,rgba(255,106,0,0.12),rgba(255,106,0,0.05))]"
-                                : metricIdx % 2 === 0
-                                  ? "bg-white/[0.03]"
-                                  : "bg-white/[0.015]"
+                                : metric.isSubRow
+                                  ? "bg-white/[0.015]"
+                                  : metricIdx % 2 === 0
+                                    ? "bg-white/[0.03]"
+                                    : "bg-white/[0.015]"
                             }`}
                           >
                             <div className="flex flex-col items-center gap-1">
-                              <span className="text-sm font-bold tabular-nums text-[var(--foreground)]">
+                              <span className={`tabular-nums font-bold ${metric.isSubRow ? "text-xs text-[var(--muted-foreground)]" : "text-sm text-[var(--foreground)]"}`}>
                                 {metric.format(metric.value(s))}
                               </span>
                             </div>
