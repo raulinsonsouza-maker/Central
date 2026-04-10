@@ -107,8 +107,15 @@ export async function fetchLeadGenForms(
   }
 
   // ── Tier 2: /{page_id}/leadgen_forms  (official per Meta docs) ───────────
-  // Retrieve the Pages linked to this ad account via promote_pages.
+  // Strategy: collect page IDs from multiple sources:
+  //   2a. promote_pages endpoint
+  //   2b. campaigns' promoted_object (works with basic insights access)
   type PageItem = { id: string; name?: string };
+
+  const pageIdSet = new Set<string>();
+  let t2PermErr: string | null = null;
+
+  // 2a — promote_pages
   const pagesRes = await fetch(
     `${GRAPH_BASE}/${actId}/promote_pages?${tokenParam}&fields=id,name&limit=25`
   );
@@ -116,10 +123,53 @@ export async function fetchLeadGenForms(
     data?: PageItem[];
     error?: { message: string; code: number };
   };
+  if (pagesRes.ok && !pagesData.error) {
+    (pagesData.data ?? []).forEach((p) => pageIdSet.add(p.id));
+  } else {
+    t2PermErr = pagesData.error?.message ?? null;
+  }
+  console.log(`[fetchLeadGenForms] T2a promote_pages ok=${pagesRes.ok} error=${pagesData.error?.code} pageIds=[${[...pageIdSet].join(",")}]`);
 
-  const pageIds: string[] = (pagesData.data ?? []).map((p) => p.id);
-  const t2PermErr = pagesData.error?.message ?? null;
-  console.log(`[fetchLeadGenForms] T2 promote_pages ok=${pagesRes.ok} error=${pagesData.error?.code} msg=${t2PermErr} pageIds=${pageIds.join(",")}`);
+  // 2b — extract page IDs from campaigns' promoted_object (requires only insights access)
+  if (pageIdSet.size === 0) {
+    const campRes = await fetch(
+      `${GRAPH_BASE}/${actId}/campaigns?${tokenParam}&fields=promoted_object&effective_status=["ACTIVE","PAUSED","ARCHIVED"]&limit=50`
+    );
+    const campData = (await campRes.json()) as {
+      data?: Array<{ promoted_object?: { page_id?: string } }>;
+      error?: { message: string; code: number };
+    };
+    if (campRes.ok && !campData.error) {
+      for (const c of campData.data ?? []) {
+        if (c.promoted_object?.page_id) pageIdSet.add(c.promoted_object.page_id);
+      }
+    }
+    console.log(`[fetchLeadGenForms] T2b campaigns promoted_object ok=${campRes.ok} error=${campData.error?.code} pageIds=[${[...pageIdSet].join(",")}]`);
+  }
+
+  // 2c — fall back to all pages the token user manages (/me/accounts)
+  //       Works when the user is a Page admin even without full ad account access.
+  if (pageIdSet.size === 0) {
+    let meAccountsUrl: string | null =
+      `${GRAPH_BASE}/me/accounts?${tokenParam}&fields=id,name&limit=100`;
+    while (meAccountsUrl) {
+      const r = await fetch(meAccountsUrl);
+      const d = (await r.json()) as {
+        data?: Array<{ id: string; name?: string }>;
+        paging?: { next?: string };
+        error?: { message: string; code: number };
+      };
+      if (!r.ok || d.error) {
+        console.log(`[fetchLeadGenForms] T2c me/accounts error=${d.error?.code} msg=${d.error?.message}`);
+        break;
+      }
+      for (const p of d.data ?? []) pageIdSet.add(p.id);
+      meAccountsUrl = d.paging?.next ?? null;
+    }
+    console.log(`[fetchLeadGenForms] T2c me/accounts pageIds=[${[...pageIdSet].join(",")}]`);
+  }
+
+  const pageIds: string[] = [...pageIdSet];
 
   if (pageIds.length > 0) {
     const formSets = await Promise.all(
@@ -198,6 +248,11 @@ export async function fetchLeadGenForms(
 /**
  * Wrapper around fetchLeadGenForms that also surfaces permission errors
  * so the caller can show actionable messages instead of silently returning 0.
+ *
+ * When a permission error is detected, it additionally checks whether the
+ * configured ad account is even visible to the token user via /me/adaccounts.
+ * If not, a specific ACCOUNT_NOT_ACCESSIBLE error is returned with the list
+ * of actually accessible accounts so the user can diagnose the issue.
  */
 export async function fetchLeadGenFormsWithDiag(
   accountId: string,
@@ -208,8 +263,57 @@ export async function fetchLeadGenFormsWithDiag(
     return { forms, permissionError: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    const isPermErr = msg.startsWith("PERMISSION_ERROR:") || msg.includes("ads_management") || msg.includes("ads_read") || msg.includes("leads_retrieval");
-    return { forms: [], permissionError: isPermErr ? msg.replace("PERMISSION_ERROR:", "").trim() : null };
+    const isPermErr =
+      msg.startsWith("PERMISSION_ERROR:") ||
+      msg.includes("ads_management") ||
+      msg.includes("ads_read") ||
+      msg.includes("leads_retrieval");
+
+    if (!isPermErr) {
+      return { forms: [], permissionError: null };
+    }
+
+    // ── Diagnose: is the account even accessible to this token? ─────────────
+    const normalizedId = accountId.replace(/^act_/, "");
+    let accountAccessible = false;
+    const accessibleNames: string[] = [];
+
+    try {
+      const tokenParam = `access_token=${encodeURIComponent(token)}`;
+      let meAccountsUrl: string | null =
+        `${GRAPH_BASE}/me/adaccounts?${tokenParam}&fields=account_id,name&limit=100`;
+      while (meAccountsUrl) {
+        const r = await fetch(meAccountsUrl);
+        const d = (await r.json()) as {
+          data?: Array<{ account_id: string; name?: string }>;
+          paging?: { next?: string };
+          error?: { message: string };
+        };
+        if (!r.ok || d.error) break;
+        for (const acc of d.data ?? []) {
+          accessibleNames.push(`${acc.name ?? acc.account_id} (${acc.account_id})`);
+          if (acc.account_id === normalizedId) accountAccessible = true;
+        }
+        meAccountsUrl = d.paging?.next ?? null;
+      }
+    } catch {
+      // ignore diagnostic errors
+    }
+
+    console.log(`[fetchLeadGenFormsWithDiag] account ${normalizedId} accessible=${accountAccessible} accessible_count=${accessibleNames.length}`);
+
+    if (!accountAccessible) {
+      const permErr =
+        `ACCOUNT_NOT_ACCESSIBLE: A conta de anúncios ${normalizedId} não está acessível pelo usuário do token. ` +
+        `Acesse o Meta Business Manager e adicione o usuário "Raul Souza" (ou o dono do token) como Anunciante na conta ${normalizedId}. ` +
+        `Contas acessíveis pelo token atual: ${accessibleNames.length > 0 ? accessibleNames.slice(0, 5).join(", ") + (accessibleNames.length > 5 ? ` (+${accessibleNames.length - 5} mais)` : "") : "nenhuma"}.`;
+      return { forms: [], permissionError: permErr };
+    }
+
+    return {
+      forms: [],
+      permissionError: msg.replace("PERMISSION_ERROR:", "").trim(),
+    };
   }
 }
 

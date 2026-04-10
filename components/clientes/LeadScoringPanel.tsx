@@ -15,7 +15,7 @@ import {
   Line,
   ComposedChart,
 } from "recharts";
-import { Users, Target, TrendingUp, BarChart3, RefreshCw, AlertTriangle, Megaphone } from "lucide-react";
+import { Users, Target, TrendingUp, BarChart3, RefreshCw, AlertTriangle, Megaphone, ShieldAlert, Info } from "lucide-react";
 import { ESTADO_LABELS } from "@/lib/utils/dddToEstado";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 
@@ -237,6 +237,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   const [estadoFilter, setEstadoFilter] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState(false);
   const [syncMsg, setSyncMsg] = React.useState<string | null>(null);
+  const [syncErrType, setSyncErrType] = React.useState<"account_access" | "permission" | "generic" | null>(null);
 
   const params = new URLSearchParams({ agrupamento });
   if (dateFilter.dataInicio) params.set("dataInicio", dateFilter.dataInicio);
@@ -280,6 +281,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   async function handleSync() {
     setSyncing(true);
     setSyncMsg(null);
+    setSyncErrType(null);
     try {
       const res = await fetch(`/api/clientes/${clienteId}/sync-leads`, {
         method: "POST",
@@ -296,15 +298,28 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         }
         refetch();
       } else {
-        const errMsg = body.error ?? "Falha na sincronização";
-        const isPermErr = errMsg.includes("leads_retrieval") || errMsg.includes("ads_management") || errMsg.includes("Permissão");
-        if (isPermErr) {
+        const errMsg: string = body.error ?? "Falha na sincronização";
+        const isAccountAccess = body.accountNotAccessible === true ||
+          errMsg.includes("não está acessível") ||
+          errMsg.includes("ACCOUNT_NOT_ACCESSIBLE");
+        const isPermErr = !isAccountAccess && (
+          errMsg.includes("leads_retrieval") ||
+          errMsg.includes("ads_management") ||
+          errMsg.includes("Permissão")
+        );
+        if (isAccountAccess) {
+          setSyncErrType("account_access");
+          setSyncMsg(errMsg);
+        } else if (isPermErr) {
+          setSyncErrType("permission");
           setSyncMsg("Token sem permissão leads_retrieval. Configure o acesso no Meta Business Manager.");
         } else {
+          setSyncErrType("generic");
           setSyncMsg(`Erro: ${errMsg}`);
         }
       }
     } catch {
+      setSyncErrType("generic");
       setSyncMsg("Erro de conexão na sincronização.");
     } finally {
       setSyncing(false);
@@ -326,20 +341,56 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
 
   if (error || !data) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-16 text-center">
-        <AlertTriangle className="h-8 w-8 text-[var(--muted-foreground)]" />
-        <p className="text-sm font-medium text-[var(--foreground)]">Dados de leads indisponíveis</p>
-        <p className="max-w-sm text-xs text-[var(--muted-foreground)]">
-          {error instanceof Error ? error.message : "Erro ao carregar dados de leads"}
-        </p>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="mt-2 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)] transition hover:opacity-90 disabled:opacity-60"
-        >
-          <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Sincronizando…" : "Sincronizar Leads"}
-        </button>
+      <div className="space-y-4">
+        {syncErrType === "account_access" && syncMsg ? (
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-50 p-5 dark:bg-amber-950/20">
+            <div className="flex items-start gap-3">
+              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <div className="min-w-0">
+                <p className="font-semibold text-amber-800 dark:text-amber-300">
+                  Conta de anúncios não acessível pelo token
+                </p>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">{syncMsg}</p>
+                <div className="mt-3 rounded-xl border border-amber-300/50 bg-white/60 p-3 dark:bg-amber-950/30">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                    <Info className="h-3.5 w-3.5" /> Como corrigir
+                  </p>
+                  <ol className="mt-2 space-y-1 pl-4 text-xs text-amber-700 dark:text-amber-400 list-decimal">
+                    <li>Acesse <strong>business.facebook.com</strong> com a conta do administrador</li>
+                    <li>Vá em <strong>Configurações do Negócio → Contas de Anúncios</strong></li>
+                    <li>Encontre a conta do cliente e clique em <strong>Adicionar Pessoas</strong></li>
+                    <li>Adicione o usuário do token com função <strong>Anunciante</strong> ou superior</li>
+                    <li>Clique em <strong>Sincronizar</strong> novamente após configurar o acesso</li>
+                  </ol>
+                </div>
+                <button
+                  onClick={handleSync}
+                  disabled={syncing}
+                  className="mt-3 inline-flex items-center gap-2 rounded-xl border border-amber-400/50 bg-white/80 px-3 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-white dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/50 disabled:opacity-60"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
+                  {syncing ? "Verificando…" : "Tentar novamente"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--card)] px-6 py-16 text-center">
+            <AlertTriangle className="h-8 w-8 text-[var(--muted-foreground)]" />
+            <p className="text-sm font-medium text-[var(--foreground)]">Dados de leads indisponíveis</p>
+            <p className="max-w-sm text-xs text-[var(--muted-foreground)]">
+              {syncMsg ?? (error instanceof Error ? error.message : "Erro ao carregar dados de leads")}
+            </p>
+            <button
+              onClick={handleSync}
+              disabled={syncing}
+              className="mt-2 inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)] transition hover:opacity-90 disabled:opacity-60"
+            >
+              <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Sincronizando…" : "Sincronizar Leads"}
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -359,8 +410,8 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {syncMsg && (
-            <span className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs text-[var(--muted-foreground)]">
+          {syncMsg && syncErrType !== "account_access" && (
+            <span className={`rounded-lg border px-3 py-1.5 text-xs ${syncErrType === "generic" || syncErrType === "permission" ? "border-amber-500/30 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400" : "border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]"}`}>
               {syncMsg}
             </span>
           )}
@@ -374,6 +425,35 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           </button>
         </div>
       </div>
+
+      {/* ── Account access error banner ── */}
+      {syncErrType === "account_access" && syncMsg && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-50 p-5 dark:bg-amber-950/20">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div className="min-w-0">
+              <p className="font-semibold text-amber-800 dark:text-amber-300">
+                Conta de anúncios não acessível pelo token
+              </p>
+              <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+                {syncMsg}
+              </p>
+              <div className="mt-3 rounded-xl border border-amber-300/50 bg-white/60 p-3 dark:bg-amber-950/30">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
+                  <Info className="h-3.5 w-3.5" /> Como corrigir
+                </p>
+                <ol className="mt-2 space-y-1 pl-4 text-xs text-amber-700 dark:text-amber-400 list-decimal">
+                  <li>Acesse <strong>business.facebook.com</strong> com a conta do administrador do Business Manager</li>
+                  <li>Vá em <strong>Configurações do Negócio → Contas de Anúncios</strong></li>
+                  <li>Encontre a conta do cliente (Miguel Imóveis) e clique em <strong>Adicionar Pessoas</strong></li>
+                  <li>Adicione o usuário <strong>Raul Souza</strong> com a função <strong>Anunciante</strong> ou superior</li>
+                  <li>Clique em <strong>Sincronizar</strong> novamente após configurar o acesso</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── KPIs ── */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

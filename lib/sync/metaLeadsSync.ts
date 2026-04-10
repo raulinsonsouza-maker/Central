@@ -56,6 +56,10 @@ export async function syncMetaLeadsCliente(
     console.log(`[metaLeadsSync] clienteId=${clienteId} accountId=${accountId} formsFound=${forms.length}`, forms.map(f => `${f.id}(${f.status ?? 'no-status'})`));
 
     if (forms.length === 0 && permissionError) {
+      const isAccountNotAccessible = permissionError.includes("ACCOUNT_NOT_ACCESSIBLE:");
+      const errorMsg = isAccountNotAccessible
+        ? permissionError.replace("ACCOUNT_NOT_ACCESSIBLE:", "").trim()
+        : `Permissão insuficiente para acessar formulários de lead. O token Meta precisa da permissão leads_retrieval aprovada no Meta App Review. Detalhes: ${permissionError}`;
       return {
         leadsProcessed: 0,
         leadsCreated: 0,
@@ -63,8 +67,9 @@ export async function syncMetaLeadsCliente(
         formsFound: 0,
         formsProcessed: 0,
         formsSummary: [],
-        error: `Permissão insuficiente para acessar formulários de lead. O token Meta precisa da permissão leads_retrieval aprovada no Meta App Review. Detalhes: ${permissionError}`,
-      };
+        error: errorMsg,
+        accountNotAccessible: isAccountNotAccessible,
+      } as MetaLeadsSyncResult & { accountNotAccessible?: boolean };
     }
 
     let leadsProcessed = 0;
