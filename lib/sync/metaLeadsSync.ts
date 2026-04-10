@@ -1,4 +1,4 @@
-import { fetchLeadGenForms, fetchLeadsFromForm } from "@/lib/meta/metaClient";
+import { fetchLeadGenFormsWithDiag, fetchLeadsFromForm } from "@/lib/meta/metaClient";
 import { prisma } from "@/lib/db";
 import { getIntegrationsConfig } from "@/lib/config/integrations";
 import { dddToEstado } from "@/lib/utils/dddToEstado";
@@ -20,7 +20,9 @@ export interface MetaLeadsSyncResult {
   leadsProcessed: number;
   leadsCreated: number;
   leadsFailed: number;
+  formsFound: number;
   formsProcessed: number;
+  formsSummary: Array<{ formId: string; formName: string; leadsFound: number }>;
   error?: string;
 }
 
@@ -32,7 +34,7 @@ export async function syncMetaLeadsCliente(
   const token = config.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
 
   if (!token) {
-    return { leadsProcessed: 0, leadsCreated: 0, formsProcessed: 0, error: "META_ACCESS_TOKEN não configurado" };
+    return { leadsProcessed: 0, leadsCreated: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "META_ACCESS_TOKEN não configurado" };
   }
 
   const conta = await prisma.conta.findFirst({
@@ -40,24 +42,43 @@ export async function syncMetaLeadsCliente(
   });
 
   if (!conta?.accountIdPlataforma) {
-    return { leadsProcessed: 0, leadsCreated: 0, formsProcessed: 0, error: "Cliente sem conta Meta configurada" };
+    return { leadsProcessed: 0, leadsCreated: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "Cliente sem conta Meta configurada" };
   }
 
   const accountId = conta.accountIdPlataforma;
   const contaId = conta.id;
 
   try {
-    const allForms = await fetchLeadGenForms(accountId, token);
-    const forms = allForms.filter((f) => !f.status || f.status.toUpperCase() === "ACTIVE");
+    const { forms: allForms, permissionError } = await fetchLeadGenFormsWithDiag(accountId, token);
+    // Include all forms regardless of status — archived/draft forms still have historical leads.
+    const forms = allForms;
+
+    console.log(`[metaLeadsSync] clienteId=${clienteId} accountId=${accountId} formsFound=${forms.length}`, forms.map(f => `${f.id}(${f.status ?? 'no-status'})`));
+
+    if (forms.length === 0 && permissionError) {
+      return {
+        leadsProcessed: 0,
+        leadsCreated: 0,
+        leadsFailed: 0,
+        formsFound: 0,
+        formsProcessed: 0,
+        formsSummary: [],
+        error: `Permissão insuficiente para acessar formulários de lead. O token Meta precisa da permissão leads_retrieval aprovada no Meta App Review. Detalhes: ${permissionError}`,
+      };
+    }
 
     let leadsProcessed = 0;
     let leadsCreated = 0;
     let leadsFailed = 0;
+    const formsSummary: Array<{ formId: string; formName: string; leadsFound: number }> = [];
 
     for (const form of forms) {
       const leads = await fetchLeadsFromForm(form.id, token, {
         dateFrom: options?.dateFrom,
       });
+
+      formsSummary.push({ formId: form.id, formName: form.name, leadsFound: leads.length });
+      console.log(`[metaLeadsSync] form=${form.name}(${form.id}) status=${form.status} leadsFound=${leads.length}`);
 
       for (const lead of leads) {
         leadsProcessed++;
@@ -126,9 +147,9 @@ export async function syncMetaLeadsCliente(
       }
     }
 
-    return { leadsProcessed, leadsCreated, leadsFailed, formsProcessed: forms.length };
+    return { leadsProcessed, leadsCreated, leadsFailed, formsFound: allForms.length, formsProcessed: forms.length, formsSummary };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    return { leadsProcessed: 0, leadsCreated: 0, leadsFailed: 0, formsProcessed: 0, error: message };
+    return { leadsProcessed: 0, leadsCreated: 0, leadsFailed: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: message };
   }
 }

@@ -286,11 +286,23 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
       });
       const body = await res.json().catch(() => ({}));
       if (body.ok) {
-        setSyncMsg(`Sincronizado! ${body.leadsCreated ?? 0} leads novos de ${body.formsProcessed ?? 0} formulários.`);
+        const forms = body.formsFound ?? 0;
+        const created = body.leadsCreated ?? 0;
+        const processed = body.leadsProcessed ?? 0;
+        if (forms === 0) {
+          setSyncMsg("Nenhum formulário de lead encontrado nesta conta.");
+        } else {
+          setSyncMsg(`${forms} formulário(s) · ${processed} leads processados · ${created} novos`);
+        }
         refetch();
       } else {
         const errMsg = body.error ?? "Falha na sincronização";
-        setSyncMsg(`Erro: ${errMsg}`);
+        const isPermErr = errMsg.includes("leads_retrieval") || errMsg.includes("ads_management") || errMsg.includes("Permissão");
+        if (isPermErr) {
+          setSyncMsg("Token sem permissão leads_retrieval. Configure o acesso no Meta Business Manager.");
+        } else {
+          setSyncMsg(`Erro: ${errMsg}`);
+        }
       }
     } catch {
       setSyncMsg("Erro de conexão na sincronização.");

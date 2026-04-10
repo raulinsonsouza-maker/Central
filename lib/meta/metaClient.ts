@@ -76,6 +76,7 @@ export async function fetchLeadGenForms(
     `${GRAPH_BASE}/${actId}/leadgen_forms?${tokenParam}&fields=id,name,status,leads_count,created_time&limit=100`
   );
   const t1Data = (await t1Res.json()) as MetaLeadGenFormsResponse;
+  console.log(`[fetchLeadGenForms] T1 actId=${actId} ok=${t1Res.ok} error=${t1Data.error?.code} msg=${t1Data.error?.message} count=${t1Data.data?.length ?? 0}`);
 
   if (t1Res.ok && !t1Data.error) {
     const all: MetaLeadGenForm[] = [];
@@ -117,6 +118,8 @@ export async function fetchLeadGenForms(
   };
 
   const pageIds: string[] = (pagesData.data ?? []).map((p) => p.id);
+  const t2PermErr = pagesData.error?.message ?? null;
+  console.log(`[fetchLeadGenForms] T2 promote_pages ok=${pagesRes.ok} error=${pagesData.error?.code} msg=${t2PermErr} pageIds=${pageIds.join(",")}`);
 
   if (pageIds.length > 0) {
     const formSets = await Promise.all(
@@ -127,7 +130,6 @@ export async function fetchLeadGenForms(
       )
     );
     const allForms = formSets.flat();
-    // Deduplicate by form id (a form can only belong to one page, but just in case).
     const seen = new Set<string>();
     return allForms.filter((f) => {
       if (seen.has(f.id)) return false;
@@ -138,6 +140,7 @@ export async function fetchLeadGenForms(
 
   // ── Tier 3: discover form IDs via ads' leadgen_id creative field ──────────
   const formIds = new Set<string>();
+  let t3PermErr: string | null = null;
   const adsParams = new URLSearchParams({
     access_token: token,
     fields: "id,adcreatives{leadgen_id}",
@@ -153,13 +156,26 @@ export async function fetchLeadGenForms(
       paging?: { next?: string };
       error?: { message: string; code: number };
     };
-    if (!r.ok || d.error) break;
+    if (!r.ok || d.error) {
+      t3PermErr = d.error?.message ?? `HTTP ${r.status}`;
+      console.warn(`[fetchLeadGenForms] T3 ads error code=${d.error?.code} msg=${t3PermErr}`);
+      break;
+    }
     for (const ad of d.data ?? []) {
       for (const creative of ad.adcreatives?.data ?? []) {
         if (creative.leadgen_id) formIds.add(creative.leadgen_id);
       }
     }
+    console.log(`[fetchLeadGenForms] T3 ads page: ${d.data?.length ?? 0} ads, formIds so far: ${formIds.size}`);
     adsUrl = d.paging?.next ?? null;
+  }
+
+  console.log(`[fetchLeadGenForms] T3 ads scan formIds found: ${formIds.size} ids=[${[...formIds].join(",")}]`);
+
+  // All three tiers failed due to permissions — throw so the caller can surface a useful message.
+  if (formIds.size === 0 && (t2PermErr || t3PermErr)) {
+    const permMsg = t2PermErr ?? t3PermErr ?? "Permission denied";
+    throw new Error(`PERMISSION_ERROR: ${permMsg}`);
   }
 
   if (formIds.size === 0) return [];
@@ -177,6 +193,24 @@ export async function fetchLeadGenForms(
   );
 
   return forms;
+}
+
+/**
+ * Wrapper around fetchLeadGenForms that also surfaces permission errors
+ * so the caller can show actionable messages instead of silently returning 0.
+ */
+export async function fetchLeadGenFormsWithDiag(
+  accountId: string,
+  token: string
+): Promise<{ forms: MetaLeadGenForm[]; permissionError: string | null }> {
+  try {
+    const forms = await fetchLeadGenForms(accountId, token);
+    return { forms, permissionError: null };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const isPermErr = msg.startsWith("PERMISSION_ERROR:") || msg.includes("ads_management") || msg.includes("ads_read") || msg.includes("leads_retrieval");
+    return { forms: [], permissionError: isPermErr ? msg.replace("PERMISSION_ERROR:", "").trim() : null };
+  }
 }
 
 /**
@@ -208,7 +242,10 @@ export async function fetchLeadsFromForm(
     const data = (await res.json()) as MetaLeadsResponse;
     if (!res.ok || data.error) {
       const msg = data?.error?.message ?? `Meta API error: ${res.status}`;
-      if (msg.includes("does not exist") || msg.includes("permission")) break;
+      const code = data?.error?.code;
+      console.warn(`[fetchLeadsFromForm] form=${formId} error code=${code} msg=${msg}`);
+      // Gracefully skip forms that don't exist or have permission issues.
+      if (msg.includes("does not exist") || msg.includes("permission") || code === 100 || code === 200 || code === 190) break;
       throw new Error(msg);
     }
     if (data.data?.length) all.push(...data.data);
