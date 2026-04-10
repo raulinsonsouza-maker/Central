@@ -78,6 +78,11 @@ export type SystemConfig = $Result.DefaultSelection<Prisma.$SystemConfigPayload>
  * 
  */
 export type Segmento = $Result.DefaultSelection<Prisma.$SegmentoPayload>
+/**
+ * Model MetaLeadIndividual
+ * 
+ */
+export type MetaLeadIndividual = $Result.DefaultSelection<Prisma.$MetaLeadIndividualPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -326,6 +331,16 @@ export class PrismaClient<
     * ```
     */
   get segmento(): Prisma.SegmentoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.metaLeadIndividual`: Exposes CRUD operations for the **MetaLeadIndividual** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MetaLeadIndividuals
+    * const metaLeadIndividuals = await prisma.metaLeadIndividual.findMany()
+    * ```
+    */
+  get metaLeadIndividual(): Prisma.MetaLeadIndividualDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -779,7 +794,8 @@ export namespace Prisma {
     FatoAnalyticsDiario: 'FatoAnalyticsDiario',
     FatoAnalyticsPorCanal: 'FatoAnalyticsPorCanal',
     SystemConfig: 'SystemConfig',
-    Segmento: 'Segmento'
+    Segmento: 'Segmento',
+    MetaLeadIndividual: 'MetaLeadIndividual'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -798,7 +814,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "cliente" | "conta" | "fatoMidiaDiario" | "agregadoMidiaSemanal" | "agregadoMidiaMensal" | "meta" | "pautaReuniao" | "googleAdsCriativo" | "metaAdsCriativo" | "fatoAnalyticsDiario" | "fatoAnalyticsPorCanal" | "systemConfig" | "segmento"
+      modelProps: "cliente" | "conta" | "fatoMidiaDiario" | "agregadoMidiaSemanal" | "agregadoMidiaMensal" | "meta" | "pautaReuniao" | "googleAdsCriativo" | "metaAdsCriativo" | "fatoAnalyticsDiario" | "fatoAnalyticsPorCanal" | "systemConfig" | "segmento" | "metaLeadIndividual"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1764,6 +1780,80 @@ export namespace Prisma {
           }
         }
       }
+      MetaLeadIndividual: {
+        payload: Prisma.$MetaLeadIndividualPayload<ExtArgs>
+        fields: Prisma.MetaLeadIndividualFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MetaLeadIndividualFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MetaLeadIndividualFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          findFirst: {
+            args: Prisma.MetaLeadIndividualFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MetaLeadIndividualFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          findMany: {
+            args: Prisma.MetaLeadIndividualFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>[]
+          }
+          create: {
+            args: Prisma.MetaLeadIndividualCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          createMany: {
+            args: Prisma.MetaLeadIndividualCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MetaLeadIndividualCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>[]
+          }
+          delete: {
+            args: Prisma.MetaLeadIndividualDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          update: {
+            args: Prisma.MetaLeadIndividualUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          deleteMany: {
+            args: Prisma.MetaLeadIndividualDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MetaLeadIndividualUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MetaLeadIndividualUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>[]
+          }
+          upsert: {
+            args: Prisma.MetaLeadIndividualUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MetaLeadIndividualPayload>
+          }
+          aggregate: {
+            args: Prisma.MetaLeadIndividualAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMetaLeadIndividual>
+          }
+          groupBy: {
+            args: Prisma.MetaLeadIndividualGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MetaLeadIndividualGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MetaLeadIndividualCountArgs<ExtArgs>
+            result: $Utils.Optional<MetaLeadIndividualCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1873,6 +1963,7 @@ export namespace Prisma {
     fatoAnalyticsPorCanal?: FatoAnalyticsPorCanalOmit
     systemConfig?: SystemConfigOmit
     segmento?: SegmentoOmit
+    metaLeadIndividual?: MetaLeadIndividualOmit
   }
 
   /* Types for Logging */
@@ -1962,6 +2053,7 @@ export namespace Prisma {
     googleAdsCriativos: number
     metas: number
     metaAdsCriativos: number
+    metaLeadsIndividuais: number
     pautasReuniao: number
   }
 
@@ -1975,6 +2067,7 @@ export namespace Prisma {
     googleAdsCriativos?: boolean | ClienteCountOutputTypeCountGoogleAdsCriativosArgs
     metas?: boolean | ClienteCountOutputTypeCountMetasArgs
     metaAdsCriativos?: boolean | ClienteCountOutputTypeCountMetaAdsCriativosArgs
+    metaLeadsIndividuais?: boolean | ClienteCountOutputTypeCountMetaLeadsIndividuaisArgs
     pautasReuniao?: boolean | ClienteCountOutputTypeCountPautasReuniaoArgs
   }
 
@@ -2050,6 +2143,13 @@ export namespace Prisma {
    */
   export type ClienteCountOutputTypeCountMetaAdsCriativosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MetaAdsCriativoWhereInput
+  }
+
+  /**
+   * ClienteCountOutputType without action
+   */
+  export type ClienteCountOutputTypeCountMetaLeadsIndividuaisArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MetaLeadIndividualWhereInput
   }
 
   /**
@@ -2373,6 +2473,7 @@ export namespace Prisma {
     googleAdsCriativos?: boolean | Cliente$googleAdsCriativosArgs<ExtArgs>
     metas?: boolean | Cliente$metasArgs<ExtArgs>
     metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
+    metaLeadsIndividuais?: boolean | Cliente$metaLeadsIndividuaisArgs<ExtArgs>
     pautasReuniao?: boolean | Cliente$pautasReuniaoArgs<ExtArgs>
     _count?: boolean | ClienteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cliente"]>
@@ -2427,6 +2528,7 @@ export namespace Prisma {
     googleAdsCriativos?: boolean | Cliente$googleAdsCriativosArgs<ExtArgs>
     metas?: boolean | Cliente$metasArgs<ExtArgs>
     metaAdsCriativos?: boolean | Cliente$metaAdsCriativosArgs<ExtArgs>
+    metaLeadsIndividuais?: boolean | Cliente$metaLeadsIndividuaisArgs<ExtArgs>
     pautasReuniao?: boolean | Cliente$pautasReuniaoArgs<ExtArgs>
     _count?: boolean | ClienteCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -2445,6 +2547,7 @@ export namespace Prisma {
       googleAdsCriativos: Prisma.$GoogleAdsCriativoPayload<ExtArgs>[]
       metas: Prisma.$MetaPayload<ExtArgs>[]
       metaAdsCriativos: Prisma.$MetaAdsCriativoPayload<ExtArgs>[]
+      metaLeadsIndividuais: Prisma.$MetaLeadIndividualPayload<ExtArgs>[]
       pautasReuniao: Prisma.$PautaReuniaoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2861,6 +2964,7 @@ export namespace Prisma {
     googleAdsCriativos<T extends Cliente$googleAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$googleAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     metas<T extends Cliente$metasArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     metaAdsCriativos<T extends Cliente$metaAdsCriativosArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metaAdsCriativosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaAdsCriativoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    metaLeadsIndividuais<T extends Cliente$metaLeadsIndividuaisArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$metaLeadsIndividuaisArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pautasReuniao<T extends Cliente$pautasReuniaoArgs<ExtArgs> = {}>(args?: Subset<T, Cliente$pautasReuniaoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PautaReuniaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3502,6 +3606,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MetaAdsCriativoScalarFieldEnum | MetaAdsCriativoScalarFieldEnum[]
+  }
+
+  /**
+   * Cliente.metaLeadsIndividuais
+   */
+  export type Cliente$metaLeadsIndividuaisArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    where?: MetaLeadIndividualWhereInput
+    orderBy?: MetaLeadIndividualOrderByWithRelationInput | MetaLeadIndividualOrderByWithRelationInput[]
+    cursor?: MetaLeadIndividualWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MetaLeadIndividualScalarFieldEnum | MetaLeadIndividualScalarFieldEnum[]
   }
 
   /**
@@ -18000,6 +18128,1242 @@ export namespace Prisma {
 
 
   /**
+   * Model MetaLeadIndividual
+   */
+
+  export type AggregateMetaLeadIndividual = {
+    _count: MetaLeadIndividualCountAggregateOutputType | null
+    _min: MetaLeadIndividualMinAggregateOutputType | null
+    _max: MetaLeadIndividualMaxAggregateOutputType | null
+  }
+
+  export type MetaLeadIndividualMinAggregateOutputType = {
+    id: string | null
+    clienteId: string | null
+    contaId: string | null
+    metaLeadId: string | null
+    formId: string | null
+    formName: string | null
+    campaignId: string | null
+    campaignName: string | null
+    createdTime: Date | null
+    nomeEmpresa: string | null
+    telefone: string | null
+    estado: string | null
+    tipoEmpresa: string | null
+    faixaFaturamento: string | null
+    emailLead: string | null
+    statusCrm: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MetaLeadIndividualMaxAggregateOutputType = {
+    id: string | null
+    clienteId: string | null
+    contaId: string | null
+    metaLeadId: string | null
+    formId: string | null
+    formName: string | null
+    campaignId: string | null
+    campaignName: string | null
+    createdTime: Date | null
+    nomeEmpresa: string | null
+    telefone: string | null
+    estado: string | null
+    tipoEmpresa: string | null
+    faixaFaturamento: string | null
+    emailLead: string | null
+    statusCrm: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MetaLeadIndividualCountAggregateOutputType = {
+    id: number
+    clienteId: number
+    contaId: number
+    metaLeadId: number
+    formId: number
+    formName: number
+    campaignId: number
+    campaignName: number
+    createdTime: number
+    nomeEmpresa: number
+    telefone: number
+    estado: number
+    tipoEmpresa: number
+    faixaFaturamento: number
+    emailLead: number
+    statusCrm: number
+    rawFieldData: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MetaLeadIndividualMinAggregateInputType = {
+    id?: true
+    clienteId?: true
+    contaId?: true
+    metaLeadId?: true
+    formId?: true
+    formName?: true
+    campaignId?: true
+    campaignName?: true
+    createdTime?: true
+    nomeEmpresa?: true
+    telefone?: true
+    estado?: true
+    tipoEmpresa?: true
+    faixaFaturamento?: true
+    emailLead?: true
+    statusCrm?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MetaLeadIndividualMaxAggregateInputType = {
+    id?: true
+    clienteId?: true
+    contaId?: true
+    metaLeadId?: true
+    formId?: true
+    formName?: true
+    campaignId?: true
+    campaignName?: true
+    createdTime?: true
+    nomeEmpresa?: true
+    telefone?: true
+    estado?: true
+    tipoEmpresa?: true
+    faixaFaturamento?: true
+    emailLead?: true
+    statusCrm?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MetaLeadIndividualCountAggregateInputType = {
+    id?: true
+    clienteId?: true
+    contaId?: true
+    metaLeadId?: true
+    formId?: true
+    formName?: true
+    campaignId?: true
+    campaignName?: true
+    createdTime?: true
+    nomeEmpresa?: true
+    telefone?: true
+    estado?: true
+    tipoEmpresa?: true
+    faixaFaturamento?: true
+    emailLead?: true
+    statusCrm?: true
+    rawFieldData?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MetaLeadIndividualAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MetaLeadIndividual to aggregate.
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MetaLeadIndividuals to fetch.
+     */
+    orderBy?: MetaLeadIndividualOrderByWithRelationInput | MetaLeadIndividualOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MetaLeadIndividualWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MetaLeadIndividuals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MetaLeadIndividuals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MetaLeadIndividuals
+    **/
+    _count?: true | MetaLeadIndividualCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MetaLeadIndividualMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MetaLeadIndividualMaxAggregateInputType
+  }
+
+  export type GetMetaLeadIndividualAggregateType<T extends MetaLeadIndividualAggregateArgs> = {
+        [P in keyof T & keyof AggregateMetaLeadIndividual]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMetaLeadIndividual[P]>
+      : GetScalarType<T[P], AggregateMetaLeadIndividual[P]>
+  }
+
+
+
+
+  export type MetaLeadIndividualGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MetaLeadIndividualWhereInput
+    orderBy?: MetaLeadIndividualOrderByWithAggregationInput | MetaLeadIndividualOrderByWithAggregationInput[]
+    by: MetaLeadIndividualScalarFieldEnum[] | MetaLeadIndividualScalarFieldEnum
+    having?: MetaLeadIndividualScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MetaLeadIndividualCountAggregateInputType | true
+    _min?: MetaLeadIndividualMinAggregateInputType
+    _max?: MetaLeadIndividualMaxAggregateInputType
+  }
+
+  export type MetaLeadIndividualGroupByOutputType = {
+    id: string
+    clienteId: string
+    contaId: string | null
+    metaLeadId: string
+    formId: string | null
+    formName: string | null
+    campaignId: string | null
+    campaignName: string | null
+    createdTime: Date
+    nomeEmpresa: string | null
+    telefone: string | null
+    estado: string | null
+    tipoEmpresa: string | null
+    faixaFaturamento: string | null
+    emailLead: string | null
+    statusCrm: string | null
+    rawFieldData: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MetaLeadIndividualCountAggregateOutputType | null
+    _min: MetaLeadIndividualMinAggregateOutputType | null
+    _max: MetaLeadIndividualMaxAggregateOutputType | null
+  }
+
+  type GetMetaLeadIndividualGroupByPayload<T extends MetaLeadIndividualGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MetaLeadIndividualGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MetaLeadIndividualGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MetaLeadIndividualGroupByOutputType[P]>
+            : GetScalarType<T[P], MetaLeadIndividualGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MetaLeadIndividualSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    clienteId?: boolean
+    contaId?: boolean
+    metaLeadId?: boolean
+    formId?: boolean
+    formName?: boolean
+    campaignId?: boolean
+    campaignName?: boolean
+    createdTime?: boolean
+    nomeEmpresa?: boolean
+    telefone?: boolean
+    estado?: boolean
+    tipoEmpresa?: boolean
+    faixaFaturamento?: boolean
+    emailLead?: boolean
+    statusCrm?: boolean
+    rawFieldData?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["metaLeadIndividual"]>
+
+  export type MetaLeadIndividualSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    clienteId?: boolean
+    contaId?: boolean
+    metaLeadId?: boolean
+    formId?: boolean
+    formName?: boolean
+    campaignId?: boolean
+    campaignName?: boolean
+    createdTime?: boolean
+    nomeEmpresa?: boolean
+    telefone?: boolean
+    estado?: boolean
+    tipoEmpresa?: boolean
+    faixaFaturamento?: boolean
+    emailLead?: boolean
+    statusCrm?: boolean
+    rawFieldData?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["metaLeadIndividual"]>
+
+  export type MetaLeadIndividualSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    clienteId?: boolean
+    contaId?: boolean
+    metaLeadId?: boolean
+    formId?: boolean
+    formName?: boolean
+    campaignId?: boolean
+    campaignName?: boolean
+    createdTime?: boolean
+    nomeEmpresa?: boolean
+    telefone?: boolean
+    estado?: boolean
+    tipoEmpresa?: boolean
+    faixaFaturamento?: boolean
+    emailLead?: boolean
+    statusCrm?: boolean
+    rawFieldData?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["metaLeadIndividual"]>
+
+  export type MetaLeadIndividualSelectScalar = {
+    id?: boolean
+    clienteId?: boolean
+    contaId?: boolean
+    metaLeadId?: boolean
+    formId?: boolean
+    formName?: boolean
+    campaignId?: boolean
+    campaignName?: boolean
+    createdTime?: boolean
+    nomeEmpresa?: boolean
+    telefone?: boolean
+    estado?: boolean
+    tipoEmpresa?: boolean
+    faixaFaturamento?: boolean
+    emailLead?: boolean
+    statusCrm?: boolean
+    rawFieldData?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MetaLeadIndividualOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "metaLeadId" | "formId" | "formName" | "campaignId" | "campaignName" | "createdTime" | "nomeEmpresa" | "telefone" | "estado" | "tipoEmpresa" | "faixaFaturamento" | "emailLead" | "statusCrm" | "rawFieldData" | "createdAt" | "updatedAt", ExtArgs["result"]["metaLeadIndividual"]>
+  export type MetaLeadIndividualInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }
+  export type MetaLeadIndividualIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }
+  export type MetaLeadIndividualIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    cliente?: boolean | ClienteDefaultArgs<ExtArgs>
+  }
+
+  export type $MetaLeadIndividualPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MetaLeadIndividual"
+    objects: {
+      cliente: Prisma.$ClientePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      clienteId: string
+      contaId: string | null
+      metaLeadId: string
+      formId: string | null
+      formName: string | null
+      campaignId: string | null
+      campaignName: string | null
+      createdTime: Date
+      nomeEmpresa: string | null
+      telefone: string | null
+      estado: string | null
+      tipoEmpresa: string | null
+      faixaFaturamento: string | null
+      emailLead: string | null
+      statusCrm: string | null
+      rawFieldData: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["metaLeadIndividual"]>
+    composites: {}
+  }
+
+  type MetaLeadIndividualGetPayload<S extends boolean | null | undefined | MetaLeadIndividualDefaultArgs> = $Result.GetResult<Prisma.$MetaLeadIndividualPayload, S>
+
+  type MetaLeadIndividualCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MetaLeadIndividualFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MetaLeadIndividualCountAggregateInputType | true
+    }
+
+  export interface MetaLeadIndividualDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MetaLeadIndividual'], meta: { name: 'MetaLeadIndividual' } }
+    /**
+     * Find zero or one MetaLeadIndividual that matches the filter.
+     * @param {MetaLeadIndividualFindUniqueArgs} args - Arguments to find a MetaLeadIndividual
+     * @example
+     * // Get one MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MetaLeadIndividualFindUniqueArgs>(args: SelectSubset<T, MetaLeadIndividualFindUniqueArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MetaLeadIndividual that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MetaLeadIndividualFindUniqueOrThrowArgs} args - Arguments to find a MetaLeadIndividual
+     * @example
+     * // Get one MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MetaLeadIndividualFindUniqueOrThrowArgs>(args: SelectSubset<T, MetaLeadIndividualFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MetaLeadIndividual that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualFindFirstArgs} args - Arguments to find a MetaLeadIndividual
+     * @example
+     * // Get one MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MetaLeadIndividualFindFirstArgs>(args?: SelectSubset<T, MetaLeadIndividualFindFirstArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MetaLeadIndividual that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualFindFirstOrThrowArgs} args - Arguments to find a MetaLeadIndividual
+     * @example
+     * // Get one MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MetaLeadIndividualFindFirstOrThrowArgs>(args?: SelectSubset<T, MetaLeadIndividualFindFirstOrThrowArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MetaLeadIndividuals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MetaLeadIndividuals
+     * const metaLeadIndividuals = await prisma.metaLeadIndividual.findMany()
+     * 
+     * // Get first 10 MetaLeadIndividuals
+     * const metaLeadIndividuals = await prisma.metaLeadIndividual.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const metaLeadIndividualWithIdOnly = await prisma.metaLeadIndividual.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MetaLeadIndividualFindManyArgs>(args?: SelectSubset<T, MetaLeadIndividualFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MetaLeadIndividual.
+     * @param {MetaLeadIndividualCreateArgs} args - Arguments to create a MetaLeadIndividual.
+     * @example
+     * // Create one MetaLeadIndividual
+     * const MetaLeadIndividual = await prisma.metaLeadIndividual.create({
+     *   data: {
+     *     // ... data to create a MetaLeadIndividual
+     *   }
+     * })
+     * 
+     */
+    create<T extends MetaLeadIndividualCreateArgs>(args: SelectSubset<T, MetaLeadIndividualCreateArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MetaLeadIndividuals.
+     * @param {MetaLeadIndividualCreateManyArgs} args - Arguments to create many MetaLeadIndividuals.
+     * @example
+     * // Create many MetaLeadIndividuals
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MetaLeadIndividualCreateManyArgs>(args?: SelectSubset<T, MetaLeadIndividualCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MetaLeadIndividuals and returns the data saved in the database.
+     * @param {MetaLeadIndividualCreateManyAndReturnArgs} args - Arguments to create many MetaLeadIndividuals.
+     * @example
+     * // Create many MetaLeadIndividuals
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MetaLeadIndividuals and only return the `id`
+     * const metaLeadIndividualWithIdOnly = await prisma.metaLeadIndividual.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MetaLeadIndividualCreateManyAndReturnArgs>(args?: SelectSubset<T, MetaLeadIndividualCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MetaLeadIndividual.
+     * @param {MetaLeadIndividualDeleteArgs} args - Arguments to delete one MetaLeadIndividual.
+     * @example
+     * // Delete one MetaLeadIndividual
+     * const MetaLeadIndividual = await prisma.metaLeadIndividual.delete({
+     *   where: {
+     *     // ... filter to delete one MetaLeadIndividual
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MetaLeadIndividualDeleteArgs>(args: SelectSubset<T, MetaLeadIndividualDeleteArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MetaLeadIndividual.
+     * @param {MetaLeadIndividualUpdateArgs} args - Arguments to update one MetaLeadIndividual.
+     * @example
+     * // Update one MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MetaLeadIndividualUpdateArgs>(args: SelectSubset<T, MetaLeadIndividualUpdateArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MetaLeadIndividuals.
+     * @param {MetaLeadIndividualDeleteManyArgs} args - Arguments to filter MetaLeadIndividuals to delete.
+     * @example
+     * // Delete a few MetaLeadIndividuals
+     * const { count } = await prisma.metaLeadIndividual.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MetaLeadIndividualDeleteManyArgs>(args?: SelectSubset<T, MetaLeadIndividualDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MetaLeadIndividuals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MetaLeadIndividuals
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MetaLeadIndividualUpdateManyArgs>(args: SelectSubset<T, MetaLeadIndividualUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MetaLeadIndividuals and returns the data updated in the database.
+     * @param {MetaLeadIndividualUpdateManyAndReturnArgs} args - Arguments to update many MetaLeadIndividuals.
+     * @example
+     * // Update many MetaLeadIndividuals
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MetaLeadIndividuals and only return the `id`
+     * const metaLeadIndividualWithIdOnly = await prisma.metaLeadIndividual.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MetaLeadIndividualUpdateManyAndReturnArgs>(args: SelectSubset<T, MetaLeadIndividualUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MetaLeadIndividual.
+     * @param {MetaLeadIndividualUpsertArgs} args - Arguments to update or create a MetaLeadIndividual.
+     * @example
+     * // Update or create a MetaLeadIndividual
+     * const metaLeadIndividual = await prisma.metaLeadIndividual.upsert({
+     *   create: {
+     *     // ... data to create a MetaLeadIndividual
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MetaLeadIndividual we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MetaLeadIndividualUpsertArgs>(args: SelectSubset<T, MetaLeadIndividualUpsertArgs<ExtArgs>>): Prisma__MetaLeadIndividualClient<$Result.GetResult<Prisma.$MetaLeadIndividualPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MetaLeadIndividuals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualCountArgs} args - Arguments to filter MetaLeadIndividuals to count.
+     * @example
+     * // Count the number of MetaLeadIndividuals
+     * const count = await prisma.metaLeadIndividual.count({
+     *   where: {
+     *     // ... the filter for the MetaLeadIndividuals we want to count
+     *   }
+     * })
+    **/
+    count<T extends MetaLeadIndividualCountArgs>(
+      args?: Subset<T, MetaLeadIndividualCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MetaLeadIndividualCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MetaLeadIndividual.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MetaLeadIndividualAggregateArgs>(args: Subset<T, MetaLeadIndividualAggregateArgs>): Prisma.PrismaPromise<GetMetaLeadIndividualAggregateType<T>>
+
+    /**
+     * Group by MetaLeadIndividual.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MetaLeadIndividualGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MetaLeadIndividualGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MetaLeadIndividualGroupByArgs['orderBy'] }
+        : { orderBy?: MetaLeadIndividualGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MetaLeadIndividualGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMetaLeadIndividualGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MetaLeadIndividual model
+   */
+  readonly fields: MetaLeadIndividualFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MetaLeadIndividual.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MetaLeadIndividualClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    cliente<T extends ClienteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClienteDefaultArgs<ExtArgs>>): Prisma__ClienteClient<$Result.GetResult<Prisma.$ClientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MetaLeadIndividual model
+   */
+  interface MetaLeadIndividualFieldRefs {
+    readonly id: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly clienteId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly contaId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly metaLeadId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly formId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly formName: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly campaignId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly campaignName: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly createdTime: FieldRef<"MetaLeadIndividual", 'DateTime'>
+    readonly nomeEmpresa: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly telefone: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly estado: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly tipoEmpresa: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly faixaFaturamento: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly emailLead: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly statusCrm: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly rawFieldData: FieldRef<"MetaLeadIndividual", 'Json'>
+    readonly createdAt: FieldRef<"MetaLeadIndividual", 'DateTime'>
+    readonly updatedAt: FieldRef<"MetaLeadIndividual", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MetaLeadIndividual findUnique
+   */
+  export type MetaLeadIndividualFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter, which MetaLeadIndividual to fetch.
+     */
+    where: MetaLeadIndividualWhereUniqueInput
+  }
+
+  /**
+   * MetaLeadIndividual findUniqueOrThrow
+   */
+  export type MetaLeadIndividualFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter, which MetaLeadIndividual to fetch.
+     */
+    where: MetaLeadIndividualWhereUniqueInput
+  }
+
+  /**
+   * MetaLeadIndividual findFirst
+   */
+  export type MetaLeadIndividualFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter, which MetaLeadIndividual to fetch.
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MetaLeadIndividuals to fetch.
+     */
+    orderBy?: MetaLeadIndividualOrderByWithRelationInput | MetaLeadIndividualOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MetaLeadIndividuals.
+     */
+    cursor?: MetaLeadIndividualWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MetaLeadIndividuals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MetaLeadIndividuals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MetaLeadIndividuals.
+     */
+    distinct?: MetaLeadIndividualScalarFieldEnum | MetaLeadIndividualScalarFieldEnum[]
+  }
+
+  /**
+   * MetaLeadIndividual findFirstOrThrow
+   */
+  export type MetaLeadIndividualFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter, which MetaLeadIndividual to fetch.
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MetaLeadIndividuals to fetch.
+     */
+    orderBy?: MetaLeadIndividualOrderByWithRelationInput | MetaLeadIndividualOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MetaLeadIndividuals.
+     */
+    cursor?: MetaLeadIndividualWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MetaLeadIndividuals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MetaLeadIndividuals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MetaLeadIndividuals.
+     */
+    distinct?: MetaLeadIndividualScalarFieldEnum | MetaLeadIndividualScalarFieldEnum[]
+  }
+
+  /**
+   * MetaLeadIndividual findMany
+   */
+  export type MetaLeadIndividualFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter, which MetaLeadIndividuals to fetch.
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MetaLeadIndividuals to fetch.
+     */
+    orderBy?: MetaLeadIndividualOrderByWithRelationInput | MetaLeadIndividualOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MetaLeadIndividuals.
+     */
+    cursor?: MetaLeadIndividualWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MetaLeadIndividuals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MetaLeadIndividuals.
+     */
+    skip?: number
+    distinct?: MetaLeadIndividualScalarFieldEnum | MetaLeadIndividualScalarFieldEnum[]
+  }
+
+  /**
+   * MetaLeadIndividual create
+   */
+  export type MetaLeadIndividualCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MetaLeadIndividual.
+     */
+    data: XOR<MetaLeadIndividualCreateInput, MetaLeadIndividualUncheckedCreateInput>
+  }
+
+  /**
+   * MetaLeadIndividual createMany
+   */
+  export type MetaLeadIndividualCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MetaLeadIndividuals.
+     */
+    data: MetaLeadIndividualCreateManyInput | MetaLeadIndividualCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MetaLeadIndividual createManyAndReturn
+   */
+  export type MetaLeadIndividualCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * The data used to create many MetaLeadIndividuals.
+     */
+    data: MetaLeadIndividualCreateManyInput | MetaLeadIndividualCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MetaLeadIndividual update
+   */
+  export type MetaLeadIndividualUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MetaLeadIndividual.
+     */
+    data: XOR<MetaLeadIndividualUpdateInput, MetaLeadIndividualUncheckedUpdateInput>
+    /**
+     * Choose, which MetaLeadIndividual to update.
+     */
+    where: MetaLeadIndividualWhereUniqueInput
+  }
+
+  /**
+   * MetaLeadIndividual updateMany
+   */
+  export type MetaLeadIndividualUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MetaLeadIndividuals.
+     */
+    data: XOR<MetaLeadIndividualUpdateManyMutationInput, MetaLeadIndividualUncheckedUpdateManyInput>
+    /**
+     * Filter which MetaLeadIndividuals to update
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * Limit how many MetaLeadIndividuals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MetaLeadIndividual updateManyAndReturn
+   */
+  export type MetaLeadIndividualUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * The data used to update MetaLeadIndividuals.
+     */
+    data: XOR<MetaLeadIndividualUpdateManyMutationInput, MetaLeadIndividualUncheckedUpdateManyInput>
+    /**
+     * Filter which MetaLeadIndividuals to update
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * Limit how many MetaLeadIndividuals to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MetaLeadIndividual upsert
+   */
+  export type MetaLeadIndividualUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MetaLeadIndividual to update in case it exists.
+     */
+    where: MetaLeadIndividualWhereUniqueInput
+    /**
+     * In case the MetaLeadIndividual found by the `where` argument doesn't exist, create a new MetaLeadIndividual with this data.
+     */
+    create: XOR<MetaLeadIndividualCreateInput, MetaLeadIndividualUncheckedCreateInput>
+    /**
+     * In case the MetaLeadIndividual was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MetaLeadIndividualUpdateInput, MetaLeadIndividualUncheckedUpdateInput>
+  }
+
+  /**
+   * MetaLeadIndividual delete
+   */
+  export type MetaLeadIndividualDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+    /**
+     * Filter which MetaLeadIndividual to delete.
+     */
+    where: MetaLeadIndividualWhereUniqueInput
+  }
+
+  /**
+   * MetaLeadIndividual deleteMany
+   */
+  export type MetaLeadIndividualDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MetaLeadIndividuals to delete
+     */
+    where?: MetaLeadIndividualWhereInput
+    /**
+     * Limit how many MetaLeadIndividuals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MetaLeadIndividual without action
+   */
+  export type MetaLeadIndividualDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MetaLeadIndividual
+     */
+    select?: MetaLeadIndividualSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MetaLeadIndividual
+     */
+    omit?: MetaLeadIndividualOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MetaLeadIndividualInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -18251,12 +19615,45 @@ export namespace Prisma {
   export type SegmentoScalarFieldEnum = (typeof SegmentoScalarFieldEnum)[keyof typeof SegmentoScalarFieldEnum]
 
 
+  export const MetaLeadIndividualScalarFieldEnum: {
+    id: 'id',
+    clienteId: 'clienteId',
+    contaId: 'contaId',
+    metaLeadId: 'metaLeadId',
+    formId: 'formId',
+    formName: 'formName',
+    campaignId: 'campaignId',
+    campaignName: 'campaignName',
+    createdTime: 'createdTime',
+    nomeEmpresa: 'nomeEmpresa',
+    telefone: 'telefone',
+    estado: 'estado',
+    tipoEmpresa: 'tipoEmpresa',
+    faixaFaturamento: 'faixaFaturamento',
+    emailLead: 'emailLead',
+    statusCrm: 'statusCrm',
+    rawFieldData: 'rawFieldData',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MetaLeadIndividualScalarFieldEnum = (typeof MetaLeadIndividualScalarFieldEnum)[keyof typeof MetaLeadIndividualScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -18273,6 +19670,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -18358,6 +19764,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -18397,6 +19817,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
     metas?: MetaListRelationFilter
     metaAdsCriativos?: MetaAdsCriativoListRelationFilter
+    metaLeadsIndividuais?: MetaLeadIndividualListRelationFilter
     pautasReuniao?: PautaReuniaoListRelationFilter
   }
 
@@ -18420,6 +19841,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoOrderByRelationAggregateInput
     metas?: MetaOrderByRelationAggregateInput
     metaAdsCriativos?: MetaAdsCriativoOrderByRelationAggregateInput
+    metaLeadsIndividuais?: MetaLeadIndividualOrderByRelationAggregateInput
     pautasReuniao?: PautaReuniaoOrderByRelationAggregateInput
   }
 
@@ -18446,6 +19868,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoListRelationFilter
     metas?: MetaListRelationFilter
     metaAdsCriativos?: MetaAdsCriativoListRelationFilter
+    metaLeadsIndividuais?: MetaLeadIndividualListRelationFilter
     pautasReuniao?: PautaReuniaoListRelationFilter
   }, "id" | "slug">
 
@@ -19637,6 +21060,132 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Segmento"> | Date | string
   }
 
+  export type MetaLeadIndividualWhereInput = {
+    AND?: MetaLeadIndividualWhereInput | MetaLeadIndividualWhereInput[]
+    OR?: MetaLeadIndividualWhereInput[]
+    NOT?: MetaLeadIndividualWhereInput | MetaLeadIndividualWhereInput[]
+    id?: StringFilter<"MetaLeadIndividual"> | string
+    clienteId?: StringFilter<"MetaLeadIndividual"> | string
+    contaId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    metaLeadId?: StringFilter<"MetaLeadIndividual"> | string
+    formId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
+    createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    updatedAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
+  }
+
+  export type MetaLeadIndividualOrderByWithRelationInput = {
+    id?: SortOrder
+    clienteId?: SortOrder
+    contaId?: SortOrderInput | SortOrder
+    metaLeadId?: SortOrder
+    formId?: SortOrderInput | SortOrder
+    formName?: SortOrderInput | SortOrder
+    campaignId?: SortOrderInput | SortOrder
+    campaignName?: SortOrderInput | SortOrder
+    createdTime?: SortOrder
+    nomeEmpresa?: SortOrderInput | SortOrder
+    telefone?: SortOrderInput | SortOrder
+    estado?: SortOrderInput | SortOrder
+    tipoEmpresa?: SortOrderInput | SortOrder
+    faixaFaturamento?: SortOrderInput | SortOrder
+    emailLead?: SortOrderInput | SortOrder
+    statusCrm?: SortOrderInput | SortOrder
+    rawFieldData?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cliente?: ClienteOrderByWithRelationInput
+  }
+
+  export type MetaLeadIndividualWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    clienteId_metaLeadId?: MetaLeadIndividualClienteIdMetaLeadIdCompoundUniqueInput
+    AND?: MetaLeadIndividualWhereInput | MetaLeadIndividualWhereInput[]
+    OR?: MetaLeadIndividualWhereInput[]
+    NOT?: MetaLeadIndividualWhereInput | MetaLeadIndividualWhereInput[]
+    clienteId?: StringFilter<"MetaLeadIndividual"> | string
+    contaId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    metaLeadId?: StringFilter<"MetaLeadIndividual"> | string
+    formId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
+    createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    updatedAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
+  }, "id" | "clienteId_metaLeadId">
+
+  export type MetaLeadIndividualOrderByWithAggregationInput = {
+    id?: SortOrder
+    clienteId?: SortOrder
+    contaId?: SortOrderInput | SortOrder
+    metaLeadId?: SortOrder
+    formId?: SortOrderInput | SortOrder
+    formName?: SortOrderInput | SortOrder
+    campaignId?: SortOrderInput | SortOrder
+    campaignName?: SortOrderInput | SortOrder
+    createdTime?: SortOrder
+    nomeEmpresa?: SortOrderInput | SortOrder
+    telefone?: SortOrderInput | SortOrder
+    estado?: SortOrderInput | SortOrder
+    tipoEmpresa?: SortOrderInput | SortOrder
+    faixaFaturamento?: SortOrderInput | SortOrder
+    emailLead?: SortOrderInput | SortOrder
+    statusCrm?: SortOrderInput | SortOrder
+    rawFieldData?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MetaLeadIndividualCountOrderByAggregateInput
+    _max?: MetaLeadIndividualMaxOrderByAggregateInput
+    _min?: MetaLeadIndividualMinOrderByAggregateInput
+  }
+
+  export type MetaLeadIndividualScalarWhereWithAggregatesInput = {
+    AND?: MetaLeadIndividualScalarWhereWithAggregatesInput | MetaLeadIndividualScalarWhereWithAggregatesInput[]
+    OR?: MetaLeadIndividualScalarWhereWithAggregatesInput[]
+    NOT?: MetaLeadIndividualScalarWhereWithAggregatesInput | MetaLeadIndividualScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MetaLeadIndividual"> | string
+    clienteId?: StringWithAggregatesFilter<"MetaLeadIndividual"> | string
+    contaId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    metaLeadId?: StringWithAggregatesFilter<"MetaLeadIndividual"> | string
+    formId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    formName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    campaignId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    campaignName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    createdTime?: DateTimeWithAggregatesFilter<"MetaLeadIndividual"> | Date | string
+    nomeEmpresa?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    telefone?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    estado?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    tipoEmpresa?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    faixaFaturamento?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    emailLead?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    statusCrm?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    rawFieldData?: JsonNullableWithAggregatesFilter<"MetaLeadIndividual">
+    createdAt?: DateTimeWithAggregatesFilter<"MetaLeadIndividual"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MetaLeadIndividual"> | Date | string
+  }
+
   export type ClienteCreateInput = {
     id?: string
     nome: string
@@ -19657,6 +21206,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -19680,6 +21230,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -19703,6 +21254,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -19726,6 +21278,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -21072,6 +22625,159 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MetaLeadIndividualCreateInput = {
+    id?: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cliente: ClienteCreateNestedOneWithoutMetaLeadsIndividuaisInput
+  }
+
+  export type MetaLeadIndividualUncheckedCreateInput = {
+    id?: string
+    clienteId: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaLeadIndividualUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cliente?: ClienteUpdateOneRequiredWithoutMetaLeadsIndividuaisNestedInput
+  }
+
+  export type MetaLeadIndividualUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clienteId?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaLeadIndividualCreateManyInput = {
+    id?: string
+    clienteId: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaLeadIndividualUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaLeadIndividualUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clienteId?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -21183,6 +22889,12 @@ export namespace Prisma {
     none?: MetaAdsCriativoWhereInput
   }
 
+  export type MetaLeadIndividualListRelationFilter = {
+    every?: MetaLeadIndividualWhereInput
+    some?: MetaLeadIndividualWhereInput
+    none?: MetaLeadIndividualWhereInput
+  }
+
   export type PautaReuniaoListRelationFilter = {
     every?: PautaReuniaoWhereInput
     some?: PautaReuniaoWhereInput
@@ -21227,6 +22939,10 @@ export namespace Prisma {
   }
 
   export type MetaAdsCriativoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MetaLeadIndividualOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -22244,6 +23960,124 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type MetaLeadIndividualClienteIdMetaLeadIdCompoundUniqueInput = {
+    clienteId: string
+    metaLeadId: string
+  }
+
+  export type MetaLeadIndividualCountOrderByAggregateInput = {
+    id?: SortOrder
+    clienteId?: SortOrder
+    contaId?: SortOrder
+    metaLeadId?: SortOrder
+    formId?: SortOrder
+    formName?: SortOrder
+    campaignId?: SortOrder
+    campaignName?: SortOrder
+    createdTime?: SortOrder
+    nomeEmpresa?: SortOrder
+    telefone?: SortOrder
+    estado?: SortOrder
+    tipoEmpresa?: SortOrder
+    faixaFaturamento?: SortOrder
+    emailLead?: SortOrder
+    statusCrm?: SortOrder
+    rawFieldData?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MetaLeadIndividualMaxOrderByAggregateInput = {
+    id?: SortOrder
+    clienteId?: SortOrder
+    contaId?: SortOrder
+    metaLeadId?: SortOrder
+    formId?: SortOrder
+    formName?: SortOrder
+    campaignId?: SortOrder
+    campaignName?: SortOrder
+    createdTime?: SortOrder
+    nomeEmpresa?: SortOrder
+    telefone?: SortOrder
+    estado?: SortOrder
+    tipoEmpresa?: SortOrder
+    faixaFaturamento?: SortOrder
+    emailLead?: SortOrder
+    statusCrm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MetaLeadIndividualMinOrderByAggregateInput = {
+    id?: SortOrder
+    clienteId?: SortOrder
+    contaId?: SortOrder
+    metaLeadId?: SortOrder
+    formId?: SortOrder
+    formName?: SortOrder
+    campaignId?: SortOrder
+    campaignName?: SortOrder
+    createdTime?: SortOrder
+    nomeEmpresa?: SortOrder
+    telefone?: SortOrder
+    estado?: SortOrder
+    tipoEmpresa?: SortOrder
+    faixaFaturamento?: SortOrder
+    emailLead?: SortOrder
+    statusCrm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
 
   export type AgregadoMidiaMensalCreateNestedManyWithoutClienteInput = {
     create?: XOR<AgregadoMidiaMensalCreateWithoutClienteInput, AgregadoMidiaMensalUncheckedCreateWithoutClienteInput> | AgregadoMidiaMensalCreateWithoutClienteInput[] | AgregadoMidiaMensalUncheckedCreateWithoutClienteInput[]
@@ -22306,6 +24140,13 @@ export namespace Prisma {
     connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
     createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
     connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+  }
+
+  export type MetaLeadIndividualCreateNestedManyWithoutClienteInput = {
+    create?: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput> | MetaLeadIndividualCreateWithoutClienteInput[] | MetaLeadIndividualUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaLeadIndividualCreateOrConnectWithoutClienteInput | MetaLeadIndividualCreateOrConnectWithoutClienteInput[]
+    createMany?: MetaLeadIndividualCreateManyClienteInputEnvelope
+    connect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
   }
 
   export type PautaReuniaoCreateNestedManyWithoutClienteInput = {
@@ -22376,6 +24217,13 @@ export namespace Prisma {
     connectOrCreate?: MetaAdsCriativoCreateOrConnectWithoutClienteInput | MetaAdsCriativoCreateOrConnectWithoutClienteInput[]
     createMany?: MetaAdsCriativoCreateManyClienteInputEnvelope
     connect?: MetaAdsCriativoWhereUniqueInput | MetaAdsCriativoWhereUniqueInput[]
+  }
+
+  export type MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput = {
+    create?: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput> | MetaLeadIndividualCreateWithoutClienteInput[] | MetaLeadIndividualUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaLeadIndividualCreateOrConnectWithoutClienteInput | MetaLeadIndividualCreateOrConnectWithoutClienteInput[]
+    createMany?: MetaLeadIndividualCreateManyClienteInputEnvelope
+    connect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
   }
 
   export type PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput = {
@@ -22535,6 +24383,20 @@ export namespace Prisma {
     deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
   }
 
+  export type MetaLeadIndividualUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput> | MetaLeadIndividualCreateWithoutClienteInput[] | MetaLeadIndividualUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaLeadIndividualCreateOrConnectWithoutClienteInput | MetaLeadIndividualCreateOrConnectWithoutClienteInput[]
+    upsert?: MetaLeadIndividualUpsertWithWhereUniqueWithoutClienteInput | MetaLeadIndividualUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: MetaLeadIndividualCreateManyClienteInputEnvelope
+    set?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    disconnect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    delete?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    connect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    update?: MetaLeadIndividualUpdateWithWhereUniqueWithoutClienteInput | MetaLeadIndividualUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: MetaLeadIndividualUpdateManyWithWhereWithoutClienteInput | MetaLeadIndividualUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: MetaLeadIndividualScalarWhereInput | MetaLeadIndividualScalarWhereInput[]
+  }
+
   export type PautaReuniaoUpdateManyWithoutClienteNestedInput = {
     create?: XOR<PautaReuniaoCreateWithoutClienteInput, PautaReuniaoUncheckedCreateWithoutClienteInput> | PautaReuniaoCreateWithoutClienteInput[] | PautaReuniaoUncheckedCreateWithoutClienteInput[]
     connectOrCreate?: PautaReuniaoCreateOrConnectWithoutClienteInput | PautaReuniaoCreateOrConnectWithoutClienteInput[]
@@ -22673,6 +24535,20 @@ export namespace Prisma {
     update?: MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput | MetaAdsCriativoUpdateWithWhereUniqueWithoutClienteInput[]
     updateMany?: MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput | MetaAdsCriativoUpdateManyWithWhereWithoutClienteInput[]
     deleteMany?: MetaAdsCriativoScalarWhereInput | MetaAdsCriativoScalarWhereInput[]
+  }
+
+  export type MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput = {
+    create?: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput> | MetaLeadIndividualCreateWithoutClienteInput[] | MetaLeadIndividualUncheckedCreateWithoutClienteInput[]
+    connectOrCreate?: MetaLeadIndividualCreateOrConnectWithoutClienteInput | MetaLeadIndividualCreateOrConnectWithoutClienteInput[]
+    upsert?: MetaLeadIndividualUpsertWithWhereUniqueWithoutClienteInput | MetaLeadIndividualUpsertWithWhereUniqueWithoutClienteInput[]
+    createMany?: MetaLeadIndividualCreateManyClienteInputEnvelope
+    set?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    disconnect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    delete?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    connect?: MetaLeadIndividualWhereUniqueInput | MetaLeadIndividualWhereUniqueInput[]
+    update?: MetaLeadIndividualUpdateWithWhereUniqueWithoutClienteInput | MetaLeadIndividualUpdateWithWhereUniqueWithoutClienteInput[]
+    updateMany?: MetaLeadIndividualUpdateManyWithWhereWithoutClienteInput | MetaLeadIndividualUpdateManyWithWhereWithoutClienteInput[]
+    deleteMany?: MetaLeadIndividualScalarWhereInput | MetaLeadIndividualScalarWhereInput[]
   }
 
   export type PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput = {
@@ -23093,6 +24969,20 @@ export namespace Prisma {
     update?: XOR<XOR<ClienteUpdateToOneWithWhereWithoutFatosAnalyticsPorCanalInput, ClienteUpdateWithoutFatosAnalyticsPorCanalInput>, ClienteUncheckedUpdateWithoutFatosAnalyticsPorCanalInput>
   }
 
+  export type ClienteCreateNestedOneWithoutMetaLeadsIndividuaisInput = {
+    create?: XOR<ClienteCreateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedCreateWithoutMetaLeadsIndividuaisInput>
+    connectOrCreate?: ClienteCreateOrConnectWithoutMetaLeadsIndividuaisInput
+    connect?: ClienteWhereUniqueInput
+  }
+
+  export type ClienteUpdateOneRequiredWithoutMetaLeadsIndividuaisNestedInput = {
+    create?: XOR<ClienteCreateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedCreateWithoutMetaLeadsIndividuaisInput>
+    connectOrCreate?: ClienteCreateOrConnectWithoutMetaLeadsIndividuaisInput
+    upsert?: ClienteUpsertWithoutMetaLeadsIndividuaisInput
+    connect?: ClienteWhereUniqueInput
+    update?: XOR<XOR<ClienteUpdateToOneWithWhereWithoutMetaLeadsIndividuaisInput, ClienteUpdateWithoutMetaLeadsIndividuaisInput>, ClienteUncheckedUpdateWithoutMetaLeadsIndividuaisInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -23348,6 +25238,29 @@ export namespace Prisma {
     _sum?: NestedBigIntFilter<$PrismaModel>
     _min?: NestedBigIntFilter<$PrismaModel>
     _max?: NestedBigIntFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type AgregadoMidiaMensalCreateWithoutClienteInput = {
@@ -23750,6 +25663,58 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type MetaLeadIndividualCreateWithoutClienteInput = {
+    id?: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaLeadIndividualUncheckedCreateWithoutClienteInput = {
+    id?: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaLeadIndividualCreateOrConnectWithoutClienteInput = {
+    where: MetaLeadIndividualWhereUniqueInput
+    create: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput>
+  }
+
+  export type MetaLeadIndividualCreateManyClienteInputEnvelope = {
+    data: MetaLeadIndividualCreateManyClienteInput | MetaLeadIndividualCreateManyClienteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PautaReuniaoCreateWithoutClienteInput = {
     id?: string
     semanaIso: number
@@ -24113,6 +26078,47 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"MetaAdsCriativo"> | Date | string
   }
 
+  export type MetaLeadIndividualUpsertWithWhereUniqueWithoutClienteInput = {
+    where: MetaLeadIndividualWhereUniqueInput
+    update: XOR<MetaLeadIndividualUpdateWithoutClienteInput, MetaLeadIndividualUncheckedUpdateWithoutClienteInput>
+    create: XOR<MetaLeadIndividualCreateWithoutClienteInput, MetaLeadIndividualUncheckedCreateWithoutClienteInput>
+  }
+
+  export type MetaLeadIndividualUpdateWithWhereUniqueWithoutClienteInput = {
+    where: MetaLeadIndividualWhereUniqueInput
+    data: XOR<MetaLeadIndividualUpdateWithoutClienteInput, MetaLeadIndividualUncheckedUpdateWithoutClienteInput>
+  }
+
+  export type MetaLeadIndividualUpdateManyWithWhereWithoutClienteInput = {
+    where: MetaLeadIndividualScalarWhereInput
+    data: XOR<MetaLeadIndividualUpdateManyMutationInput, MetaLeadIndividualUncheckedUpdateManyWithoutClienteInput>
+  }
+
+  export type MetaLeadIndividualScalarWhereInput = {
+    AND?: MetaLeadIndividualScalarWhereInput | MetaLeadIndividualScalarWhereInput[]
+    OR?: MetaLeadIndividualScalarWhereInput[]
+    NOT?: MetaLeadIndividualScalarWhereInput | MetaLeadIndividualScalarWhereInput[]
+    id?: StringFilter<"MetaLeadIndividual"> | string
+    clienteId?: StringFilter<"MetaLeadIndividual"> | string
+    contaId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    metaLeadId?: StringFilter<"MetaLeadIndividual"> | string
+    formId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
+    createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    updatedAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+  }
+
   export type PautaReuniaoUpsertWithWhereUniqueWithoutClienteInput = {
     where: PautaReuniaoWhereUniqueInput
     update: XOR<PautaReuniaoUpdateWithoutClienteInput, PautaReuniaoUncheckedUpdateWithoutClienteInput>
@@ -24163,6 +26169,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24185,6 +26192,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24445,6 +26453,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24467,6 +26476,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24553,6 +26563,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24575,6 +26586,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24646,6 +26658,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24668,6 +26681,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24729,6 +26743,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24751,6 +26766,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24789,6 +26805,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24811,6 +26828,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24833,6 +26851,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24855,6 +26874,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24893,6 +26913,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -24915,6 +26936,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -24937,6 +26959,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -24959,6 +26982,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -24997,6 +27021,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25019,6 +27044,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25042,6 +27068,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
   }
 
   export type ClienteUncheckedCreateWithoutPautasReuniaoInput = {
@@ -25064,6 +27091,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
   }
 
   export type ClienteCreateOrConnectWithoutPautasReuniaoInput = {
@@ -25102,6 +27130,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
   }
 
   export type ClienteUncheckedUpdateWithoutPautasReuniaoInput = {
@@ -25124,6 +27153,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
   }
 
   export type ClienteCreateWithoutGoogleAdsCriativosInput = {
@@ -25145,6 +27175,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25167,6 +27198,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25238,6 +27270,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25260,6 +27293,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25321,6 +27355,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25343,6 +27378,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25414,6 +27450,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25436,6 +27473,7 @@ export namespace Prisma {
     fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25497,6 +27535,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25519,6 +27558,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25590,6 +27630,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25612,6 +27653,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
   }
 
@@ -25673,6 +27715,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
     metas?: MetaCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
   }
 
@@ -25695,6 +27738,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
     metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
     metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedCreateNestedManyWithoutClienteInput
     pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
   }
 
@@ -25733,6 +27777,7 @@ export namespace Prisma {
     googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
     metas?: MetaUpdateManyWithoutClienteNestedInput
     metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUpdateManyWithoutClienteNestedInput
     pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
   }
 
@@ -25751,6 +27796,115 @@ export namespace Prisma {
     agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
     contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
     fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
+    googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
+    metaLeadsIndividuais?: MetaLeadIndividualUncheckedUpdateManyWithoutClienteNestedInput
+    pautasReuniao?: PautaReuniaoUncheckedUpdateManyWithoutClienteNestedInput
+  }
+
+  export type ClienteCreateWithoutMetaLeadsIndividuaisInput = {
+    id?: string
+    nome: string
+    slug: string
+    logoUrl?: string | null
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    segmento?: string | null
+    orcamentoMidiaGoogleMensal?: Decimal | DecimalJsLike | number | string | null
+    orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
+    agregadosMensal?: AgregadoMidiaMensalCreateNestedManyWithoutClienteInput
+    agregadosSemanal?: AgregadoMidiaSemanalCreateNestedManyWithoutClienteInput
+    contas?: ContaCreateNestedManyWithoutClienteInput
+    fatosAnalyticsDiario?: FatoAnalyticsDiarioCreateNestedManyWithoutClienteInput
+    fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioCreateNestedManyWithoutClienteInput
+    googleAdsCriativos?: GoogleAdsCriativoCreateNestedManyWithoutClienteInput
+    metas?: MetaCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoCreateNestedManyWithoutClienteInput
+    pautasReuniao?: PautaReuniaoCreateNestedManyWithoutClienteInput
+  }
+
+  export type ClienteUncheckedCreateWithoutMetaLeadsIndividuaisInput = {
+    id?: string
+    nome: string
+    slug: string
+    logoUrl?: string | null
+    ativo?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    segmento?: string | null
+    orcamentoMidiaGoogleMensal?: Decimal | DecimalJsLike | number | string | null
+    orcamentoMidiaMetaMensal?: Decimal | DecimalJsLike | number | string | null
+    agregadosMensal?: AgregadoMidiaMensalUncheckedCreateNestedManyWithoutClienteInput
+    agregadosSemanal?: AgregadoMidiaSemanalUncheckedCreateNestedManyWithoutClienteInput
+    contas?: ContaUncheckedCreateNestedManyWithoutClienteInput
+    fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedCreateNestedManyWithoutClienteInput
+    fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedCreateNestedManyWithoutClienteInput
+    fatosMidia?: FatoMidiaDiarioUncheckedCreateNestedManyWithoutClienteInput
+    googleAdsCriativos?: GoogleAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    metas?: MetaUncheckedCreateNestedManyWithoutClienteInput
+    metaAdsCriativos?: MetaAdsCriativoUncheckedCreateNestedManyWithoutClienteInput
+    pautasReuniao?: PautaReuniaoUncheckedCreateNestedManyWithoutClienteInput
+  }
+
+  export type ClienteCreateOrConnectWithoutMetaLeadsIndividuaisInput = {
+    where: ClienteWhereUniqueInput
+    create: XOR<ClienteCreateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedCreateWithoutMetaLeadsIndividuaisInput>
+  }
+
+  export type ClienteUpsertWithoutMetaLeadsIndividuaisInput = {
+    update: XOR<ClienteUpdateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedUpdateWithoutMetaLeadsIndividuaisInput>
+    create: XOR<ClienteCreateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedCreateWithoutMetaLeadsIndividuaisInput>
+    where?: ClienteWhereInput
+  }
+
+  export type ClienteUpdateToOneWithWhereWithoutMetaLeadsIndividuaisInput = {
+    where?: ClienteWhereInput
+    data: XOR<ClienteUpdateWithoutMetaLeadsIndividuaisInput, ClienteUncheckedUpdateWithoutMetaLeadsIndividuaisInput>
+  }
+
+  export type ClienteUpdateWithoutMetaLeadsIndividuaisInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    segmento?: NullableStringFieldUpdateOperationsInput | string | null
+    orcamentoMidiaGoogleMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    agregadosMensal?: AgregadoMidiaMensalUpdateManyWithoutClienteNestedInput
+    agregadosSemanal?: AgregadoMidiaSemanalUpdateManyWithoutClienteNestedInput
+    contas?: ContaUpdateManyWithoutClienteNestedInput
+    fatosAnalyticsDiario?: FatoAnalyticsDiarioUpdateManyWithoutClienteNestedInput
+    fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUpdateManyWithoutClienteNestedInput
+    fatosMidia?: FatoMidiaDiarioUpdateManyWithoutClienteNestedInput
+    googleAdsCriativos?: GoogleAdsCriativoUpdateManyWithoutClienteNestedInput
+    metas?: MetaUpdateManyWithoutClienteNestedInput
+    metaAdsCriativos?: MetaAdsCriativoUpdateManyWithoutClienteNestedInput
+    pautasReuniao?: PautaReuniaoUpdateManyWithoutClienteNestedInput
+  }
+
+  export type ClienteUncheckedUpdateWithoutMetaLeadsIndividuaisInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    segmento?: NullableStringFieldUpdateOperationsInput | string | null
+    orcamentoMidiaGoogleMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    orcamentoMidiaMetaMensal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    agregadosMensal?: AgregadoMidiaMensalUncheckedUpdateManyWithoutClienteNestedInput
+    agregadosSemanal?: AgregadoMidiaSemanalUncheckedUpdateManyWithoutClienteNestedInput
+    contas?: ContaUncheckedUpdateManyWithoutClienteNestedInput
+    fatosAnalyticsDiario?: FatoAnalyticsDiarioUncheckedUpdateManyWithoutClienteNestedInput
+    fatosAnalyticsPorCanal?: FatoAnalyticsPorCanalUncheckedUpdateManyWithoutClienteNestedInput
     fatosMidia?: FatoMidiaDiarioUncheckedUpdateManyWithoutClienteNestedInput
     googleAdsCriativos?: GoogleAdsCriativoUncheckedUpdateManyWithoutClienteNestedInput
     metas?: MetaUncheckedUpdateManyWithoutClienteNestedInput
@@ -25905,6 +28059,27 @@ export namespace Prisma {
     clicks?: number
     ctr?: Decimal | DecimalJsLike | number | string | null
     cpc?: Decimal | DecimalJsLike | number | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MetaLeadIndividualCreateManyClienteInput = {
+    id?: string
+    contaId?: string | null
+    metaLeadId: string
+    formId?: string | null
+    formName?: string | null
+    campaignId?: string | null
+    campaignName?: string | null
+    createdTime: Date | string
+    nomeEmpresa?: string | null
+    telefone?: string | null
+    estado?: string | null
+    tipoEmpresa?: string | null
+    faixaFaturamento?: string | null
+    emailLead?: string | null
+    statusCrm?: string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -26377,6 +28552,69 @@ export namespace Prisma {
     clicks?: IntFieldUpdateOperationsInput | number
     ctr?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     cpc?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaLeadIndividualUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaLeadIndividualUncheckedUpdateWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MetaLeadIndividualUncheckedUpdateManyWithoutClienteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contaId?: NullableStringFieldUpdateOperationsInput | string | null
+    metaLeadId?: StringFieldUpdateOperationsInput | string
+    formId?: NullableStringFieldUpdateOperationsInput | string | null
+    formName?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignId?: NullableStringFieldUpdateOperationsInput | string | null
+    campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    telefone?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
+    faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
+    emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
+    rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

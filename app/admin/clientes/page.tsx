@@ -101,6 +101,21 @@ async function syncCliente(clienteId: string) {
   return data;
 }
 
+async function syncLeadsCliente(clienteId: string, token?: string) {
+  const res = await fetch("/api/admin/sync-leads", {
+    method: "POST",
+    headers: { ...getHeaders(token), "Content-Type": "application/json" },
+    body: JSON.stringify({ clienteId }),
+  });
+  const data = await res.json().catch(() => ({})) as { ok: boolean; error?: string; results?: Array<{ clienteId: string; leadsCreated: number; leadsFailed: number; formsProcessed: number; error?: string }> };
+  if (res.status === 401) throw new Error("Unauthorized");
+  if (!res.ok) {
+    const errMsg = data.results?.[0]?.error ?? data.error ?? res.statusText;
+    throw new Error(errMsg);
+  }
+  return data;
+}
+
 async function syncAll(token?: string) {
   const res = await fetch("/api/admin/sync-all", {
     method: "POST",
@@ -563,6 +578,20 @@ export default function AdminClientesPage() {
     },
   });
 
+  const syncLeadsMutation = useMutation({
+    mutationFn: (clienteId: string) => syncLeadsCliente(clienteId, adminToken || undefined),
+    onSuccess: (data) => {
+      const r = data.results?.[0];
+      const failMsg = r?.leadsFailed ? ` (${r.leadsFailed} falhas)` : "";
+      setFormSuccess(`Leads sincronizados: ${r?.leadsCreated ?? 0} novos de ${r?.formsProcessed ?? 0} formulário(s).${failMsg}`);
+      setFormError("");
+    },
+    onError: (e: Error) => {
+      setFormError(e.message);
+      setFormSuccess("");
+    },
+  });
+
   const syncAllMutation = useMutation({
     mutationFn: () => syncAll(adminToken || undefined),
     onSuccess: (data) => {
@@ -863,6 +892,17 @@ export default function AdminClientesPage() {
                       <RefreshCw className={`h-3.5 w-3.5 ${syncMutation.isPending && syncMutation.variables === cliente.id ? "animate-spin" : ""}`} />
                       Sync
                     </button>
+                    {metaConta && (
+                      <button
+                        onClick={() => syncLeadsMutation.mutate(cliente.id)}
+                        disabled={!cliente.ativo || (syncLeadsMutation.isPending && syncLeadsMutation.variables === cliente.id)}
+                        title="Sincronizar leads individuais do Meta Lead Gen"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition-all hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5 hover:text-[var(--primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${syncLeadsMutation.isPending && syncLeadsMutation.variables === cliente.id ? "animate-spin" : ""}`} />
+                        Leads
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setEditing(cliente);

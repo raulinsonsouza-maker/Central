@@ -1,0 +1,134 @@
+import { fetchLeadGenForms, fetchLeadsFromForm } from "@/lib/meta/metaClient";
+import { prisma } from "@/lib/db";
+import { getIntegrationsConfig } from "@/lib/config/integrations";
+import { dddToEstado } from "@/lib/utils/dddToEstado";
+
+function getFieldValue(
+  fieldData: Array<{ name: string; values: string[] }>,
+  ...names: string[]
+): string | null {
+  for (const name of names) {
+    const field = fieldData.find((f) =>
+      f.name.toLowerCase().includes(name.toLowerCase())
+    );
+    if (field?.values?.[0]) return field.values[0];
+  }
+  return null;
+}
+
+export interface MetaLeadsSyncResult {
+  leadsProcessed: number;
+  leadsCreated: number;
+  leadsFailed: number;
+  formsProcessed: number;
+  error?: string;
+}
+
+export async function syncMetaLeadsCliente(
+  clienteId: string,
+  options?: { dateFrom?: string }
+): Promise<MetaLeadsSyncResult> {
+  const config = await getIntegrationsConfig();
+  const token = config.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
+
+  if (!token) {
+    return { leadsProcessed: 0, leadsCreated: 0, formsProcessed: 0, error: "META_ACCESS_TOKEN não configurado" };
+  }
+
+  const conta = await prisma.conta.findFirst({
+    where: { clienteId, plataforma: "META" },
+  });
+
+  if (!conta?.accountIdPlataforma) {
+    return { leadsProcessed: 0, leadsCreated: 0, formsProcessed: 0, error: "Cliente sem conta Meta configurada" };
+  }
+
+  const accountId = conta.accountIdPlataforma;
+  const contaId = conta.id;
+
+  try {
+    const allForms = await fetchLeadGenForms(accountId, token);
+    const forms = allForms.filter((f) => !f.status || f.status.toUpperCase() === "ACTIVE");
+
+    let leadsProcessed = 0;
+    let leadsCreated = 0;
+    let leadsFailed = 0;
+
+    for (const form of forms) {
+      const leads = await fetchLeadsFromForm(form.id, token, {
+        dateFrom: options?.dateFrom,
+      });
+
+      for (const lead of leads) {
+        leadsProcessed++;
+        const fd = lead.field_data ?? [];
+
+        const nomeEmpresa = getFieldValue(fd, "empresa", "company", "nome_empresa", "razao_social", "nome");
+        const telefone = getFieldValue(fd, "phone", "telefone", "celular", "whatsapp");
+        const emailLead = getFieldValue(fd, "email");
+        const tipoEmpresa = getFieldValue(fd, "tipo_empresa", "tipo", "segmento", "ramo");
+        const faixaFaturamento = getFieldValue(fd, "faturamento", "receita", "faixa", "faturamento_anual", "faturamento_mensal");
+        const statusCrm = getFieldValue(fd, "status_crm", "status", "crm_status", "etapa", "fase", "pipeline");
+
+        const estado = dddToEstado(telefone);
+
+        const createdTime = new Date(lead.created_time);
+
+        try {
+          const existing = await prisma.metaLeadIndividual.findUnique({
+            where: { clienteId_metaLeadId: { clienteId, metaLeadId: lead.id } },
+            select: { id: true },
+          });
+          const isNew = !existing;
+          await prisma.metaLeadIndividual.upsert({
+            where: {
+              clienteId_metaLeadId: {
+                clienteId,
+                metaLeadId: lead.id,
+              },
+            },
+            create: {
+              clienteId,
+              contaId,
+              metaLeadId: lead.id,
+              formId: form.id,
+              formName: form.name,
+              campaignId: lead.campaign_id ?? null,
+              campaignName: lead.campaign_name ?? null,
+              createdTime,
+              nomeEmpresa,
+              telefone,
+              estado,
+              tipoEmpresa,
+              faixaFaturamento,
+              emailLead,
+              statusCrm,
+              rawFieldData: fd as object,
+            },
+            update: {
+              campaignId: lead.campaign_id ?? null,
+              campaignName: lead.campaign_name ?? null,
+              nomeEmpresa,
+              telefone,
+              estado,
+              tipoEmpresa,
+              faixaFaturamento,
+              emailLead,
+              ...(statusCrm !== null ? { statusCrm } : {}),
+              rawFieldData: fd as object,
+            },
+          });
+          if (isNew) leadsCreated++;
+        } catch (e) {
+          leadsFailed++;
+          console.error(`[metaLeadsSync] Failed to upsert lead ${lead.id} for client ${clienteId}:`, e instanceof Error ? e.message : e);
+        }
+      }
+    }
+
+    return { leadsProcessed, leadsCreated, leadsFailed, formsProcessed: forms.length };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return { leadsProcessed: 0, leadsCreated: 0, leadsFailed: 0, formsProcessed: 0, error: message };
+  }
+}

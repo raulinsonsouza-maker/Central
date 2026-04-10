@@ -1,6 +1,108 @@
 const GRAPH_BASE = "https://graph.facebook.com/v19.0";
 const GRAPH_PREVIEW_BASE = "https://graph.facebook.com/v25.0";
 
+export interface MetaLeadGenForm {
+  id: string;
+  name: string;
+  status?: string;
+  leads_count?: number;
+  created_time?: string;
+}
+
+export interface MetaLeadGenFormsResponse {
+  data: MetaLeadGenForm[];
+  paging?: { cursors?: { before: string; after: string }; next?: string };
+  error?: { message: string; type: string; code: number };
+}
+
+export interface MetaLeadFieldData {
+  name: string;
+  values: string[];
+}
+
+export interface MetaLeadEntry {
+  id: string;
+  created_time: string;
+  field_data: MetaLeadFieldData[];
+  ad_id?: string;
+  ad_name?: string;
+  campaign_id?: string;
+  campaign_name?: string;
+  form_id?: string;
+}
+
+export interface MetaLeadsResponse {
+  data: MetaLeadEntry[];
+  paging?: { cursors?: { before: string; after: string }; next?: string };
+  error?: { message: string; type: string; code: number };
+}
+
+/**
+ * Fetch all lead gen forms for an ad account.
+ * @see https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieval/
+ */
+export async function fetchLeadGenForms(
+  accountId: string,
+  token: string
+): Promise<MetaLeadGenForm[]> {
+  const actId = ensureActPrefix(accountId);
+  const all: MetaLeadGenForm[] = [];
+  let url: string | null =
+    `${GRAPH_BASE}/${actId}/leadgen_forms?access_token=${encodeURIComponent(token)}&fields=id,name,status,leads_count,created_time&limit=100`;
+
+  while (url) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaLeadGenFormsResponse;
+    if (!res.ok || data.error) {
+      const msg = data?.error?.message ?? `Meta API error: ${res.status}`;
+      throw new Error(msg);
+    }
+    if (data.data?.length) all.push(...data.data);
+    url = data.paging?.next ?? null;
+  }
+
+  return all;
+}
+
+/**
+ * Fetch individual lead entries from a lead gen form.
+ * Supports paging and optional date filtering.
+ */
+export async function fetchLeadsFromForm(
+  formId: string,
+  token: string,
+  options?: { dateFrom?: string; dateTo?: string; maxLeads?: number }
+): Promise<MetaLeadEntry[]> {
+  const maxLeads = options?.maxLeads ?? 10000;
+  const fields = "id,created_time,field_data,ad_id,ad_name,campaign_id,campaign_name,form_id";
+  const params = new URLSearchParams({
+    access_token: token,
+    fields,
+    limit: "100",
+  });
+  if (options?.dateFrom) {
+    const sinceTs = Math.floor(new Date(options.dateFrom + "T00:00:00Z").getTime() / 1000);
+    params.set("filtering", JSON.stringify([{ field: "time_created", operator: "GREATER_THAN", value: sinceTs }]));
+  }
+
+  const all: MetaLeadEntry[] = [];
+  let url: string | null = `${GRAPH_BASE}/${formId}/leads?${params.toString()}`;
+
+  while (url && all.length < maxLeads) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaLeadsResponse;
+    if (!res.ok || data.error) {
+      const msg = data?.error?.message ?? `Meta API error: ${res.status}`;
+      if (msg.includes("does not exist") || msg.includes("permission")) break;
+      throw new Error(msg);
+    }
+    if (data.data?.length) all.push(...data.data);
+    url = data.paging?.next ?? null;
+  }
+
+  return all;
+}
+
 /** Ad formats supported by Meta preview API */
 export type MetaAdPreviewFormat =
   | "DESKTOP_FEED_STANDARD"

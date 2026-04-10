@@ -1,0 +1,202 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+
+function parseDateOnly(value?: string | null): Date | null {
+  if (!value) return null;
+  const [y, m, d] = value.split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const date = new Date(y, m - 1, d);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatDateOnly(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function getMonthKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getWeekKey(date: Date): string {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, "0")}`;
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: clienteId } = await params;
+
+  const searchParams = request.nextUrl.searchParams;
+  const dataInicioParam = searchParams.get("dataInicio");
+  const dataFimParam = searchParams.get("dataFim");
+  const agrupamento = searchParams.get("agrupamento") ?? "mensal";
+  const tipoEmpresaFilter = searchParams.get("tipoEmpresa");
+  const estadoFilter = searchParams.get("estado");
+  const fallbackDays = Math.min(365, Math.max(1, parseInt(searchParams.get("periodo") ?? "90", 10) || 90));
+
+  const dataFim = parseDateOnly(dataFimParam) ?? new Date();
+  const dataInicio =
+    parseDateOnly(dataInicioParam) ??
+    new Date(dataFim.getFullYear(), dataFim.getMonth(), dataFim.getDate() - (fallbackDays - 1));
+
+  const dataInicioStr = formatDateOnly(dataInicio);
+  const dataFimStr = formatDateOnly(dataFim);
+
+  const whereBase = {
+    clienteId,
+    createdTime: {
+      gte: new Date(dataInicioStr + "T00:00:00Z"),
+      lte: new Date(dataFimStr + "T23:59:59Z"),
+    },
+  };
+
+  const whereFiltered = {
+    ...whereBase,
+    ...(tipoEmpresaFilter ? { tipoEmpresa: tipoEmpresaFilter } : {}),
+    ...(estadoFilter ? { estado: estadoFilter } : {}),
+  };
+
+  const LEADS_PAGE_LIMIT = 500;
+  const [allLeads, filteredLeads, totalFilteredCount] = await Promise.all([
+    prisma.metaLeadIndividual.findMany({
+      where: whereBase,
+      orderBy: { createdTime: "desc" },
+    }),
+    prisma.metaLeadIndividual.findMany({
+      where: whereFiltered,
+      orderBy: { createdTime: "desc" },
+      take: LEADS_PAGE_LIMIT,
+    }),
+    prisma.metaLeadIndividual.count({ where: whereFiltered }),
+  ]);
+
+  const totalLeads = allLeads.length;
+  const campanhasDistintas = new Set(allLeads.map((l) => l.campaignId).filter(Boolean)).size;
+  const statusCrmCount = allLeads.filter((l) => l.statusCrm).length;
+
+  const tiposCount: Record<string, number> = {};
+  for (const lead of allLeads) {
+    const tipo = lead.tipoEmpresa ?? "Não informado";
+    tiposCount[tipo] = (tiposCount[tipo] ?? 0) + 1;
+  }
+
+  const estadosCount: Record<string, number> = {};
+  for (const lead of allLeads) {
+    const estado = lead.estado ?? "Outros";
+    estadosCount[estado] = (estadosCount[estado] ?? 0) + 1;
+  }
+
+  const faturamentoCount: Record<string, number> = {};
+  for (const lead of allLeads) {
+    const faixa = lead.faixaFaturamento ?? "Não informado";
+    faturamentoCount[faixa] = (faturamentoCount[faixa] ?? 0) + 1;
+  }
+
+  const periodoMap: Record<string, { total: number; tipos: Record<string, number> }> = {};
+  for (const lead of allLeads) {
+    const key = agrupamento === "semanal"
+      ? getWeekKey(new Date(lead.createdTime))
+      : getMonthKey(new Date(lead.createdTime));
+    if (!periodoMap[key]) periodoMap[key] = { total: 0, tipos: {} };
+    periodoMap[key].total++;
+    const tipo = lead.tipoEmpresa ?? "Não informado";
+    periodoMap[key].tipos[tipo] = (periodoMap[key].tipos[tipo] ?? 0) + 1;
+  }
+
+  const periodoSeries = Object.entries(periodoMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([periodo, data]) => ({ periodo, ...data }));
+
+  const fatosMidia = await prisma.fatoMidiaDiario.findMany({
+    where: {
+      clienteId,
+      data: {
+        gte: new Date(dataInicioStr),
+        lte: new Date(dataFimStr),
+      },
+      canal: "META",
+    },
+    select: {
+      data: true,
+      investimento: true,
+      leads: true,
+      cpl: true,
+    },
+  });
+
+  const totalInvestimento = fatosMidia.reduce((sum, f) => sum + Number(f.investimento), 0);
+  const cplMedio = totalLeads > 0 && totalInvestimento > 0 ? totalInvestimento / totalLeads : null;
+
+  const campanhasLeadsMap: Record<string, { campaignId: string; campaignName: string | null; leads: number }> = {};
+  for (const lead of allLeads) {
+    if (!lead.campaignId) continue;
+    if (!campanhasLeadsMap[lead.campaignId]) {
+      campanhasLeadsMap[lead.campaignId] = { campaignId: lead.campaignId, campaignName: lead.campaignName, leads: 0 };
+    }
+    campanhasLeadsMap[lead.campaignId].leads++;
+  }
+
+  const totalLeadsWithCampaign = allLeads.filter((l) => l.campaignId).length;
+
+  const campanhasRanking = Object.values(campanhasLeadsMap)
+    .map((c) => {
+      const participacao = totalLeads > 0 ? Math.round((c.leads / totalLeads) * 1000) / 10 : 0;
+      const investimentoAtribuidoEst =
+        totalLeadsWithCampaign > 0 && totalInvestimento > 0
+          ? Math.round(totalInvestimento * (c.leads / totalLeadsWithCampaign) * 100) / 100
+          : null;
+      return {
+        campaignId: c.campaignId,
+        campaignName: c.campaignName,
+        leads: c.leads,
+        participacao,
+        investimentoAtribuidoEst,
+      };
+    })
+    .sort((a, b) => b.leads - a.leads);
+
+  const leadsList = filteredLeads.map((l) => ({
+    id: l.id,
+    createdTime: l.createdTime.toISOString(),
+    nomeEmpresa: l.nomeEmpresa,
+    tipoEmpresa: l.tipoEmpresa,
+    faixaFaturamento: l.faixaFaturamento,
+    estado: l.estado,
+    campaignName: l.campaignName,
+    formName: l.formName,
+    statusCrm: l.statusCrm,
+  }));
+
+  return NextResponse.json({
+    dataInicio: dataInicioStr,
+    dataFim: dataFimStr,
+    kpis: {
+      totalLeads,
+      campanhasDistintas,
+      statusCrmCount,
+      totalInvestimento,
+      cplMedio,
+    },
+    periodoSeries,
+    tiposDistribuicao: Object.entries(tiposCount)
+      .map(([tipo, total]) => ({ tipo, total }))
+      .sort((a, b) => b.total - a.total),
+    estadosDistribuicao: Object.entries(estadosCount)
+      .map(([estado, total]) => ({ estado, total }))
+      .sort((a, b) => b.total - a.total),
+    faturamentoDistribuicao: Object.entries(faturamentoCount)
+      .map(([faixa, total]) => ({ faixa, total }))
+      .sort((a, b) => b.total - a.total),
+    campanhasRanking,
+    leads: leadsList,
+    leadsTruncated: totalFilteredCount > LEADS_PAGE_LIMIT,
+    totalFilteredCount,
+    agrupamento,
+  });
+}
