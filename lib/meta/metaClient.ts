@@ -39,6 +39,9 @@ export interface MetaLeadsResponse {
 
 /**
  * Fetch all lead gen forms for an ad account.
+ * First tries the direct /{act_id}/leadgen_forms endpoint.
+ * If the account doesn't have that field available (Meta permission error #100),
+ * falls back to discovering form IDs via the account's ads (leadgen_id in creatives).
  * @see https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieval/
  */
 export async function fetchLeadGenForms(
@@ -46,22 +49,85 @@ export async function fetchLeadGenForms(
   token: string
 ): Promise<MetaLeadGenForm[]> {
   const actId = ensureActPrefix(accountId);
-  const all: MetaLeadGenForm[] = [];
-  let url: string | null =
-    `${GRAPH_BASE}/${actId}/leadgen_forms?access_token=${encodeURIComponent(token)}&fields=id,name,status,leads_count,created_time&limit=100`;
 
-  while (url) {
-    const res = await fetch(url);
-    const data = (await res.json()) as MetaLeadGenFormsResponse;
-    if (!res.ok || data.error) {
-      const msg = data?.error?.message ?? `Meta API error: ${res.status}`;
-      throw new Error(msg);
+  // --- Primary approach: /{act_id}/leadgen_forms ---
+  const primaryUrl =
+    `${GRAPH_BASE}/${actId}/leadgen_forms?access_token=${encodeURIComponent(token)}&fields=id,name,status,leads_count,created_time&limit=100`;
+  const primaryRes = await fetch(primaryUrl);
+  const primaryData = (await primaryRes.json()) as MetaLeadGenFormsResponse;
+
+  // If the primary endpoint works, paginate through all forms.
+  if (primaryRes.ok && !primaryData.error) {
+    const all: MetaLeadGenForm[] = [];
+    if (primaryData.data?.length) all.push(...primaryData.data);
+    let next = primaryData.paging?.next ?? null;
+    while (next) {
+      const r = await fetch(next);
+      const d = (await r.json()) as MetaLeadGenFormsResponse;
+      if (!r.ok || d.error) break;
+      if (d.data?.length) all.push(...d.data);
+      next = d.paging?.next ?? null;
     }
-    if (data.data?.length) all.push(...data.data);
-    url = data.paging?.next ?? null;
+    return all;
   }
 
-  return all;
+  // --- Fallback: discover form IDs via ads' leadgen_id field ---
+  // This works even when the account-level leadgen_forms field is unavailable.
+  const errCode = primaryData?.error?.code;
+  const errMsg = primaryData?.error?.message ?? "";
+  const isPermissionError =
+    errCode === 100 ||
+    errMsg.includes("leadgen_forms") ||
+    errMsg.includes("nonexisting field") ||
+    errMsg.includes("permission");
+
+  if (!isPermissionError) {
+    // Some other error — surface it.
+    throw new Error(errMsg || `Meta API error: ${primaryRes.status}`);
+  }
+
+  // Step 1: collect unique form IDs from ads.
+  const formIds = new Set<string>();
+  const adsParams = new URLSearchParams({
+    access_token: token,
+    fields: "id,adcreatives{leadgen_id}",
+    effective_status: JSON.stringify(["ACTIVE", "PAUSED", "ARCHIVED", "DELETED"]),
+    limit: "500",
+  });
+  let adsUrl: string | null = `${GRAPH_BASE}/${actId}/ads?${adsParams.toString()}`;
+
+  while (adsUrl) {
+    const r = await fetch(adsUrl);
+    const d = (await r.json()) as {
+      data?: Array<{ id: string; adcreatives?: { data?: Array<{ leadgen_id?: string }> } }>;
+      paging?: { next?: string };
+      error?: { message: string; code: number };
+    };
+    if (!r.ok || d.error) break;
+    for (const ad of d.data ?? []) {
+      for (const creative of ad.adcreatives?.data ?? []) {
+        if (creative.leadgen_id) formIds.add(creative.leadgen_id);
+      }
+    }
+    adsUrl = d.paging?.next ?? null;
+  }
+
+  if (formIds.size === 0) return [];
+
+  // Step 2: fetch details for each unique form.
+  const forms: MetaLeadGenForm[] = [];
+  const tokenParam = `access_token=${encodeURIComponent(token)}`;
+  await Promise.all(
+    [...formIds].map(async (formId) => {
+      const r = await fetch(
+        `${GRAPH_BASE}/${formId}?${tokenParam}&fields=id,name,status,leads_count,created_time`
+      );
+      const d = (await r.json()) as MetaLeadGenForm & { error?: { message: string } };
+      if (!d.error && d.id) forms.push(d);
+    })
+  );
+
+  return forms;
 }
 
 /**
