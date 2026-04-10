@@ -38,29 +38,49 @@ export interface MetaLeadsResponse {
 }
 
 /**
+ * Paginate through all results of a /{page_id}/leadgen_forms endpoint.
+ */
+async function paginateLeadGenForms(firstUrl: string): Promise<MetaLeadGenForm[]> {
+  const all: MetaLeadGenForm[] = [];
+  let url: string | null = firstUrl;
+  while (url) {
+    const r = await fetch(url);
+    const d = (await r.json()) as MetaLeadGenFormsResponse;
+    if (!r.ok || d.error) break;
+    if (d.data?.length) all.push(...d.data);
+    url = d.paging?.next ?? null;
+  }
+  return all;
+}
+
+/**
  * Fetch all lead gen forms for an ad account.
- * First tries the direct /{act_id}/leadgen_forms endpoint.
- * If the account doesn't have that field available (Meta permission error #100),
- * falls back to discovering form IDs via the account's ads (leadgen_id in creatives).
- * @see https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieval/
+ *
+ * Strategy (three-tier):
+ * 1. Try the unofficial /{act_id}/leadgen_forms endpoint (works with some tokens).
+ * 2. If that fails, retrieve the Facebook Pages associated with the ad account via
+ *    /{act_id}/promote_pages and use the official /{page_id}/leadgen_forms endpoint
+ *    documented at https://developers.facebook.com/docs/marketing-api/guides/lead-ads/
+ * 3. Last resort: discover form IDs by scanning ads for their `leadgen_id` creative
+ *    field, then fetch each form individually.
  */
 export async function fetchLeadGenForms(
   accountId: string,
   token: string
 ): Promise<MetaLeadGenForm[]> {
   const actId = ensureActPrefix(accountId);
+  const tokenParam = `access_token=${encodeURIComponent(token)}`;
 
-  // --- Primary approach: /{act_id}/leadgen_forms ---
-  const primaryUrl =
-    `${GRAPH_BASE}/${actId}/leadgen_forms?access_token=${encodeURIComponent(token)}&fields=id,name,status,leads_count,created_time&limit=100`;
-  const primaryRes = await fetch(primaryUrl);
-  const primaryData = (await primaryRes.json()) as MetaLeadGenFormsResponse;
+  // ── Tier 1: /{act_id}/leadgen_forms ──────────────────────────────────────
+  const t1Res = await fetch(
+    `${GRAPH_BASE}/${actId}/leadgen_forms?${tokenParam}&fields=id,name,status,leads_count,created_time&limit=100`
+  );
+  const t1Data = (await t1Res.json()) as MetaLeadGenFormsResponse;
 
-  // If the primary endpoint works, paginate through all forms.
-  if (primaryRes.ok && !primaryData.error) {
+  if (t1Res.ok && !t1Data.error) {
     const all: MetaLeadGenForm[] = [];
-    if (primaryData.data?.length) all.push(...primaryData.data);
-    let next = primaryData.paging?.next ?? null;
+    if (t1Data.data?.length) all.push(...t1Data.data);
+    let next = t1Data.paging?.next ?? null;
     while (next) {
       const r = await fetch(next);
       const d = (await r.json()) as MetaLeadGenFormsResponse;
@@ -71,22 +91,52 @@ export async function fetchLeadGenForms(
     return all;
   }
 
-  // --- Fallback: discover form IDs via ads' leadgen_id field ---
-  // This works even when the account-level leadgen_forms field is unavailable.
-  const errCode = primaryData?.error?.code;
-  const errMsg = primaryData?.error?.message ?? "";
-  const isPermissionError =
-    errCode === 100 ||
-    errMsg.includes("leadgen_forms") ||
-    errMsg.includes("nonexisting field") ||
-    errMsg.includes("permission");
+  // Only proceed with fallbacks on known permission / field-not-found errors.
+  const t1ErrCode = t1Data?.error?.code;
+  const t1ErrMsg = t1Data?.error?.message ?? "";
+  const isKnownError =
+    t1ErrCode === 100 ||
+    t1ErrMsg.includes("leadgen_forms") ||
+    t1ErrMsg.includes("nonexisting field") ||
+    t1ErrMsg.includes("permission") ||
+    t1ErrMsg.includes("OAuthException");
 
-  if (!isPermissionError) {
-    // Some other error — surface it.
-    throw new Error(errMsg || `Meta API error: ${primaryRes.status}`);
+  if (!isKnownError) {
+    throw new Error(t1ErrMsg || `Meta API error: ${t1Res.status}`);
   }
 
-  // Step 1: collect unique form IDs from ads.
+  // ── Tier 2: /{page_id}/leadgen_forms  (official per Meta docs) ───────────
+  // Retrieve the Pages linked to this ad account via promote_pages.
+  type PageItem = { id: string; name?: string };
+  const pagesRes = await fetch(
+    `${GRAPH_BASE}/${actId}/promote_pages?${tokenParam}&fields=id,name&limit=25`
+  );
+  const pagesData = (await pagesRes.json()) as {
+    data?: PageItem[];
+    error?: { message: string; code: number };
+  };
+
+  const pageIds: string[] = (pagesData.data ?? []).map((p) => p.id);
+
+  if (pageIds.length > 0) {
+    const formSets = await Promise.all(
+      pageIds.map((pageId) =>
+        paginateLeadGenForms(
+          `${GRAPH_BASE}/${pageId}/leadgen_forms?${tokenParam}&fields=id,name,status,leads_count,created_time&limit=100`
+        )
+      )
+    );
+    const allForms = formSets.flat();
+    // Deduplicate by form id (a form can only belong to one page, but just in case).
+    const seen = new Set<string>();
+    return allForms.filter((f) => {
+      if (seen.has(f.id)) return false;
+      seen.add(f.id);
+      return true;
+    });
+  }
+
+  // ── Tier 3: discover form IDs via ads' leadgen_id creative field ──────────
   const formIds = new Set<string>();
   const adsParams = new URLSearchParams({
     access_token: token,
@@ -114,9 +164,8 @@ export async function fetchLeadGenForms(
 
   if (formIds.size === 0) return [];
 
-  // Step 2: fetch details for each unique form.
+  // Fetch details for each discovered form.
   const forms: MetaLeadGenForm[] = [];
-  const tokenParam = `access_token=${encodeURIComponent(token)}`;
   await Promise.all(
     [...formIds].map(async (formId) => {
       const r = await fetch(
