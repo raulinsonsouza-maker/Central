@@ -121,6 +121,7 @@ interface LeadScoringData {
     periodo: string;
     total: number;
     tipos: Record<string, number>;
+    cpl?: number | null;
   }>;
   tiposDistribuicao: Array<{ tipo: string; total: number }>;
   estadosDistribuicao: Array<{ estado: string; total: number }>;
@@ -315,11 +316,12 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   const chartData = React.useMemo(() => {
     if (!data) return [];
     return data.periodoSeries.map((s) => {
-      const entry: Record<string, string | number> = { periodo: s.periodo };
+      const entry: Record<string, string | number | null> = { periodo: s.periodo };
       for (const tipo of allTipos) {
         entry[tipo] = s.tipos[tipo] ?? 0;
       }
       entry["Total"] = s.total;
+      entry["CPL"] = s.cpl ?? null;
       return entry;
     });
   }, [data, allTipos]);
@@ -656,23 +658,67 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           ) : (
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} barCategoryGap="30%">
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
+                <ComposedChart data={chartData} barCategoryGap="30%">
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
                   <XAxis dataKey="periodo" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip {...tooltipStyle} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ paddingTop: 12, fontSize: 12 }} />
-                  {allTipos.map((tipo, i) => (
-                    <Bar
-                      key={tipo}
-                      dataKey={tipo}
-                      stackId="stack"
-                      fill={getColor(tipo, i)}
-                      radius={i === allTipos.length - 1 ? [4, 4, 0, 0] : undefined}
-                      opacity={tipoFilter === null || tipoFilter === tipo ? 1 : 0.25}
-                    />
-                  ))}
-                </BarChart>
+                  <YAxis yAxisId="leads" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="cpl" orientation="right" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} width={52} />
+                  <Tooltip
+                    {...tooltipStyle}
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload?.length) return null;
+                      const totalEntry = payload.find((p) => p.dataKey === "Total");
+                      const cplEntry = payload.find((p) => p.dataKey === "CPL");
+                      const tipos = allTipos.filter((t) => {
+                        const v = chartData.find((d) => d.periodo === label)?.[t];
+                        return typeof v === "number" && v > 0;
+                      });
+                      return (
+                        <div style={tooltipStyle.contentStyle} className="min-w-[160px] space-y-1.5">
+                          <p className="text-xs font-bold" style={tooltipStyle.labelStyle}>{label}</p>
+                          {totalEntry && (
+                            <p className="text-sm font-black" style={{ color: "var(--primary)" }}>
+                              {fmt(Number(totalEntry.value))} leads
+                            </p>
+                          )}
+                          {tipos.length > 0 && (
+                            <div className="space-y-0.5 border-t border-white/10 pt-1.5">
+                              {tipos.map((t, i) => {
+                                const v = chartData.find((d) => d.periodo === label)?.[t];
+                                return (
+                                  <div key={t} className="flex items-center justify-between gap-4">
+                                    <span className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+                                      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: getColor(t, i) }} />
+                                      {t}
+                                    </span>
+                                    <span className="text-[11px] font-semibold" style={{ color: "var(--foreground)" }}>{fmt(Number(v))}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {cplEntry?.value != null && (
+                            <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-1.5">
+                              <span className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>CPL</span>
+                              <span className="text-[11px] font-bold text-amber-400">{fmtCurrency(Number(cplEntry.value))}</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }}
+                  />
+                  <Bar yAxisId="leads" dataKey="Total" fill="var(--primary)" radius={[5, 5, 0, 0]} maxBarSize={56} opacity={0.85} />
+                  <Line
+                    yAxisId="cpl"
+                    type="monotone"
+                    dataKey="CPL"
+                    stroke="#fbbf24"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "#fbbf24", strokeWidth: 0 }}
+                    activeDot={{ r: 5 }}
+                    connectNulls
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           )}

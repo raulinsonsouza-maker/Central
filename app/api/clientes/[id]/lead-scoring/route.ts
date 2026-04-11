@@ -166,10 +166,6 @@ export async function GET(
     periodoMap[key].tipos[tipo] = (periodoMap[key].tipos[tipo] ?? 0) + 1;
   }
 
-  const periodoSeries = Object.entries(periodoMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([periodo, data]) => ({ periodo, ...data }));
-
   const fatosMidia = await prisma.fatoMidiaDiario.findMany({
     where: {
       clienteId,
@@ -184,6 +180,23 @@ export async function GET(
 
   const totalInvestimento = fatosMidia.reduce((sum, f) => sum + Number(f.investimento), 0);
   const cplMedio = totalLeads > 0 && totalInvestimento > 0 ? totalInvestimento / totalLeads : null;
+
+  // Build investimento-per-period map for CPL line
+  const investPorPeriodo: Record<string, number> = {};
+  for (const f of fatosMidia) {
+    const key = agrupamento === "semanal"
+      ? getWeekKey(new Date(f.data))
+      : getMonthKey(new Date(f.data));
+    investPorPeriodo[key] = (investPorPeriodo[key] ?? 0) + Number(f.investimento);
+  }
+
+  const periodoSeries = Object.entries(periodoMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([periodo, data]) => {
+      const invest = investPorPeriodo[periodo] ?? 0;
+      const cpl = invest > 0 && data.total > 0 ? Math.round((invest / data.total) * 100) / 100 : null;
+      return { periodo, ...data, cpl };
+    });
 
   const campanhasLeadsMap: Record<string, { campaignId: string; campaignName: string | null; leads: number }> = {};
   for (const lead of filteredLeads) {
