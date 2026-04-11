@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   BarChart,
@@ -299,13 +299,14 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   if (faixaFilter) params.set("faixaFaturamento", faixaFilter);
   if (gradeFilter) params.set("grade", gradeFilter);
 
-  const { data, isLoading, error, refetch } = useQuery<LeadScoringData>({
+  const { data, isLoading, isFetching, error, refetch } = useQuery<LeadScoringData>({
     queryKey: ["lead-scoring", clienteId, dateFilter.dataInicio, dateFilter.dataFim, agrupamento, tipoFilter, estadoFilter, platformFilter, faixaFilter, gradeFilter],
     queryFn: async () => {
       const res = await fetch(`/api/clientes/${clienteId}/lead-scoring?${params.toString()}`);
       if (!res.ok) throw new Error("Falha ao carregar dados de leads");
       return res.json();
     },
+    placeholderData: keepPreviousData,
   });
 
   const allTipos = React.useMemo(() => {
@@ -450,14 +451,21 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-8">
+      {/* ── Content wrapper — fades slightly while re-fetching, preserves old data ── */}
+      <div className={`transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-50 pointer-events-none select-none" : "opacity-100"}`}>
       {/* ── Header with sync button ── */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="mt-1 h-8 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]">Meta Lead Gen</p>
-            <h2 className="text-xl font-extrabold tracking-tight text-[var(--foreground)]">Lead Scoring</h2>
+            <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-[var(--foreground)]">
+              Lead Scoring
+              {isFetching && !isLoading && (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin text-[var(--primary)] opacity-70" />
+              )}
+            </h2>
             <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
               {data.dataInicio} → {data.dataFim} · {dateFilter.label}
             </p>
@@ -1442,6 +1450,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           </p>
         )}
       </section>
+      </div>{/* end content wrapper */}
     </div>
   );
 }
