@@ -461,21 +461,11 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {syncMsg && syncErrType !== "account_access" && (
-            <span className={`rounded-lg border px-3 py-1.5 text-xs ${syncErrType === "generic" || syncErrType === "permission" ? "border-amber-500/30 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400" : "border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]"}`}>
-              {syncMsg}
-            </span>
-          )}
-          <button
-            onClick={handleSync}
-            disabled={syncing}
-            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--foreground)] transition hover:bg-[var(--muted)] disabled:opacity-60"
-          >
-            <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Sincronizando…" : "Sincronizar"}
-          </button>
-        </div>
+        {syncMsg && syncErrType !== "account_access" && (
+          <span className={`rounded-lg border px-3 py-1.5 text-xs ${syncErrType === "generic" || syncErrType === "permission" ? "border-amber-500/30 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400" : "border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)]"}`}>
+            {syncMsg}
+          </span>
+        )}
       </div>
 
       {/* ── Account access error banner ── */}
@@ -569,9 +559,9 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           accent
         />
         <KpiCard
-          title="Status no CRM"
-          value={fmt(data.kpis.statusCrmCount)}
-          sub="Leads com status CRM registrado"
+          title="Investimento Total"
+          value={data.kpis.totalInvestimento > 0 ? fmtCurrency(data.kpis.totalInvestimento) : "—"}
+          sub="Gasto total no período (META)"
           icon={TrendingUp}
         />
       </section>
@@ -824,105 +814,183 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
       })()}
 
       {/* ── Seção Leads por Estado (com mapa Brasil) ── */}
-      {data.estadosDistribuicao.length > 0 && (
-        <section>
-          <div className="mb-4 flex items-start gap-3">
-            <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-            <div>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Leads por Estado</h3>
-              <p className="text-xs text-[var(--muted-foreground)]">Derivado do DDD do telefone informado no formulário · clique no estado para filtrar</p>
-            </div>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            {/* Mapa do Brasil + Ranking */}
-            <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
-              <CardContent className="p-4">
-                <BrazilMap
-                  estadosDistribuicao={data.estadosDistribuicao}
-                  estadoFilter={estadoFilter}
-                  onEstadoClick={(uf) => setEstadoFilter(estadoFilter === uf ? null : uf)}
-                />
-                <div className="mt-4 space-y-1.5">
-                  {data.estadosDistribuicao.slice(0, 10).map((e, i) => {
-                    const pct = totalEstados > 0 ? (e.total / totalEstados) * 100 : 0;
-                    const barWidth = maxEstadoCount > 0 ? (e.total / maxEstadoCount) * 100 : 0;
-                    const isActive = estadoFilter === e.estado;
-                    return (
-                      <button
-                        key={e.estado}
-                        onClick={() => setEstadoFilter(isActive ? null : e.estado)}
-                        className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
-                          isActive
-                            ? "bg-[var(--primary)]/10 border border-[var(--primary)]/30"
-                            : "hover:bg-white/[0.03]"
-                        }`}
-                      >
-                        <span className="w-4 shrink-0 text-center text-[10px] font-bold text-[var(--muted-foreground)]">
-                          {i + 1}
-                        </span>
-                        <span className="w-8 shrink-0 text-xs font-black text-[var(--foreground)]">{e.estado}</span>
-                        <div className="flex-1">
-                          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
-                            <div
-                              className="h-full rounded-full bg-[var(--primary)]"
-                              style={{ width: `${barWidth}%` }}
-                            />
-                          </div>
-                          <span className="mt-0.5 block text-[10px] text-[var(--muted-foreground)]">
-                            {ESTADO_LABELS[e.estado] ?? e.estado}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <span className="block text-sm font-bold text-[var(--foreground)]">{fmt(e.total)}</span>
-                          <span className="text-[10px] text-[var(--muted-foreground)]">{pct.toFixed(1)}%</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Monthly breakdown with avg line */}
-            <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
-              <CardHeader className="pb-1 pt-4">
-                <h4 className="text-sm font-bold text-[var(--foreground)]">
-                  Leads por {agrupamento === "mensal" ? "mês" : "semana"}
-                </h4>
-                {estadoFilter && (
-                  <p className="text-xs text-[var(--primary)]">Filtrado: {estadoFilter}</p>
-                )}
-              </CardHeader>
-              <CardContent>
-                {chartData.length === 0 ? (
-                  <div className="flex h-40 items-center justify-center text-xs text-[var(--muted-foreground)]">Sem dados</div>
-                ) : (
-                  <div className="h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={chartData.map((d) => ({ ...d, Média: Math.round(avgLeadsPorMes) }))}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
-                        <XAxis dataKey="periodo" stroke="var(--muted-foreground)" fontSize={9} tickLine={false} axisLine={false} />
-                        <YAxis stroke="var(--muted-foreground)" fontSize={9} tickLine={false} axisLine={false} />
-                        <Tooltip {...tooltipStyle} />
-                        <Bar dataKey="Total" fill="var(--primary)" radius={[4, 4, 0, 0]} opacity={0.7} />
-                        <Line
-                          type="monotone"
-                          dataKey="Média"
-                          stroke="#fbbf24"
-                          strokeWidth={2}
-                          dot={false}
-                          strokeDasharray="4 2"
-                        />
-                      </ComposedChart>
-                    </ResponsiveContainer>
+      {data.estadosDistribuicao.length > 0 && (() => {
+        const numUfs = data.estadosDistribuicao.length;
+        const avgPorUf = numUfs > 0 ? totalEstados / numUfs : 0;
+        const top1 = data.estadosDistribuicao[0];
+        const top1Pct = totalEstados > 0 ? (top1.total / totalEstados) * 100 : 0;
+        const top1Ratio = avgPorUf > 0 ? top1.total / avgPorUf : 0;
+        const top3Total = data.estadosDistribuicao.slice(0, 3).reduce((s, e) => s + e.total, 0);
+        const top3Pct = totalEstados > 0 ? (top3Total / totalEstados) * 100 : 0;
+        const picoPeriodo = chartData.reduce<{ periodo: string; total: number } | null>((best, d) => {
+          const t = (d["Total"] as number) ?? 0;
+          return best === null || t > best.total ? { periodo: d["periodo"] as string, total: t } : best;
+        }, null);
+        const isHighConc = top1Pct > 40;
+        const isPicoAcimaMed = picoPeriodo !== null && picoPeriodo.total > avgLeadsPorMes * 1.5;
+        return (
+          <section>
+            {/* Section title + badges */}
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base font-bold text-[var(--foreground)]">Leads por Estado</h3>
+                    {isHighConc && (
+                      <span className="rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--primary)]">
+                        Alta concentração na 1ª UF
+                      </span>
+                    )}
+                    {isPicoAcimaMed && (
+                      <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-400">
+                        Mês pico acima da média
+                      </span>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      )}
+                  <p className="text-xs text-[var(--muted-foreground)]">
+                    Derivado do DDD do telefone informado no formulário · clique no estado para filtrar
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* KPI header row */}
+            <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {/* Volume com UF */}
+              <div className="rounded-2xl border border-[var(--border)] bg-white/[0.02] px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Volume com UF</p>
+                <p className="mt-1 text-2xl font-black tabular-nums text-[var(--foreground)]">{fmt(totalEstados)}</p>
+                <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">{numUfs} UFs · média {Math.round(avgPorUf)} / UF</p>
+              </div>
+              {/* 1ª Colocada */}
+              <div className="rounded-2xl border border-[var(--border)] bg-white/[0.02] px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">1ª Colocada</p>
+                <p className="mt-1 text-2xl font-black tabular-nums text-[var(--primary)]">{top1?.estado ?? "—"}</p>
+                <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">
+                  {top1Pct.toFixed(1)}% do volume · {top1Ratio.toFixed(1)}× a méd/UF
+                </p>
+              </div>
+              {/* Top 3 UFs */}
+              <div className="rounded-2xl border border-[var(--border)] bg-white/[0.02] px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Top 3 UFs</p>
+                <p className="mt-1 text-2xl font-black tabular-nums text-[var(--foreground)]">{top3Pct.toFixed(1)}%</p>
+                <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">Participação cumulativa</p>
+              </div>
+              {/* Pico mensal */}
+              <div className="rounded-2xl border border-[var(--border)] bg-white/[0.02] px-4 py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Pico Mensal</p>
+                <p className="mt-1 text-2xl font-black tabular-nums text-[var(--foreground)]">{picoPeriodo?.periodo ?? "—"}</p>
+                <p className="mt-0.5 text-[11px] text-[var(--muted-foreground)]">
+                  {picoPeriodo ? `${fmt(picoPeriodo.total)} leads · média ${Math.round(avgLeadsPorMes)}` : "Sem dados"}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+              {/* Mapa do Brasil + Ranking */}
+              <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
+                <CardContent className="p-4">
+                  <BrazilMap
+                    estadosDistribuicao={data.estadosDistribuicao}
+                    estadoFilter={estadoFilter}
+                    onEstadoClick={(uf) => setEstadoFilter(estadoFilter === uf ? null : uf)}
+                  />
+                  <div className="mt-4">
+                    <p className="mb-2 text-[11px] font-semibold text-[var(--muted-foreground)]">
+                      Volume por estado · {numUfs} UFs com lead · {totalEstados} com UF · {fmt(data.kpis.totalLeads)} na base
+                    </p>
+                    <p className="mb-2 text-[10px] text-[var(--muted-foreground)]">Role a lista para ver todas as UFs</p>
+                    <div className="max-h-72 space-y-1 overflow-y-auto pr-1">
+                      {data.estadosDistribuicao.map((e, i) => {
+                        const pct = totalEstados > 0 ? (e.total / totalEstados) * 100 : 0;
+                        const barWidth = maxEstadoCount > 0 ? (e.total / maxEstadoCount) * 100 : 0;
+                        const isActive = estadoFilter === e.estado;
+                        return (
+                          <button
+                            key={e.estado}
+                            onClick={() => setEstadoFilter(isActive ? null : e.estado)}
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
+                              isActive
+                                ? "border border-[var(--primary)]/30 bg-[var(--primary)]/10"
+                                : "hover:bg-white/[0.04]"
+                            }`}
+                          >
+                            <span className="w-5 shrink-0 text-center text-[10px] font-bold text-[var(--muted-foreground)]">{i + 1}</span>
+                            <div className="w-[100px] shrink-0">
+                              <p className="text-xs font-black text-[var(--foreground)]">
+                                {e.estado} <span className="font-normal text-[var(--muted-foreground)]">· {ESTADO_LABELS[e.estado] ?? e.estado}</span>
+                              </p>
+                            </div>
+                            <div className="flex flex-1 items-center gap-2">
+                              <div className="flex-1 overflow-hidden rounded-full bg-[var(--border)]" style={{ height: 6 }}>
+                                <div className="h-full rounded-full bg-[var(--primary)] transition-all" style={{ width: `${barWidth}%` }} />
+                              </div>
+                              <span className="w-6 shrink-0 text-right text-sm font-bold tabular-nums text-[var(--foreground)]">{e.total}</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Monthly breakdown with avg line */}
+              <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
+                <CardHeader className="pb-1 pt-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="text-sm font-bold text-[var(--foreground)]">
+                        Leads gerados por {agrupamento === "mensal" ? "mês" : "semana"}
+                      </h4>
+                      <p className="text-[11px] text-[var(--muted-foreground)]">
+                        Clique na barra para filtrar o painel pelo {agrupamento === "mensal" ? "mês" : "semana"}. Linha tracejada = média no período.
+                      </p>
+                    </div>
+                    {estadoFilter && (
+                      <span className="shrink-0 rounded-lg border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2 py-1 text-[10px] font-bold text-[var(--primary)]">
+                        {estadoFilter}
+                      </span>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {chartData.length === 0 ? (
+                    <div className="flex h-40 items-center justify-center text-xs text-[var(--muted-foreground)]">Sem dados</div>
+                  ) : (
+                    <div className="h-56">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={chartData.map((d) => ({ ...d, Média: Math.round(avgLeadsPorMes) }))}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
+                          <XAxis dataKey="periodo" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} />
+                          <YAxis stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} width={28} />
+                          <Tooltip {...tooltipStyle} />
+                          <Bar dataKey="Total" fill="var(--primary)" radius={[5, 5, 0, 0]} maxBarSize={48} />
+                          <Line
+                            type="monotone"
+                            dataKey="Média"
+                            stroke="#fbbf24"
+                            strokeWidth={1.5}
+                            dot={false}
+                            strokeDasharray="5 3"
+                            label={{
+                              position: "right",
+                              fontSize: 9,
+                              fill: "#fbbf24",
+                              formatter: (v: number) => `Média ${Math.round(v)}`,
+                            }}
+                          />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* ── Campanhas Ranking ── */}
       {data.campanhasRanking && data.campanhasRanking.length > 0 && (
@@ -952,7 +1020,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                         <td className="rounded-l-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
                           <div className="flex items-center gap-2">
                             <Megaphone className="h-3.5 w-3.5 shrink-0 text-[var(--primary)]" />
-                            <span className="max-w-[240px] truncate text-xs font-medium text-[var(--foreground)]">
+                            <span className="line-clamp-2 max-w-[400px] break-words text-xs font-medium leading-snug text-[var(--foreground)]">
                               {c.campaignName ?? c.campaignId}
                             </span>
                           </div>
