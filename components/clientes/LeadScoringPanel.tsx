@@ -664,15 +664,25 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
               Nenhum dado de lead para o período selecionado
             </div>
           ) : (
-            <div className="h-72">
+            <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={chartData} barCategoryGap="30%">
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.4} vertical={false} />
+                <ComposedChart data={chartData}>
+                  <defs>
+                    <linearGradient id="barGradLeads" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--muted-foreground)" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="var(--muted)" stopOpacity={0.8} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
                   <XAxis dataKey="periodo" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis yAxisId="leads" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis yAxisId="cpl" orientation="right" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} width={52} />
+                  <YAxis yAxisId="left" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="right" orientation="right" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `R$${v}`} />
                   <Tooltip
                     {...tooltipStyle}
+                    formatter={(value: number, name: string) => {
+                      if (name === "CPL") return [fmtCurrency(Number(value)), name];
+                      return [fmt(Number(value)), name];
+                    }}
                     content={({ active, payload, label }) => {
                       if (!active || !payload?.length) return null;
                       const totalEntry = payload.find((p) => p.dataKey === "Total");
@@ -707,23 +717,28 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                           )}
                           {cplEntry?.value != null && (
                             <div className="flex items-center justify-between gap-4 border-t border-white/10 pt-1.5">
-                              <span className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>CPL</span>
-                              <span className="text-[11px] font-bold text-amber-400">{fmtCurrency(Number(cplEntry.value))}</span>
+                              <span className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+                                <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
+                                CPL
+                              </span>
+                              <span className="text-[11px] font-bold" style={{ color: "var(--primary)" }}>{fmtCurrency(Number(cplEntry.value))}</span>
                             </div>
                           )}
                         </div>
                       );
                     }}
                   />
-                  <Bar yAxisId="leads" dataKey="Total" fill="var(--primary)" radius={[5, 5, 0, 0]} maxBarSize={56} opacity={0.85} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ paddingTop: 12, fontSize: 12 }} />
+                  <Bar yAxisId="left" dataKey="Total" name="Leads" fill="url(#barGradLeads)" radius={[6, 6, 0, 0]} />
                   <Line
-                    yAxisId="cpl"
+                    yAxisId="right"
                     type="monotone"
                     dataKey="CPL"
-                    stroke="#fbbf24"
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: "#fbbf24", strokeWidth: 0 }}
-                    activeDot={{ r: 5 }}
+                    name="CPL"
+                    stroke="var(--primary)"
+                    strokeWidth={2.5}
+                    dot={{ fill: "var(--primary)", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0, fill: "var(--primary)" }}
                     connectNulls
                   />
                 </ComposedChart>
