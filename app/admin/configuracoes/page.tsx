@@ -60,6 +60,7 @@ type ImportResult = {
   updated: number;
   failed: number;
   errors?: string[];
+  colunasDetectadas?: string[];
 };
 
 export default function AdminIntegrationsConfigPage() {
@@ -446,6 +447,14 @@ export default function AdminIntegrationsConfigPage() {
                   </div>
                 ))}
               </div>
+              {importResult.failed > 0 && importResult.total > 0 && importResult.failed === importResult.total && importResult.colunasDetectadas && (
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
+                  <p className="text-xs font-semibold text-amber-400">Todos os leads falharam — verifique se as colunas do CSV estão corretas.</p>
+                  <p className="mt-1 text-[11px] text-[var(--muted-foreground)]">Colunas detectadas no arquivo:</p>
+                  <p className="mt-1 font-mono text-[10px] text-amber-300 break-all">{importResult.colunasDetectadas.join(", ")}</p>
+                  <p className="mt-2 text-[11px] text-[var(--muted-foreground)]">Colunas obrigatórias: <span className="font-mono text-amber-300">id, created_time</span></p>
+                </div>
+              )}
               {importResult.errors && importResult.errors.length > 0 && (
                 <details className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
                   <summary className="cursor-pointer text-xs font-semibold text-red-400">

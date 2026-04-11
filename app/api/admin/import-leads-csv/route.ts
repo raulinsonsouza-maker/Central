@@ -47,21 +47,25 @@ function normalizeSegmento(raw: string): string | null {
   return map[key] ?? raw;
 }
 
-function parseCSV(text: string): Record<string, string>[] {
-  const lines = text.split("\n").filter((l) => l.trim());
-  if (lines.length < 2) return [];
-  const headers = parseCSVLine(lines[0]);
+function parseCSV(text: string): { rows: Record<string, string>[]; headers: string[] } {
+  // Strip UTF-8 BOM if present
+  const clean = text.replace(/^\uFEFF/, "");
+  // Normalize Windows line endings
+  const normalized = clean.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const lines = normalized.split("\n").filter((l) => l.trim());
+  if (lines.length < 2) return { rows: [], headers: [] };
+  const headers = parseCSVLine(lines[0]).map((h) => h.trim().toLowerCase());
   const rows: Record<string, string>[] = [];
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
     if (values.length === 0) continue;
     const row: Record<string, string> = {};
     for (let j = 0; j < headers.length; j++) {
-      row[headers[j]] = values[j] ?? "";
+      row[headers[j]] = (values[j] ?? "").trim();
     }
     rows.push(row);
   }
-  return rows;
+  return { rows, headers };
 }
 
 function parseCSVLine(line: string): string[] {
@@ -185,12 +189,16 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
       }
       const csv = await file.text();
-      const rows = parseCSV(csv);
+      const { rows, headers } = parseCSV(csv);
+      console.log(`[import-leads-csv] upload: ${rows.length} linhas | colunas: ${headers.join(", ")}`);
       if (rows.length === 0) {
-        return NextResponse.json({ error: "Arquivo CSV vazio ou sem linhas válidas." }, { status: 400 });
+        return NextResponse.json({
+          error: "Arquivo CSV vazio ou sem linhas válidas.",
+          colunasDetectadas: headers,
+        }, { status: 400 });
       }
       const result = await processRows(rows);
-      return NextResponse.json({ ok: true, source: "upload", ...result });
+      return NextResponse.json({ ok: true, source: "upload", colunasDetectadas: headers, ...result });
     }
 
     // Fallback: fetch from Google Sheets URL
@@ -202,9 +210,10 @@ export async function POST(request: NextRequest) {
       );
     }
     const csv = await res.text();
-    const rows = parseCSV(csv);
+    const { rows, headers } = parseCSV(csv);
+    console.log(`[import-leads-csv] sheets: ${rows.length} linhas | colunas: ${headers.join(", ")}`);
     const result = await processRows(rows);
-    return NextResponse.json({ ok: true, source: "sheets", ...result });
+    return NextResponse.json({ ok: true, source: "sheets", colunasDetectadas: headers, ...result });
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : String(e) },
