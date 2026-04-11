@@ -35,7 +35,7 @@ const GRADE_FAIXAS: Record<string, string[]> = {
 
 const GRADE_E_FAIXAS = ["até_r$50.000/mês", "ainda_não_faturo_nada"];
 
-export function getFaixaGrade(faixa: string | null | undefined): "A" | "B" | "C" | "D" | "E" {
+function getFaixaGrade(faixa: string | null | undefined): "A" | "B" | "C" | "D" | "E" {
   if (!faixa) return "E";
   const key = faixa.toLowerCase().trim();
   if (GRADE_FAIXAS.A.includes(key)) return "A";
