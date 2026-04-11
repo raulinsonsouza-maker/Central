@@ -451,9 +451,9 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   }
 
   return (
-    <div className="relative space-y-8">
+    <div className="relative">
       {/* ── Content wrapper — fades slightly while re-fetching, preserves old data ── */}
-      <div className={`transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-50 pointer-events-none select-none" : "opacity-100"}`}>
+      <div className={`space-y-8 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-50 pointer-events-none select-none" : "opacity-100"}`}>
       {/* ── Header with sync button ── */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
