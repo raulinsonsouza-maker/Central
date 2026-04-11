@@ -34,7 +34,7 @@ export async function syncMetaLeadsCliente(
   const token = config.metaAccessToken ?? process.env.META_ACCESS_TOKEN;
 
   if (!token) {
-    return { leadsProcessed: 0, leadsCreated: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "META_ACCESS_TOKEN não configurado" };
+    return { leadsProcessed: 0, leadsCreated: 0, leadsFailed: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "META_ACCESS_TOKEN não configurado" };
   }
 
   const conta = await prisma.conta.findFirst({
@@ -42,7 +42,7 @@ export async function syncMetaLeadsCliente(
   });
 
   if (!conta?.accountIdPlataforma) {
-    return { leadsProcessed: 0, leadsCreated: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "Cliente sem conta Meta configurada" };
+    return { leadsProcessed: 0, leadsCreated: 0, leadsFailed: 0, formsFound: 0, formsProcessed: 0, formsSummary: [], error: "Cliente sem conta Meta configurada" };
   }
 
   const accountId = conta.accountIdPlataforma;
