@@ -274,13 +274,19 @@ model MetaLeadIndividual {
   formName         String?
   campaignId       String?
   campaignName     String?
+  adId             String?
+  adName           String?
+  adsetId          String?
+  adsetName        String?
   createdTime      DateTime
+  fullName         String?
   nomeEmpresa      String?
   telefone         String?
   estado           String?
   tipoEmpresa      String?
   faixaFaturamento String?
   emailLead        String?
+  platform         String?
   statusCrm        String?
   rawFieldData     Json?
   createdAt        DateTime @default(now())
@@ -291,4 +297,5 @@ model MetaLeadIndividual {
   @@index([clienteId, createdTime])
   @@index([clienteId, tipoEmpresa])
   @@index([clienteId, estado])
+  @@index([clienteId, platform])
 }

@@ -105,6 +105,7 @@ interface LeadScoringData {
   tiposDistribuicao: Array<{ tipo: string; total: number }>;
   estadosDistribuicao: Array<{ estado: string; total: number }>;
   faturamentoDistribuicao: Array<{ faixa: string; total: number }>;
+  platformDistribuicao?: Array<{ platform: string; total: number }>;
   campanhasRanking: Array<{
     campaignId: string;
     campaignName: string | null;
@@ -115,13 +116,19 @@ interface LeadScoringData {
   leads: Array<{
     id: string;
     createdTime: string;
+    fullName: string | null;
     nomeEmpresa: string | null;
     tipoEmpresa: string | null;
     faixaFaturamento: string | null;
     estado: string | null;
     campaignName: string | null;
+    adName: string | null;
+    adsetName: string | null;
     formName: string | null;
+    platform: string | null;
     statusCrm: string | null;
+    emailLead: string | null;
+    telefone: string | null;
   }>;
   leadsTruncated: boolean;
   totalFilteredCount: number;
@@ -809,9 +816,35 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
             <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
             <div>
               <h3 className="text-base font-bold text-[var(--foreground)]">Distribuição</h3>
-              <p className="text-xs text-[var(--muted-foreground)]">Por tipo de empresa e faixa de faturamento</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Por tipo de empresa, faixa de faturamento e plataforma</p>
             </div>
           </div>
+
+          {/* Platform breakdown pills — compact, top of distribution */}
+          {data.platformDistribuicao && data.platformDistribuicao.length > 0 && (() => {
+            const total = data.platformDistribuicao.reduce((s, p) => s + p.total, 0);
+            const PLAT_COLORS: Record<string, string> = {
+              "Instagram": "#e1306c",
+              "Facebook": "#1877f2",
+              "Não informado": "#6b7280",
+            };
+            return (
+              <div className="mb-6 flex flex-wrap items-center gap-3">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Plataforma</span>
+                {data.platformDistribuicao.map((p) => {
+                  const pct = total > 0 ? Math.round((p.total / total) * 100) : 0;
+                  const color = PLAT_COLORS[p.platform] ?? "#6b7280";
+                  return (
+                    <div key={p.platform} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-2">
+                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+                      <span className="text-xs font-semibold text-[var(--foreground)]">{p.platform}</span>
+                      <span className="text-xs text-[var(--muted-foreground)]">{p.total.toLocaleString("pt-BR")} leads · {pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Tipos */}
@@ -944,10 +977,10 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                   <thead>
                     <tr>
                       <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Data / Hora
+                        Data
                       </th>
                       <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Empresa
+                        Nome / Empresa
                       </th>
                       <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
                         Tipo
@@ -956,7 +989,10 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                         Faturamento
                       </th>
                       <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Estado
+                        Est.
+                      </th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
+                        Plat.
                       </th>
                       <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
                         Campanha
@@ -967,30 +1003,43 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                     {data.leads.map((lead) => {
                       const dt = new Date(lead.createdTime);
                       const dateStr = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
-                      const timeStr = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+                      const PLAT_DOT: Record<string, string> = { Instagram: "#e1306c", Facebook: "#1877f2" };
+                      const platColor = lead.platform ? (PLAT_DOT[lead.platform] ?? "#6b7280") : "#6b7280";
                       return (
                         <tr key={lead.id} className="group">
                           <td className="rounded-l-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <p className="text-xs font-semibold text-[var(--foreground)]">{dateStr}</p>
-                            <p className="text-[11px] text-[var(--muted-foreground)]">{timeStr}</p>
+                            <p className="whitespace-nowrap text-xs font-semibold text-[var(--foreground)]">{dateStr}</p>
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <p className="max-w-[180px] truncate text-xs text-[var(--foreground)]">
-                              {lead.nomeEmpresa ?? <span className="text-[var(--muted-foreground)]">—</span>}
+                            <p className="max-w-[160px] truncate text-xs font-semibold text-[var(--foreground)]">
+                              {lead.fullName ?? lead.nomeEmpresa ?? "—"}
                             </p>
+                            {lead.fullName && lead.nomeEmpresa && (
+                              <p className="max-w-[160px] truncate text-[11px] text-[var(--muted-foreground)]">{lead.nomeEmpresa}</p>
+                            )}
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
                             <span className="text-xs text-[var(--muted-foreground)]">{lead.tipoEmpresa ?? "—"}</span>
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <span className="max-w-[140px] truncate text-xs text-[var(--muted-foreground)]">
-                              {lead.faixaFaturamento ?? "—"}
+                            <span className="max-w-[130px] truncate text-xs text-[var(--muted-foreground)]">
+                              {lead.faixaFaturamento ? lead.faixaFaturamento.replace(/_/g, " ").replace("r$", "R$").replace("/mês", "/mês") : "—"}
                             </span>
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
                             <span className="text-xs font-semibold text-[var(--foreground)]">
                               {lead.estado ?? "—"}
                             </span>
+                          </td>
+                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                            {lead.platform ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: platColor }} />
+                                <span className="text-xs text-[var(--muted-foreground)]">{lead.platform}</span>
+                              </span>
+                            ) : (
+                              <span className="text-xs text-[var(--muted-foreground)]">—</span>
+                            )}
                           </td>
                           <td className="rounded-r-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
                             <p className="max-w-[160px] truncate text-xs text-[var(--muted-foreground)]">

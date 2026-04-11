@@ -266,29 +266,36 @@ model Segmento {
 }
 
 model MetaLeadIndividual {
-  id              String   @id @default(cuid())
-  clienteId       String
-  contaId         String?
-  metaLeadId      String
-  formId          String?
-  formName        String?
-  campaignId      String?
-  campaignName    String?
-  createdTime     DateTime
-  nomeEmpresa     String?
-  telefone        String?
-  estado          String?
-  tipoEmpresa     String?
+  id               String   @id @default(cuid())
+  clienteId        String
+  contaId          String?
+  metaLeadId       String
+  formId           String?
+  formName         String?
+  campaignId       String?
+  campaignName     String?
+  adId             String?
+  adName           String?
+  adsetId          String?
+  adsetName        String?
+  createdTime      DateTime
+  fullName         String?
+  nomeEmpresa      String?
+  telefone         String?
+  estado           String?
+  tipoEmpresa      String?
   faixaFaturamento String?
-  emailLead       String?
-  statusCrm       String?
-  rawFieldData    Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  cliente         Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  emailLead        String?
+  platform         String?
+  statusCrm        String?
+  rawFieldData     Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  cliente          Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
 
   @@unique([clienteId, metaLeadId])
   @@index([clienteId, createdTime])
   @@index([clienteId, tipoEmpresa])
   @@index([clienteId, estado])
+  @@index([clienteId, platform])
 }

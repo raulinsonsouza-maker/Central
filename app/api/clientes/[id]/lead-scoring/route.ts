@@ -98,6 +98,12 @@ export async function GET(
     faturamentoCount[faixa] = (faturamentoCount[faixa] ?? 0) + 1;
   }
 
+  const platformCount: Record<string, number> = {};
+  for (const lead of allLeads) {
+    const plat = lead.platform ?? "Não informado";
+    platformCount[plat] = (platformCount[plat] ?? 0) + 1;
+  }
+
   const periodoMap: Record<string, { total: number; tipos: Record<string, number> }> = {};
   for (const lead of allLeads) {
     const key = agrupamento === "semanal"
@@ -164,13 +170,19 @@ export async function GET(
   const leadsList = filteredLeads.map((l) => ({
     id: l.id,
     createdTime: l.createdTime.toISOString(),
+    fullName: l.fullName,
     nomeEmpresa: l.nomeEmpresa,
     tipoEmpresa: l.tipoEmpresa,
     faixaFaturamento: l.faixaFaturamento,
     estado: l.estado,
     campaignName: l.campaignName,
+    adName: l.adName,
+    adsetName: l.adsetName,
     formName: l.formName,
+    platform: l.platform,
     statusCrm: l.statusCrm,
+    emailLead: l.emailLead,
+    telefone: l.telefone,
   }));
 
   return NextResponse.json({
@@ -192,6 +204,9 @@ export async function GET(
       .sort((a, b) => b.total - a.total),
     faturamentoDistribuicao: Object.entries(faturamentoCount)
       .map(([faixa, total]) => ({ faixa, total }))
+      .sort((a, b) => b.total - a.total),
+    platformDistribuicao: Object.entries(platformCount)
+      .map(([platform, total]) => ({ platform, total }))
       .sort((a, b) => b.total - a.total),
     campanhasRanking,
     leads: leadsList,

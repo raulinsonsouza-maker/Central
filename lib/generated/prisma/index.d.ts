@@ -18146,13 +18146,19 @@ export namespace Prisma {
     formName: string | null
     campaignId: string | null
     campaignName: string | null
+    adId: string | null
+    adName: string | null
+    adsetId: string | null
+    adsetName: string | null
     createdTime: Date | null
+    fullName: string | null
     nomeEmpresa: string | null
     telefone: string | null
     estado: string | null
     tipoEmpresa: string | null
     faixaFaturamento: string | null
     emailLead: string | null
+    platform: string | null
     statusCrm: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -18167,13 +18173,19 @@ export namespace Prisma {
     formName: string | null
     campaignId: string | null
     campaignName: string | null
+    adId: string | null
+    adName: string | null
+    adsetId: string | null
+    adsetName: string | null
     createdTime: Date | null
+    fullName: string | null
     nomeEmpresa: string | null
     telefone: string | null
     estado: string | null
     tipoEmpresa: string | null
     faixaFaturamento: string | null
     emailLead: string | null
+    platform: string | null
     statusCrm: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -18188,13 +18200,19 @@ export namespace Prisma {
     formName: number
     campaignId: number
     campaignName: number
+    adId: number
+    adName: number
+    adsetId: number
+    adsetName: number
     createdTime: number
+    fullName: number
     nomeEmpresa: number
     telefone: number
     estado: number
     tipoEmpresa: number
     faixaFaturamento: number
     emailLead: number
+    platform: number
     statusCrm: number
     rawFieldData: number
     createdAt: number
@@ -18212,13 +18230,19 @@ export namespace Prisma {
     formName?: true
     campaignId?: true
     campaignName?: true
+    adId?: true
+    adName?: true
+    adsetId?: true
+    adsetName?: true
     createdTime?: true
+    fullName?: true
     nomeEmpresa?: true
     telefone?: true
     estado?: true
     tipoEmpresa?: true
     faixaFaturamento?: true
     emailLead?: true
+    platform?: true
     statusCrm?: true
     createdAt?: true
     updatedAt?: true
@@ -18233,13 +18257,19 @@ export namespace Prisma {
     formName?: true
     campaignId?: true
     campaignName?: true
+    adId?: true
+    adName?: true
+    adsetId?: true
+    adsetName?: true
     createdTime?: true
+    fullName?: true
     nomeEmpresa?: true
     telefone?: true
     estado?: true
     tipoEmpresa?: true
     faixaFaturamento?: true
     emailLead?: true
+    platform?: true
     statusCrm?: true
     createdAt?: true
     updatedAt?: true
@@ -18254,13 +18284,19 @@ export namespace Prisma {
     formName?: true
     campaignId?: true
     campaignName?: true
+    adId?: true
+    adName?: true
+    adsetId?: true
+    adsetName?: true
     createdTime?: true
+    fullName?: true
     nomeEmpresa?: true
     telefone?: true
     estado?: true
     tipoEmpresa?: true
     faixaFaturamento?: true
     emailLead?: true
+    platform?: true
     statusCrm?: true
     rawFieldData?: true
     createdAt?: true
@@ -18349,13 +18385,19 @@ export namespace Prisma {
     formName: string | null
     campaignId: string | null
     campaignName: string | null
+    adId: string | null
+    adName: string | null
+    adsetId: string | null
+    adsetName: string | null
     createdTime: Date
+    fullName: string | null
     nomeEmpresa: string | null
     telefone: string | null
     estado: string | null
     tipoEmpresa: string | null
     faixaFaturamento: string | null
     emailLead: string | null
+    platform: string | null
     statusCrm: string | null
     rawFieldData: JsonValue | null
     createdAt: Date
@@ -18388,13 +18430,19 @@ export namespace Prisma {
     formName?: boolean
     campaignId?: boolean
     campaignName?: boolean
+    adId?: boolean
+    adName?: boolean
+    adsetId?: boolean
+    adsetName?: boolean
     createdTime?: boolean
+    fullName?: boolean
     nomeEmpresa?: boolean
     telefone?: boolean
     estado?: boolean
     tipoEmpresa?: boolean
     faixaFaturamento?: boolean
     emailLead?: boolean
+    platform?: boolean
     statusCrm?: boolean
     rawFieldData?: boolean
     createdAt?: boolean
@@ -18411,13 +18459,19 @@ export namespace Prisma {
     formName?: boolean
     campaignId?: boolean
     campaignName?: boolean
+    adId?: boolean
+    adName?: boolean
+    adsetId?: boolean
+    adsetName?: boolean
     createdTime?: boolean
+    fullName?: boolean
     nomeEmpresa?: boolean
     telefone?: boolean
     estado?: boolean
     tipoEmpresa?: boolean
     faixaFaturamento?: boolean
     emailLead?: boolean
+    platform?: boolean
     statusCrm?: boolean
     rawFieldData?: boolean
     createdAt?: boolean
@@ -18434,13 +18488,19 @@ export namespace Prisma {
     formName?: boolean
     campaignId?: boolean
     campaignName?: boolean
+    adId?: boolean
+    adName?: boolean
+    adsetId?: boolean
+    adsetName?: boolean
     createdTime?: boolean
+    fullName?: boolean
     nomeEmpresa?: boolean
     telefone?: boolean
     estado?: boolean
     tipoEmpresa?: boolean
     faixaFaturamento?: boolean
     emailLead?: boolean
+    platform?: boolean
     statusCrm?: boolean
     rawFieldData?: boolean
     createdAt?: boolean
@@ -18457,20 +18517,26 @@ export namespace Prisma {
     formName?: boolean
     campaignId?: boolean
     campaignName?: boolean
+    adId?: boolean
+    adName?: boolean
+    adsetId?: boolean
+    adsetName?: boolean
     createdTime?: boolean
+    fullName?: boolean
     nomeEmpresa?: boolean
     telefone?: boolean
     estado?: boolean
     tipoEmpresa?: boolean
     faixaFaturamento?: boolean
     emailLead?: boolean
+    platform?: boolean
     statusCrm?: boolean
     rawFieldData?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MetaLeadIndividualOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "metaLeadId" | "formId" | "formName" | "campaignId" | "campaignName" | "createdTime" | "nomeEmpresa" | "telefone" | "estado" | "tipoEmpresa" | "faixaFaturamento" | "emailLead" | "statusCrm" | "rawFieldData" | "createdAt" | "updatedAt", ExtArgs["result"]["metaLeadIndividual"]>
+  export type MetaLeadIndividualOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "metaLeadId" | "formId" | "formName" | "campaignId" | "campaignName" | "adId" | "adName" | "adsetId" | "adsetName" | "createdTime" | "fullName" | "nomeEmpresa" | "telefone" | "estado" | "tipoEmpresa" | "faixaFaturamento" | "emailLead" | "platform" | "statusCrm" | "rawFieldData" | "createdAt" | "updatedAt", ExtArgs["result"]["metaLeadIndividual"]>
   export type MetaLeadIndividualInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
   }
@@ -18495,13 +18561,19 @@ export namespace Prisma {
       formName: string | null
       campaignId: string | null
       campaignName: string | null
+      adId: string | null
+      adName: string | null
+      adsetId: string | null
+      adsetName: string | null
       createdTime: Date
+      fullName: string | null
       nomeEmpresa: string | null
       telefone: string | null
       estado: string | null
       tipoEmpresa: string | null
       faixaFaturamento: string | null
       emailLead: string | null
+      platform: string | null
       statusCrm: string | null
       rawFieldData: Prisma.JsonValue | null
       createdAt: Date
@@ -18938,13 +19010,19 @@ export namespace Prisma {
     readonly formName: FieldRef<"MetaLeadIndividual", 'String'>
     readonly campaignId: FieldRef<"MetaLeadIndividual", 'String'>
     readonly campaignName: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly adId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly adName: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly adsetId: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly adsetName: FieldRef<"MetaLeadIndividual", 'String'>
     readonly createdTime: FieldRef<"MetaLeadIndividual", 'DateTime'>
+    readonly fullName: FieldRef<"MetaLeadIndividual", 'String'>
     readonly nomeEmpresa: FieldRef<"MetaLeadIndividual", 'String'>
     readonly telefone: FieldRef<"MetaLeadIndividual", 'String'>
     readonly estado: FieldRef<"MetaLeadIndividual", 'String'>
     readonly tipoEmpresa: FieldRef<"MetaLeadIndividual", 'String'>
     readonly faixaFaturamento: FieldRef<"MetaLeadIndividual", 'String'>
     readonly emailLead: FieldRef<"MetaLeadIndividual", 'String'>
+    readonly platform: FieldRef<"MetaLeadIndividual", 'String'>
     readonly statusCrm: FieldRef<"MetaLeadIndividual", 'String'>
     readonly rawFieldData: FieldRef<"MetaLeadIndividual", 'Json'>
     readonly createdAt: FieldRef<"MetaLeadIndividual", 'DateTime'>
@@ -19624,13 +19702,19 @@ export namespace Prisma {
     formName: 'formName',
     campaignId: 'campaignId',
     campaignName: 'campaignName',
+    adId: 'adId',
+    adName: 'adName',
+    adsetId: 'adsetId',
+    adsetName: 'adsetName',
     createdTime: 'createdTime',
+    fullName: 'fullName',
     nomeEmpresa: 'nomeEmpresa',
     telefone: 'telefone',
     estado: 'estado',
     tipoEmpresa: 'tipoEmpresa',
     faixaFaturamento: 'faixaFaturamento',
     emailLead: 'emailLead',
+    platform: 'platform',
     statusCrm: 'statusCrm',
     rawFieldData: 'rawFieldData',
     createdAt: 'createdAt',
@@ -21072,13 +21156,19 @@ export namespace Prisma {
     formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    fullName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    platform?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
     createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
@@ -21095,13 +21185,19 @@ export namespace Prisma {
     formName?: SortOrderInput | SortOrder
     campaignId?: SortOrderInput | SortOrder
     campaignName?: SortOrderInput | SortOrder
+    adId?: SortOrderInput | SortOrder
+    adName?: SortOrderInput | SortOrder
+    adsetId?: SortOrderInput | SortOrder
+    adsetName?: SortOrderInput | SortOrder
     createdTime?: SortOrder
+    fullName?: SortOrderInput | SortOrder
     nomeEmpresa?: SortOrderInput | SortOrder
     telefone?: SortOrderInput | SortOrder
     estado?: SortOrderInput | SortOrder
     tipoEmpresa?: SortOrderInput | SortOrder
     faixaFaturamento?: SortOrderInput | SortOrder
     emailLead?: SortOrderInput | SortOrder
+    platform?: SortOrderInput | SortOrder
     statusCrm?: SortOrderInput | SortOrder
     rawFieldData?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21122,13 +21218,19 @@ export namespace Prisma {
     formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    fullName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    platform?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
     createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
@@ -21145,13 +21247,19 @@ export namespace Prisma {
     formName?: SortOrderInput | SortOrder
     campaignId?: SortOrderInput | SortOrder
     campaignName?: SortOrderInput | SortOrder
+    adId?: SortOrderInput | SortOrder
+    adName?: SortOrderInput | SortOrder
+    adsetId?: SortOrderInput | SortOrder
+    adsetName?: SortOrderInput | SortOrder
     createdTime?: SortOrder
+    fullName?: SortOrderInput | SortOrder
     nomeEmpresa?: SortOrderInput | SortOrder
     telefone?: SortOrderInput | SortOrder
     estado?: SortOrderInput | SortOrder
     tipoEmpresa?: SortOrderInput | SortOrder
     faixaFaturamento?: SortOrderInput | SortOrder
     emailLead?: SortOrderInput | SortOrder
+    platform?: SortOrderInput | SortOrder
     statusCrm?: SortOrderInput | SortOrder
     rawFieldData?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21173,13 +21281,19 @@ export namespace Prisma {
     formName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     campaignId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     campaignName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    adId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    adName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    adsetId?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    adsetName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     createdTime?: DateTimeWithAggregatesFilter<"MetaLeadIndividual"> | Date | string
+    fullName?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     nomeEmpresa?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     telefone?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     estado?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     tipoEmpresa?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     faixaFaturamento?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     emailLead?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
+    platform?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     statusCrm?: StringNullableWithAggregatesFilter<"MetaLeadIndividual"> | string | null
     rawFieldData?: JsonNullableWithAggregatesFilter<"MetaLeadIndividual">
     createdAt?: DateTimeWithAggregatesFilter<"MetaLeadIndividual"> | Date | string
@@ -22633,13 +22747,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -22656,13 +22776,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -22677,13 +22803,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22700,13 +22832,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22722,13 +22860,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -22743,13 +22887,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22765,13 +22915,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23998,13 +24154,19 @@ export namespace Prisma {
     formName?: SortOrder
     campaignId?: SortOrder
     campaignName?: SortOrder
+    adId?: SortOrder
+    adName?: SortOrder
+    adsetId?: SortOrder
+    adsetName?: SortOrder
     createdTime?: SortOrder
+    fullName?: SortOrder
     nomeEmpresa?: SortOrder
     telefone?: SortOrder
     estado?: SortOrder
     tipoEmpresa?: SortOrder
     faixaFaturamento?: SortOrder
     emailLead?: SortOrder
+    platform?: SortOrder
     statusCrm?: SortOrder
     rawFieldData?: SortOrder
     createdAt?: SortOrder
@@ -24020,13 +24182,19 @@ export namespace Prisma {
     formName?: SortOrder
     campaignId?: SortOrder
     campaignName?: SortOrder
+    adId?: SortOrder
+    adName?: SortOrder
+    adsetId?: SortOrder
+    adsetName?: SortOrder
     createdTime?: SortOrder
+    fullName?: SortOrder
     nomeEmpresa?: SortOrder
     telefone?: SortOrder
     estado?: SortOrder
     tipoEmpresa?: SortOrder
     faixaFaturamento?: SortOrder
     emailLead?: SortOrder
+    platform?: SortOrder
     statusCrm?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -24041,13 +24209,19 @@ export namespace Prisma {
     formName?: SortOrder
     campaignId?: SortOrder
     campaignName?: SortOrder
+    adId?: SortOrder
+    adName?: SortOrder
+    adsetId?: SortOrder
+    adsetName?: SortOrder
     createdTime?: SortOrder
+    fullName?: SortOrder
     nomeEmpresa?: SortOrder
     telefone?: SortOrder
     estado?: SortOrder
     tipoEmpresa?: SortOrder
     faixaFaturamento?: SortOrder
     emailLead?: SortOrder
+    platform?: SortOrder
     statusCrm?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -25671,13 +25845,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -25692,13 +25872,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -26106,13 +26292,19 @@ export namespace Prisma {
     formName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     campaignName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetId?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    adsetName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     createdTime?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
+    fullName?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     nomeEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     telefone?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     estado?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     tipoEmpresa?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     faixaFaturamento?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     emailLead?: StringNullableFilter<"MetaLeadIndividual"> | string | null
+    platform?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     statusCrm?: StringNullableFilter<"MetaLeadIndividual"> | string | null
     rawFieldData?: JsonNullableFilter<"MetaLeadIndividual">
     createdAt?: DateTimeFilter<"MetaLeadIndividual"> | Date | string
@@ -28071,13 +28263,19 @@ export namespace Prisma {
     formName?: string | null
     campaignId?: string | null
     campaignName?: string | null
+    adId?: string | null
+    adName?: string | null
+    adsetId?: string | null
+    adsetName?: string | null
     createdTime: Date | string
+    fullName?: string | null
     nomeEmpresa?: string | null
     telefone?: string | null
     estado?: string | null
     tipoEmpresa?: string | null
     faixaFaturamento?: string | null
     emailLead?: string | null
+    platform?: string | null
     statusCrm?: string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -28564,13 +28762,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28585,13 +28789,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28606,13 +28816,19 @@ export namespace Prisma {
     formName?: NullableStringFieldUpdateOperationsInput | string | null
     campaignId?: NullableStringFieldUpdateOperationsInput | string | null
     campaignName?: NullableStringFieldUpdateOperationsInput | string | null
+    adId?: NullableStringFieldUpdateOperationsInput | string | null
+    adName?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetId?: NullableStringFieldUpdateOperationsInput | string | null
+    adsetName?: NullableStringFieldUpdateOperationsInput | string | null
     createdTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    fullName?: NullableStringFieldUpdateOperationsInput | string | null
     nomeEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     telefone?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: NullableStringFieldUpdateOperationsInput | string | null
     tipoEmpresa?: NullableStringFieldUpdateOperationsInput | string | null
     faixaFaturamento?: NullableStringFieldUpdateOperationsInput | string | null
     emailLead?: NullableStringFieldUpdateOperationsInput | string | null
+    platform?: NullableStringFieldUpdateOperationsInput | string | null
     statusCrm?: NullableStringFieldUpdateOperationsInput | string | null
     rawFieldData?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
