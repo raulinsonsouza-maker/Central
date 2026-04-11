@@ -38,6 +38,8 @@ export async function GET(
   const agrupamento = searchParams.get("agrupamento") ?? "mensal";
   const tipoEmpresaFilter = searchParams.get("tipoEmpresa");
   const estadoFilter = searchParams.get("estado");
+  const platformFilter = searchParams.get("platform");
+  const faixaFilter = searchParams.get("faixaFaturamento");
   const fallbackDays = Math.min(365, Math.max(1, parseInt(searchParams.get("periodo") ?? "90", 10) || 90));
 
   const dataFim = parseDateOnly(dataFimParam) ?? new Date();
@@ -60,10 +62,13 @@ export async function GET(
     ...whereBase,
     ...(tipoEmpresaFilter ? { tipoEmpresa: tipoEmpresaFilter } : {}),
     ...(estadoFilter ? { estado: estadoFilter } : {}),
+    ...(platformFilter ? { platform: platformFilter } : {}),
+    ...(faixaFilter ? { faixaFaturamento: faixaFilter } : {}),
   };
 
   const LEADS_PAGE_LIMIT = 500;
-  const [allLeads, filteredLeads, totalFilteredCount] = await Promise.all([
+
+  const [allLeads, filteredLeadsPage, totalFilteredCount] = await Promise.all([
     prisma.metaLeadIndividual.findMany({
       where: whereBase,
       orderBy: { createdTime: "desc" },
@@ -76,36 +81,42 @@ export async function GET(
     prisma.metaLeadIndividual.count({ where: whereFiltered }),
   ]);
 
+  const filteredLeads = await prisma.metaLeadIndividual.findMany({
+    where: whereFiltered,
+    orderBy: { createdTime: "desc" },
+  });
+
   const totalLeads = allLeads.length;
+  const totalFilteredLeads = filteredLeads.length;
   const campanhasDistintas = new Set(allLeads.map((l) => l.campaignId).filter(Boolean)).size;
-  const statusCrmCount = allLeads.filter((l) => l.statusCrm).length;
+  const statusCrmCount = filteredLeads.filter((l) => l.statusCrm).length;
 
   const tiposCount: Record<string, number> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     const tipo = lead.tipoEmpresa ?? "Não informado";
     tiposCount[tipo] = (tiposCount[tipo] ?? 0) + 1;
   }
 
   const estadosCount: Record<string, number> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     const estado = lead.estado ?? "Outros";
     estadosCount[estado] = (estadosCount[estado] ?? 0) + 1;
   }
 
   const faturamentoCount: Record<string, number> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     const faixa = lead.faixaFaturamento ?? "Não informado";
     faturamentoCount[faixa] = (faturamentoCount[faixa] ?? 0) + 1;
   }
 
   const platformCount: Record<string, number> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     const plat = lead.platform ?? "Não informado";
     platformCount[plat] = (platformCount[plat] ?? 0) + 1;
   }
 
   const periodoMap: Record<string, { total: number; tipos: Record<string, number> }> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     const key = agrupamento === "semanal"
       ? getWeekKey(new Date(lead.createdTime))
       : getMonthKey(new Date(lead.createdTime));
@@ -140,7 +151,7 @@ export async function GET(
   const cplMedio = totalLeads > 0 && totalInvestimento > 0 ? totalInvestimento / totalLeads : null;
 
   const campanhasLeadsMap: Record<string, { campaignId: string; campaignName: string | null; leads: number }> = {};
-  for (const lead of allLeads) {
+  for (const lead of filteredLeads) {
     if (!lead.campaignId) continue;
     if (!campanhasLeadsMap[lead.campaignId]) {
       campanhasLeadsMap[lead.campaignId] = { campaignId: lead.campaignId, campaignName: lead.campaignName, leads: 0 };
@@ -148,11 +159,11 @@ export async function GET(
     campanhasLeadsMap[lead.campaignId].leads++;
   }
 
-  const totalLeadsWithCampaign = allLeads.filter((l) => l.campaignId).length;
+  const totalLeadsWithCampaign = filteredLeads.filter((l) => l.campaignId).length;
 
   const campanhasRanking = Object.values(campanhasLeadsMap)
     .map((c) => {
-      const participacao = totalLeads > 0 ? Math.round((c.leads / totalLeads) * 1000) / 10 : 0;
+      const participacao = totalFilteredLeads > 0 ? Math.round((c.leads / totalFilteredLeads) * 1000) / 10 : 0;
       const investimentoAtribuidoEst =
         totalLeadsWithCampaign > 0 && totalInvestimento > 0
           ? Math.round(totalInvestimento * (c.leads / totalLeadsWithCampaign) * 100) / 100
@@ -167,7 +178,7 @@ export async function GET(
     })
     .sort((a, b) => b.leads - a.leads);
 
-  const leadsList = filteredLeads.map((l) => ({
+  const leadsList = filteredLeadsPage.map((l) => ({
     id: l.id,
     createdTime: l.createdTime.toISOString(),
     fullName: l.fullName,
@@ -189,7 +200,8 @@ export async function GET(
     dataInicio: dataInicioStr,
     dataFim: dataFimStr,
     kpis: {
-      totalLeads,
+      totalLeads: totalFilteredLeads,
+      totalLeadsAll: totalLeads,
       campanhasDistintas,
       statusCrmCount,
       totalInvestimento,
@@ -213,5 +225,11 @@ export async function GET(
     leadsTruncated: totalFilteredCount > LEADS_PAGE_LIMIT,
     totalFilteredCount,
     agrupamento,
+    activeFilters: {
+      tipoEmpresa: tipoEmpresaFilter,
+      estado: estadoFilter,
+      platform: platformFilter,
+      faixaFaturamento: faixaFilter,
+    },
   });
 }

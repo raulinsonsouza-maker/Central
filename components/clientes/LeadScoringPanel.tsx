@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
   Line,
   ComposedChart,
+  Cell,
 } from "recharts";
 import { Users, Target, TrendingUp, BarChart3, RefreshCw, AlertTriangle, Megaphone, ShieldAlert, Info } from "lucide-react";
 import { ESTADO_LABELS } from "@/lib/utils/dddToEstado";
@@ -152,6 +153,12 @@ interface LeadScoringData {
   leadsTruncated: boolean;
   totalFilteredCount: number;
   agrupamento: string;
+  activeFilters?: {
+    tipoEmpresa: string | null;
+    estado: string | null;
+    platform: string | null;
+    faixaFaturamento: string | null;
+  };
 }
 
 const UF_TO_NAME: Record<string, string> = {
@@ -261,9 +268,20 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   const [agrupamento, setAgrupamento] = React.useState<"mensal" | "semanal">("mensal");
   const [tipoFilter, setTipoFilter] = React.useState<string | null>(null);
   const [estadoFilter, setEstadoFilter] = React.useState<string | null>(null);
+  const [platformFilter, setPlatformFilter] = React.useState<string | null>(null);
+  const [faixaFilter, setFaixaFilter] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState(false);
   const [syncMsg, setSyncMsg] = React.useState<string | null>(null);
   const [syncErrType, setSyncErrType] = React.useState<"account_access" | "permission" | "generic" | null>(null);
+
+  const hasAnyFilter = !!(tipoFilter || estadoFilter || platformFilter || faixaFilter);
+
+  function clearAllFilters() {
+    setTipoFilter(null);
+    setEstadoFilter(null);
+    setPlatformFilter(null);
+    setFaixaFilter(null);
+  }
 
   const params = new URLSearchParams({ agrupamento });
   if (dateFilter.dataInicio) params.set("dataInicio", dateFilter.dataInicio);
@@ -271,9 +289,11 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   if (dateFilter.periodo) params.set("periodo", dateFilter.periodo);
   if (tipoFilter) params.set("tipoEmpresa", tipoFilter);
   if (estadoFilter) params.set("estado", estadoFilter);
+  if (platformFilter) params.set("platform", platformFilter);
+  if (faixaFilter) params.set("faixaFaturamento", faixaFilter);
 
   const { data, isLoading, error, refetch } = useQuery<LeadScoringData>({
-    queryKey: ["lead-scoring", clienteId, dateFilter.dataInicio, dateFilter.dataFim, agrupamento, tipoFilter, estadoFilter],
+    queryKey: ["lead-scoring", clienteId, dateFilter.dataInicio, dateFilter.dataFim, agrupamento, tipoFilter, estadoFilter, platformFilter, faixaFilter],
     queryFn: async () => {
       const res = await fetch(`/api/clientes/${clienteId}/lead-scoring?${params.toString()}`);
       if (!res.ok) throw new Error("Falha ao carregar dados de leads");
@@ -481,12 +501,47 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         </div>
       )}
 
+      {/* ── Barra de filtros ativos ── */}
+      {hasAnyFilter && (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[var(--primary)]/20 bg-[var(--primary)]/5 px-4 py-3">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--primary)]">Filtros ativos</span>
+          <div className="flex flex-1 flex-wrap gap-1.5">
+            {tipoFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2.5 py-0.5 text-[11px] font-medium text-[var(--primary)]">
+                Tipo: {tipoFilter} <button onClick={() => setTipoFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </span>
+            )}
+            {estadoFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-medium text-blue-400">
+                Estado: {estadoFilter} <button onClick={() => setEstadoFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </span>
+            )}
+            {platformFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-pink-500/30 bg-pink-500/10 px-2.5 py-0.5 text-[11px] font-medium text-pink-400">
+                Plataforma: {platformFilter} <button onClick={() => setPlatformFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </span>
+            )}
+            {faixaFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2.5 py-0.5 text-[11px] font-medium text-yellow-400">
+                Faturamento: {formatFaixa(faixaFilter)} <button onClick={() => setFaixaFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </span>
+            )}
+          </div>
+          <button
+            onClick={clearAllFilters}
+            className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
+          >
+            Limpar tudo
+          </button>
+        </div>
+      )}
+
       {/* ── KPIs ── */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           title="Total de Leads"
           value={fmt(data.kpis.totalLeads)}
-          sub={`No período selecionado`}
+          sub={hasAnyFilter ? "Com filtros aplicados" : "No período selecionado"}
           icon={Users}
         />
         <KpiCard
@@ -787,18 +842,20 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         </section>
       )}
 
-      {/* ── Distribuição ── */}
-      {(data.tiposDistribuicao.length > 0 || data.faturamentoDistribuicao.length > 0) && (
+      {/* ── Distribuição (todos os gráficos são filtros) ── */}
+      {(data.tiposDistribuicao.length > 0 || data.faturamentoDistribuicao.length > 0 || (data.platformDistribuicao && data.platformDistribuicao.length > 0)) && (
         <section>
-          <div className="mb-4 flex items-start gap-3">
-            <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
-            <div>
-              <h3 className="text-base font-bold text-[var(--foreground)]">Distribuição</h3>
-              <p className="text-xs text-[var(--muted-foreground)]">Por tipo de empresa, faixa de faturamento e plataforma</p>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
+              <div>
+                <h3 className="text-base font-bold text-[var(--foreground)]">Distribuição</h3>
+                <p className="text-xs text-[var(--muted-foreground)]">Clique em qualquer barra ou card para filtrar os leads</p>
+              </div>
             </div>
           </div>
 
-          {/* Platform breakdown pills — compact, top of distribution */}
+          {/* Platform — botões clicáveis */}
           {data.platformDistribuicao && data.platformDistribuicao.length > 0 && (() => {
             const total = data.platformDistribuicao.reduce((s, p) => s + p.total, 0);
             const PLAT_COLORS: Record<string, string> = {
@@ -807,29 +864,51 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
               "Não informado": "#6b7280",
             };
             return (
-              <div className="mb-6 flex flex-wrap items-center gap-3">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Plataforma</span>
-                {data.platformDistribuicao.map((p) => {
-                  const pct = total > 0 ? Math.round((p.total / total) * 100) : 0;
-                  const color = PLAT_COLORS[p.platform] ?? "#6b7280";
-                  return (
-                    <div key={p.platform} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-2">
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-                      <span className="text-xs font-semibold text-[var(--foreground)]">{p.platform}</span>
-                      <span className="text-xs text-[var(--muted-foreground)]">{p.total.toLocaleString("pt-BR")} leads · {pct}%</span>
-                    </div>
-                  );
-                })}
+              <div className="mb-6">
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Plataforma</p>
+                <div className="flex flex-wrap gap-3">
+                  {data.platformDistribuicao.map((p) => {
+                    const pct = total > 0 ? Math.round((p.total / total) * 100) : 0;
+                    const color = PLAT_COLORS[p.platform] ?? "#6b7280";
+                    const isActive = platformFilter === p.platform;
+                    return (
+                      <button
+                        key={p.platform}
+                        onClick={() => setPlatformFilter(isActive ? null : p.platform)}
+                        className={`group relative flex items-center gap-3 overflow-hidden rounded-xl border px-4 py-3 text-left transition-all ${
+                          isActive
+                            ? "shadow-md"
+                            : "border-[var(--border)] bg-[var(--card)] hover:bg-[var(--muted)]/30"
+                        }`}
+                        style={isActive ? { backgroundColor: `${color}18`, borderColor: `${color}55` } : {}}
+                      >
+                        <div
+                          className="pointer-events-none absolute -right-4 -top-4 h-16 w-16 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-30"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+                        <div>
+                          <p className="text-sm font-bold text-[var(--foreground)]">{p.platform}</p>
+                          <p className="text-[11px] text-[var(--muted-foreground)]">{p.total.toLocaleString("pt-BR")} leads · {pct}%</p>
+                        </div>
+                        {isActive && (
+                          <span className="ml-2 text-[10px] font-bold" style={{ color }}>✓ Ativo</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             );
           })()}
 
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Tipos */}
+            {/* Tipos — barras clicáveis */}
             {data.tiposDistribuicao.length > 0 && (
               <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
                 <CardHeader className="pb-2 pt-4">
                   <h4 className="text-sm font-bold text-[var(--foreground)]">Por Tipo de Empresa</h4>
+                  <p className="text-[11px] text-[var(--muted-foreground)]">Clique na barra para filtrar</p>
                 </CardHeader>
                 <CardContent>
                   <div className="h-56">
@@ -838,6 +917,13 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                         data={data.tiposDistribuicao}
                         layout="vertical"
                         margin={{ left: 8, right: 16, top: 4, bottom: 4 }}
+                        onClick={(e) => {
+                          if (e?.activePayload?.[0]) {
+                            const tipo = e.activePayload[0].payload?.tipo as string;
+                            if (tipo) setTipoFilter(tipoFilter === tipo ? null : tipo);
+                          }
+                        }}
+                        style={{ cursor: "pointer" }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} horizontal={false} />
                         <XAxis type="number" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} />
@@ -851,13 +937,18 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                           width={90}
                         />
                         <Tooltip {...tooltipStyle} />
-                        <Bar
-                          dataKey="total"
-                          name="Leads"
-                          radius={[0, 4, 4, 0]}
-                          fill="var(--primary)"
-                          opacity={0.85}
-                        />
+                        <Bar dataKey="total" name="Leads" radius={[0, 4, 4, 0]}>
+                          {data.tiposDistribuicao.map((entry, index) => {
+                            const isActive = tipoFilter === null || tipoFilter === entry.tipo;
+                            return (
+                              <Cell
+                                key={`cell-tipo-${index}`}
+                                fill={getColor(entry.tipo, index)}
+                                opacity={isActive ? 0.9 : 0.25}
+                              />
+                            );
+                          })}
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -865,39 +956,55 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
               </Card>
             )}
 
-            {/* Faturamento */}
+            {/* Faturamento — barras clicáveis */}
             {data.faturamentoDistribuicao.length > 0 && (
               <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
                 <CardHeader className="pb-2 pt-4">
                   <h4 className="text-sm font-bold text-[var(--foreground)]">Por Faixa de Faturamento</h4>
+                  <p className="text-[11px] text-[var(--muted-foreground)]">Clique na barra para filtrar</p>
                 </CardHeader>
                 <CardContent>
                   <div className="h-56">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={data.faturamentoDistribuicao.map((f) => ({ ...f, faixa: formatFaixa(f.faixa) }))}
+                        data={data.faturamentoDistribuicao.map((f) => ({ ...f, faixaLabel: formatFaixa(f.faixa) }))}
                         layout="vertical"
                         margin={{ left: 8, right: 16, top: 4, bottom: 4 }}
+                        onClick={(e) => {
+                          if (e?.activePayload?.[0]) {
+                            const rawFaixa = e.activePayload[0].payload?.faixa as string;
+                            if (rawFaixa) setFaixaFilter(faixaFilter === rawFaixa ? null : rawFaixa);
+                          }
+                        }}
+                        style={{ cursor: "pointer" }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} horizontal={false} />
                         <XAxis type="number" stroke="var(--muted-foreground)" fontSize={10} tickLine={false} axisLine={false} />
                         <YAxis
                           type="category"
-                          dataKey="faixa"
+                          dataKey="faixaLabel"
                           stroke="var(--muted-foreground)"
                           fontSize={10}
                           tickLine={false}
                           axisLine={false}
                           width={120}
                         />
-                        <Tooltip {...tooltipStyle} />
-                        <Bar
-                          dataKey="total"
-                          name="Leads"
-                          radius={[0, 4, 4, 0]}
-                          fill="#f97316"
-                          opacity={0.85}
+                        <Tooltip
+                          {...tooltipStyle}
+                          formatter={(val: number, _: string, props: { payload?: { faixaLabel?: string } }) => [val, props.payload?.faixaLabel ?? ""]}
                         />
+                        <Bar dataKey="total" name="Leads" radius={[0, 4, 4, 0]}>
+                          {data.faturamentoDistribuicao.map((entry, index) => {
+                            const isActive = faixaFilter === null || faixaFilter === entry.faixa;
+                            return (
+                              <Cell
+                                key={`cell-fat-${index}`}
+                                fill="#f97316"
+                                opacity={isActive ? 0.85 : 0.2}
+                              />
+                            );
+                          })}
+                        </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -910,30 +1017,54 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
 
       {/* ── Lista de Leads Individuais ── */}
       <section>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <div className="mt-1 h-6 w-1 shrink-0 rounded-full bg-[var(--primary)]" />
             <div>
               <h3 className="text-base font-bold text-[var(--foreground)]">Leads Individuais</h3>
               <p className="text-xs text-[var(--muted-foreground)]">
-                {data.leads.length} lead{data.leads.length !== 1 ? "s" : ""}
-                {(tipoFilter || estadoFilter) && " (filtrado)"}
+                {data.totalFilteredCount.toLocaleString("pt-BR")} lead{data.totalFilteredCount !== 1 ? "s" : ""}
+                {hasAnyFilter ? " filtrados" : " no período"}
               </p>
             </div>
           </div>
-          {(tipoFilter || estadoFilter) && (
-            <div className="flex flex-wrap gap-1.5">
+          {hasAnyFilter && (
+            <div className="flex flex-wrap items-center gap-1.5">
               {tipoFilter && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2.5 py-1 text-[11px] text-[var(--primary)]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2.5 py-1 text-[11px] font-medium text-[var(--primary)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
                   Tipo: {tipoFilter}
-                  <button onClick={() => setTipoFilter(null)} className="ml-0.5 opacity-60 hover:opacity-100">✕</button>
+                  <button onClick={() => setTipoFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
                 </span>
               )}
               {estadoFilter && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 px-2.5 py-1 text-[11px] text-[var(--primary)]">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-[11px] font-medium text-blue-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                   Estado: {estadoFilter}
-                  <button onClick={() => setEstadoFilter(null)} className="ml-0.5 opacity-60 hover:opacity-100">✕</button>
+                  <button onClick={() => setEstadoFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
                 </span>
+              )}
+              {platformFilter && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-500/30 bg-pink-500/10 px-2.5 py-1 text-[11px] font-medium text-pink-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-pink-400" />
+                  Plataforma: {platformFilter}
+                  <button onClick={() => setPlatformFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+                </span>
+              )}
+              {faixaFilter && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2.5 py-1 text-[11px] font-medium text-yellow-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" />
+                  Faturamento: {formatFaixa(faixaFilter)}
+                  <button onClick={() => setFaixaFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+                </span>
+              )}
+              {[tipoFilter, estadoFilter, platformFilter, faixaFilter].filter(Boolean).length > 1 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
+                >
+                  Limpar tudo
+                </button>
               )}
             </div>
           )}
@@ -1036,7 +1167,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
 
         {data.leadsTruncated && (
           <p className="mt-3 text-center text-[11px] text-[var(--muted-foreground)]">
-            Exibindo 500 de {data.totalFilteredCount.toLocaleString("pt-BR")} leads. Use os filtros de tipo/estado para refinar a listagem.
+            Exibindo 500 de {data.totalFilteredCount.toLocaleString("pt-BR")} leads. Use os filtros de tipo, estado, plataforma ou faturamento para refinar.
           </p>
         )}
       </section>
