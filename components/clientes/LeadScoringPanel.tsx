@@ -888,16 +888,21 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-              {/* Mapa do Brasil + Ranking */}
+              {/* Mapa do Brasil + Ranking lado a lado */}
               <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
                 <CardContent className="p-4">
-                  <BrazilMap
-                    estadosDistribuicao={data.estadosDistribuicao}
-                    estadoFilter={estadoFilter}
-                    onEstadoClick={(uf) => setEstadoFilter(estadoFilter === uf ? null : uf)}
-                  />
-                  <div className="mt-4">
-                    <p className="mb-2 text-[11px] font-semibold text-[var(--muted-foreground)]">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                    {/* Mapa */}
+                    <div className="w-full md:w-[55%] shrink-0">
+                      <BrazilMap
+                        estadosDistribuicao={data.estadosDistribuicao}
+                        estadoFilter={estadoFilter}
+                        onEstadoClick={(uf) => setEstadoFilter(estadoFilter === uf ? null : uf)}
+                      />
+                    </div>
+                    {/* Lista de estados */}
+                    <div className="flex-1 min-w-0">
+                    <p className="mb-1 text-[11px] font-semibold text-[var(--muted-foreground)]">
                       Volume por estado · {numUfs} UFs com lead · {totalEstados} com UF · {fmt(data.kpis.totalLeads)} na base
                     </p>
                     <p className="mb-2 text-[10px] text-[var(--muted-foreground)]">Role a lista para ver todas as UFs</p>
@@ -932,7 +937,8 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                         );
                       })}
                     </div>
-                  </div>
+                    </div>{/* end lista */}
+                  </div>{/* end flex row */}
                 </CardContent>
               </Card>
 
