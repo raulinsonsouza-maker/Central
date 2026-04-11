@@ -79,6 +79,7 @@ export default function AdminIntegrationsConfigPage() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importError, setImportError] = useState("");
   const [importLoading, setImportLoading] = useState(false);
+  const [sheetsUrl, setSheetsUrl] = useState("");
 
   const {
     data,
@@ -142,9 +143,12 @@ export default function AdminIntegrationsConfigPage() {
     setImportError("");
     setImportResult(null);
     try {
+      const body: Record<string, string> = {};
+      if (sheetsUrl.trim()) body.sheetsUrl = sheetsUrl.trim();
       const res = await fetch("/api/admin/import-leads-csv", {
         method: "POST",
-        headers: { "x-admin-token": adminToken },
+        headers: { "x-admin-token": adminToken, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || res.statusText);
@@ -399,7 +403,26 @@ export default function AdminIntegrationsConfigPage() {
               )}
               {importLoading ? "Importando..." : "Importar CSV"}
             </button>
+          </div>
 
+          {/* Google Sheets URL + sync */}
+          <div className="rounded-2xl border border-[var(--border)] bg-white/[0.02] p-4 space-y-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                URL do Google Sheets
+              </label>
+              <input
+                type="url"
+                value={sheetsUrl}
+                onChange={(e) => setSheetsUrl(e.target.value)}
+                placeholder="https://docs.google.com/spreadsheets/d/..."
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)] px-4 py-2.5 text-sm transition-colors focus:border-[var(--primary)]/40 focus:outline-none"
+              />
+              <p className="mt-1 text-[11px] text-[var(--muted-foreground)]">
+                Cole o link de compartilhamento da planilha. URLs normais (/edit, /view) são convertidas automaticamente.
+                Se deixar em branco, usa a planilha padrão da Inout.
+              </p>
+            </div>
             <button
               disabled={importLoading}
               onClick={handleSyncSheets}

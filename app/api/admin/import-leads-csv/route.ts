@@ -47,17 +47,30 @@ function normalizeSegmento(raw: string): string | null {
   return map[key] ?? raw;
 }
 
+function detectDelimiter(firstLine: string): string {
+  const tabCount = (firstLine.match(/\t/g) ?? []).length;
+  const commaCount = (firstLine.match(/,/g) ?? []).length;
+  const semicolonCount = (firstLine.match(/;/g) ?? []).length;
+  if (tabCount > commaCount && tabCount > semicolonCount) return "\t";
+  if (semicolonCount > commaCount) return ";";
+  return ",";
+}
+
 function parseCSV(text: string): { rows: Record<string, string>[]; headers: string[] } {
-  // Strip UTF-8 BOM if present
-  const clean = text.replace(/^\uFEFF/, "");
+  // Strip UTF-8 BOM if present (handles both 3-byte BOM and the two-char sequence)
+  const clean = text.replace(/^\uFEFF/, "").replace(/^\xEF\xBB\xBF/, "");
   // Normalize Windows line endings
   const normalized = clean.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   const lines = normalized.split("\n").filter((l) => l.trim());
   if (lines.length < 2) return { rows: [], headers: [] };
-  const headers = parseCSVLine(lines[0]).map((h) => h.trim().toLowerCase());
+
+  // Auto-detect delimiter from the first line
+  const delimiter = detectDelimiter(lines[0]);
+
+  const headers = parseLine(lines[0], delimiter).map((h) => h.trim().toLowerCase());
   const rows: Record<string, string>[] = [];
   for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
+    const values = parseLine(lines[i], delimiter);
     if (values.length === 0) continue;
     const row: Record<string, string> = {};
     for (let j = 0; j < headers.length; j++) {
@@ -68,7 +81,12 @@ function parseCSV(text: string): { rows: Record<string, string>[]; headers: stri
   return { rows, headers };
 }
 
-function parseCSVLine(line: string): string[] {
+function parseLine(line: string, delimiter: string): string[] {
+  if (delimiter === "\t") {
+    // TSV: no quoting complexity, just split on tab
+    return line.split("\t").map((v) => v.trim());
+  }
+  // CSV with optional quoting
   const result: string[] = [];
   let current = "";
   let inQuotes = false;
@@ -77,7 +95,7 @@ function parseCSVLine(line: string): string[] {
     if (char === '"') {
       if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
       else { inQuotes = !inQuotes; }
-    } else if (char === "," && !inQuotes) {
+    } else if (char === delimiter && !inQuotes) {
       result.push(current);
       current = "";
     } else {
@@ -173,6 +191,24 @@ async function processRows(rows: Record<string, string>[]) {
   return { created, updated, failed, total: rows.length, errors: errors.slice(0, 20) };
 }
 
+function normalizeSheetUrl(url: string): string {
+  // If it's already a CSV export URL, return as-is
+  if (url.includes("export?format=csv") || url.includes("output=csv")) return url;
+
+  // Convert /edit, /view, /pub share URLs to export CSV
+  // e.g. https://docs.google.com/spreadsheets/d/SHEET_ID/edit#gid=0
+  //   -> https://docs.google.com/spreadsheets/d/SHEET_ID/export?format=csv&gid=0
+  const match = url.match(/\/spreadsheets\/d\/([^/]+)/);
+  if (match) {
+    const sheetId = match[1];
+    const gidMatch = url.match(/[?&#]gid=(\d+)/);
+    const gid = gidMatch ? `&gid=${gidMatch[1]}` : "";
+    return `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv${gid}`;
+  }
+
+  return url;
+}
+
 export async function POST(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -201,17 +237,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, source: "upload", colunasDetectadas: headers, ...result });
     }
 
-    // Fallback: fetch from Google Sheets URL
-    const res = await fetch(SHEET_CSV_URL);
+    // Fetch from Google Sheets URL (custom or default)
+    let sheetsUrl = SHEET_CSV_URL;
+    if (contentType.includes("application/json")) {
+      try {
+        const body = await request.json() as { sheetsUrl?: string };
+        if (body.sheetsUrl?.trim()) sheetsUrl = body.sheetsUrl.trim();
+      } catch { /* ignore parse errors, use default */ }
+    }
+
+    // Convert a regular Google Sheets share URL to CSV export URL if needed
+    sheetsUrl = normalizeSheetUrl(sheetsUrl);
+
+    const res = await fetch(sheetsUrl);
     if (!res.ok) {
       return NextResponse.json(
-        { error: `Falha ao baixar CSV da planilha: ${res.status}` },
+        { error: `Falha ao baixar CSV da planilha: HTTP ${res.status}` },
         { status: 502 }
       );
     }
     const csv = await res.text();
     const { rows, headers } = parseCSV(csv);
-    console.log(`[import-leads-csv] sheets: ${rows.length} linhas | colunas: ${headers.join(", ")}`);
+    console.log(`[import-leads-csv] sheets: ${rows.length} linhas | colunas: ${headers.join(", ")} | url: ${sheetsUrl}`);
     const result = await processRows(rows);
     return NextResponse.json({ ok: true, source: "sheets", colunasDetectadas: headers, ...result });
   } catch (e) {
