@@ -47,6 +47,25 @@ const tooltipStyle = {
   itemStyle: { color: "var(--foreground)", fontSize: 13 },
 };
 
+const FAIXA_MAP: Record<string, string> = {
+  "ainda_não_faturo_nada": "Ainda não faturo",
+  "ainda não faturo nada": "Ainda não faturo",
+  "até_r$50.000/mês": "Até R$ 50k/mês",
+  "de_r$50.000/mês_a_r$75.000/mês": "R$ 50k–75k/mês",
+  "de_r$75.000/mês_a_r$100.000/mês": "R$ 75k–100k/mês",
+  "de_r$100.000/mês_a_r$300.000/mês": "R$ 100k–300k/mês",
+  "de_r$300.000/mês_a_r$500.000/mês": "R$ 300k–500k/mês",
+  "de_r$500.000/mês_a_r$1.000.000/mês": "R$ 500k–1M/mês",
+  "acima_de_r$1.000.000/mês": "Acima de R$ 1M/mês",
+};
+
+function formatFaixa(raw: string | null | undefined): string {
+  if (!raw) return "—";
+  const key = raw.toLowerCase().trim();
+  if (FAIXA_MAP[key]) return FAIXA_MAP[key];
+  return raw.replace(/_/g, " ").replace(/\br\$/gi, "R$").replace(/\/mes/g, "/mês");
+}
+
 function KpiCard({
   title,
   value,
@@ -491,44 +510,9 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         />
       </section>
 
-      {/* ── Filtro tipo de empresa ── */}
-      {data.tiposDistribuicao.length > 0 && (
-        <section>
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-            Filtrar por tipo de empresa
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setTipoFilter(null)}
-              className={`rounded-xl border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                tipoFilter === null
-                  ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--primary-foreground)]"
-                  : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--primary)]/40 hover:text-[var(--foreground)]"
-              }`}
-            >
-              Todos
-            </button>
-            {data.tiposDistribuicao.map((t, i) => (
-              <button
-                key={t.tipo}
-                onClick={() => setTipoFilter(tipoFilter === t.tipo ? null : t.tipo)}
-                className={`rounded-xl border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
-                  tipoFilter === t.tipo
-                    ? "border-transparent text-white"
-                    : "border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--primary)]/40 hover:text-[var(--foreground)]"
-                }`}
-                style={tipoFilter === t.tipo ? { backgroundColor: getColor(t.tipo, i) } : {}}
-              >
-                {t.tipo} <span className="opacity-70">({fmt(t.total)})</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Período toggle + Evolução de leads ── */}
+      {/* ── Evolução de Leads + Cards por tipo ── */}
       <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-4">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-[var(--foreground)]">Evolução de Leads</h3>
@@ -536,24 +520,79 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                 Volume por tipo de empresa ({agrupamento === "mensal" ? "mês" : "semana"})
               </p>
             </div>
-            <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--card)] p-1">
-              {(["mensal", "semanal"] as const).map((a) => (
+            <div className="flex items-center gap-2">
+              {tipoFilter !== null && (
                 <button
-                  key={a}
-                  onClick={() => setAgrupamento(a)}
-                  className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-all ${
-                    agrupamento === a
-                      ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                      : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                  }`}
+                  onClick={() => setTipoFilter(null)}
+                  className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
                 >
-                  {a === "mensal" ? "Mês" : "Semana"}
+                  Limpar ✕
                 </button>
-              ))}
+              )}
+              <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--muted)]/30 p-1">
+                {(["mensal", "semanal"] as const).map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setAgrupamento(a)}
+                    className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition-all ${
+                      agrupamento === a
+                        ? "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                        : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                    }`}
+                  >
+                    {a === "mensal" ? "Mês" : "Semana"}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+
+        {/* Tipo cards — clicáveis para filtrar */}
+        {data.tiposDistribuicao.length > 0 && (() => {
+          const totalTipos = data.tiposDistribuicao.reduce((s, t) => s + t.total, 0);
+          return (
+            <div className="grid grid-cols-2 gap-3 px-6 pb-5 sm:grid-cols-4">
+              {data.tiposDistribuicao.map((t, i) => {
+                const color = getColor(t.tipo, i);
+                const pct = totalTipos > 0 ? Math.round((t.total / totalTipos) * 100) : 0;
+                const isActive = tipoFilter === t.tipo;
+                return (
+                  <button
+                    key={t.tipo}
+                    onClick={() => setTipoFilter(isActive ? null : t.tipo)}
+                    className={`group relative overflow-hidden rounded-xl border p-3.5 text-left transition-all ${
+                      isActive
+                        ? "shadow-md"
+                        : "border-[var(--border)] bg-[var(--muted)]/20 hover:bg-[var(--muted)]/40"
+                    }`}
+                    style={isActive ? { backgroundColor: `${color}18`, borderColor: `${color}55` } : {}}
+                  >
+                    <div
+                      className="pointer-events-none absolute -right-3 -top-3 h-16 w-16 rounded-full opacity-0 blur-2xl transition-opacity group-hover:opacity-40"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
+                      <span className="text-[10px] font-bold tabular-nums" style={{ color }}>{pct}%</span>
+                    </div>
+                    <p className="text-xl font-black tabular-nums leading-none text-[var(--foreground)]">
+                      {fmt(t.total)}
+                    </p>
+                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
+                      {t.tipo}
+                    </p>
+                    <div className="mt-2 h-0.5 overflow-hidden rounded-full bg-[var(--border)]">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        <CardContent className="pt-0">
           {chartData.length === 0 ? (
             <div className="flex h-48 items-center justify-center text-sm text-[var(--muted-foreground)]">
               Nenhum dado de lead para o período selecionado
@@ -561,7 +600,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           ) : (
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
+                <BarChart data={chartData} barCategoryGap="30%">
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.5} />
                   <XAxis dataKey="periodo" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
@@ -574,6 +613,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                       stackId="stack"
                       fill={getColor(tipo, i)}
                       radius={i === allTipos.length - 1 ? [4, 4, 0, 0] : undefined}
+                      opacity={tipoFilter === null || tipoFilter === tipo ? 1 : 0.25}
                     />
                   ))}
                 </BarChart>
@@ -583,68 +623,6 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         </CardContent>
       </Card>
 
-      {/* ── Tabela mês a mês ── */}
-      {data.periodoSeries.length > 0 && (
-        <Card className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
-          <CardHeader className="border-b border-[var(--border)]/60 px-6 pb-5 pt-6 sm:px-8">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,var(--accent),var(--primary))] text-white">
-                <BarChart3 className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tight text-[var(--foreground)]">
-                  Leads <span className="ml-2 bg-[linear-gradient(90deg,var(--accent),var(--primary))] bg-clip-text text-transparent">
-                    {agrupamento === "mensal" ? "Mês a mês" : "Semana a semana"}
-                  </span>
-                </h3>
-                <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                  Detalhamento por tipo de empresa
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="px-3 pb-4 pt-4 sm:px-5">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] border-separate [border-spacing:0_8px]">
-                <thead>
-                  <tr>
-                    <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                      Período
-                    </th>
-                    <th className="px-4 pb-1 text-right text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                      Total
-                    </th>
-                    {data.tiposDistribuicao.slice(0, 4).map((t) => (
-                      <th key={t.tipo} className="px-4 pb-1 text-right text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        {t.tipo}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.periodoSeries.map((row) => (
-                    <tr key={row.periodo} className="group">
-                      <td className="rounded-l-2xl bg-white/[0.03] px-4 py-3.5 transition-colors group-hover:bg-white/[0.05]">
-                        <span className="text-sm font-bold text-[var(--foreground)]">{row.periodo}</span>
-                      </td>
-                      <td className="bg-white/[0.03] px-4 py-3.5 text-right transition-colors group-hover:bg-white/[0.05]">
-                        <span className="text-sm font-black text-[var(--primary)]">{fmt(row.total)}</span>
-                      </td>
-                      {data.tiposDistribuicao.slice(0, 4).map((t) => (
-                        <td key={t.tipo} className="bg-white/[0.03] px-4 py-3.5 text-right transition-colors group-hover:bg-white/[0.05]">
-                          <span className="text-sm font-semibold text-[var(--foreground)]">
-                            {fmt(row.tipos[t.tipo] ?? 0)}
-                          </span>
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* ── Seção Leads por Estado (com mapa Brasil) ── */}
       {data.estadosDistribuicao.length > 0 && (
@@ -897,7 +875,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                   <div className="h-56">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={data.faturamentoDistribuicao}
+                        data={data.faturamentoDistribuicao.map((f) => ({ ...f, faixa: formatFaixa(f.faixa) }))}
                         layout="vertical"
                         margin={{ left: 8, right: 16, top: 4, bottom: 4 }}
                       >
@@ -910,7 +888,7 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                           fontSize={10}
                           tickLine={false}
                           axisLine={false}
-                          width={100}
+                          width={120}
                         />
                         <Tooltip {...tooltipStyle} />
                         <Bar
@@ -1022,8 +1000,8 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                             <span className="text-xs text-[var(--muted-foreground)]">{lead.tipoEmpresa ?? "—"}</span>
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <span className="max-w-[130px] truncate text-xs text-[var(--muted-foreground)]">
-                              {lead.faixaFaturamento ? lead.faixaFaturamento.replace(/_/g, " ").replace("r$", "R$").replace("/mês", "/mês") : "—"}
+                            <span className="max-w-[140px] truncate text-xs text-[var(--muted-foreground)]">
+                              {formatFaixa(lead.faixaFaturamento)}
                             </span>
                           </td>
                           <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
