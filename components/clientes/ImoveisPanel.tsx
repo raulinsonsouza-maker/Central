@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Building2, MessageCircle, FileText, TrendingUp, AlertCircle, RefreshCw, Hash, Home } from "lucide-react";
 
 export interface DateFilter {
-  periodo: number;
+  periodo: string | number;
   dataInicio?: string;
   dataFim?: string;
-  label: string;
+  label?: string;
 }
 
 interface ImoveisItem {
