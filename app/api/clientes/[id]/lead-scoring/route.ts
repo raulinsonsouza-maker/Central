@@ -26,6 +26,25 @@ function getWeekKey(date: Date): string {
   return `${d.getUTCFullYear()}-S${String(weekNo).padStart(2, "0")}`;
 }
 
+const GRADE_FAIXAS: Record<string, string[]> = {
+  A: ["acima_de_r$1.000.000/mês"],
+  B: ["de_r$500.000/mês_a_r$1.000.000/mês"],
+  C: ["de_r$100.000/mês_a_r$300.000/mês", "de_r$300.000/mês_a_r$500.000/mês"],
+  D: ["de_r$50.000/mês_a_r$75.000/mês", "de_r$75.000/mês_a_r$100.000/mês"],
+};
+
+const GRADE_E_FAIXAS = ["até_r$50.000/mês", "ainda_não_faturo_nada"];
+
+export function getFaixaGrade(faixa: string | null | undefined): "A" | "B" | "C" | "D" | "E" {
+  if (!faixa) return "E";
+  const key = faixa.toLowerCase().trim();
+  if (GRADE_FAIXAS.A.includes(key)) return "A";
+  if (GRADE_FAIXAS.B.includes(key)) return "B";
+  if (GRADE_FAIXAS.C.includes(key)) return "C";
+  if (GRADE_FAIXAS.D.includes(key)) return "D";
+  return "E";
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -40,6 +59,7 @@ export async function GET(
   const estadoFilter = searchParams.get("estado");
   const platformFilter = searchParams.get("platform");
   const faixaFilter = searchParams.get("faixaFaturamento");
+  const gradeFilter = searchParams.get("grade");
   const fallbackDays = Math.min(365, Math.max(1, parseInt(searchParams.get("periodo") ?? "90", 10) || 90));
 
   const dataFim = parseDateOnly(dataFimParam) ?? new Date();
@@ -58,12 +78,26 @@ export async function GET(
     },
   };
 
+  let faixaCondition: Record<string, unknown> = {};
+  if (gradeFilter && gradeFilter !== "E") {
+    faixaCondition = { faixaFaturamento: { in: GRADE_FAIXAS[gradeFilter] ?? [] } };
+  } else if (gradeFilter === "E") {
+    faixaCondition = {
+      OR: [
+        { faixaFaturamento: { in: GRADE_E_FAIXAS } },
+        { faixaFaturamento: null },
+      ],
+    };
+  } else if (faixaFilter) {
+    faixaCondition = { faixaFaturamento: faixaFilter };
+  }
+
   const whereFiltered = {
     ...whereBase,
     ...(tipoEmpresaFilter ? { tipoEmpresa: tipoEmpresaFilter } : {}),
     ...(estadoFilter ? { estado: estadoFilter } : {}),
     ...(platformFilter ? { platform: platformFilter } : {}),
-    ...(faixaFilter ? { faixaFaturamento: faixaFilter } : {}),
+    ...faixaCondition,
   };
 
   const LEADS_PAGE_LIMIT = 500;
@@ -115,6 +149,12 @@ export async function GET(
     platformCount[plat] = (platformCount[plat] ?? 0) + 1;
   }
 
+  const gradeCount: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  for (const lead of filteredLeads) {
+    const grade = getFaixaGrade(lead.faixaFaturamento);
+    gradeCount[grade]++;
+  }
+
   const periodoMap: Record<string, { total: number; tipos: Record<string, number> }> = {};
   for (const lead of filteredLeads) {
     const key = agrupamento === "semanal"
@@ -139,12 +179,7 @@ export async function GET(
       },
       canal: "META",
     },
-    select: {
-      data: true,
-      investimento: true,
-      leads: true,
-      cpl: true,
-    },
+    select: { data: true, investimento: true, leads: true, cpl: true },
   });
 
   const totalInvestimento = fatosMidia.reduce((sum, f) => sum + Number(f.investimento), 0);
@@ -168,13 +203,7 @@ export async function GET(
         totalLeadsWithCampaign > 0 && totalInvestimento > 0
           ? Math.round(totalInvestimento * (c.leads / totalLeadsWithCampaign) * 100) / 100
           : null;
-      return {
-        campaignId: c.campaignId,
-        campaignName: c.campaignName,
-        leads: c.leads,
-        participacao,
-        investimentoAtribuidoEst,
-      };
+      return { campaignId: c.campaignId, campaignName: c.campaignName, leads: c.leads, participacao, investimentoAtribuidoEst };
     })
     .sort((a, b) => b.leads - a.leads);
 
@@ -185,6 +214,7 @@ export async function GET(
     nomeEmpresa: l.nomeEmpresa,
     tipoEmpresa: l.tipoEmpresa,
     faixaFaturamento: l.faixaFaturamento,
+    grade: getFaixaGrade(l.faixaFaturamento),
     estado: l.estado,
     campaignName: l.campaignName,
     adName: l.adName,
@@ -194,6 +224,20 @@ export async function GET(
     statusCrm: l.statusCrm,
     emailLead: l.emailLead,
     telefone: l.telefone,
+  }));
+
+  const GRADE_LABELS: Record<string, string> = {
+    A: "Acima de R$ 1M/mês",
+    B: "R$ 500k – R$ 1M/mês",
+    C: "R$ 100k – R$ 500k/mês",
+    D: "R$ 50k – R$ 100k/mês",
+    E: "Abaixo de R$ 50k / Não declarado",
+  };
+
+  const gradeDistribuicao = ["A", "B", "C", "D", "E"].map((grade) => ({
+    grade,
+    total: gradeCount[grade] ?? 0,
+    label: GRADE_LABELS[grade],
   }));
 
   return NextResponse.json({
@@ -220,6 +264,7 @@ export async function GET(
     platformDistribuicao: Object.entries(platformCount)
       .map(([platform, total]) => ({ platform, total }))
       .sort((a, b) => b.total - a.total),
+    gradeDistribuicao,
     campanhasRanking,
     leads: leadsList,
     leadsTruncated: totalFilteredCount > LEADS_PAGE_LIMIT,
@@ -230,6 +275,7 @@ export async function GET(
       estado: estadoFilter,
       platform: platformFilter,
       faixaFaturamento: faixaFilter,
+      grade: gradeFilter,
     },
   });
 }

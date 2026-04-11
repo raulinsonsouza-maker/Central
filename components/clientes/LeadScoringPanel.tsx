@@ -140,6 +140,7 @@ interface LeadScoringData {
     nomeEmpresa: string | null;
     tipoEmpresa: string | null;
     faixaFaturamento: string | null;
+    grade: string;
     estado: string | null;
     campaignName: string | null;
     adName: string | null;
@@ -150,6 +151,7 @@ interface LeadScoringData {
     emailLead: string | null;
     telefone: string | null;
   }>;
+  gradeDistribuicao: Array<{ grade: string; total: number; label: string }>;
   leadsTruncated: boolean;
   totalFilteredCount: number;
   agrupamento: string;
@@ -158,6 +160,7 @@ interface LeadScoringData {
     estado: string | null;
     platform: string | null;
     faixaFaturamento: string | null;
+    grade: string | null;
   };
 }
 
@@ -270,17 +273,19 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   const [estadoFilter, setEstadoFilter] = React.useState<string | null>(null);
   const [platformFilter, setPlatformFilter] = React.useState<string | null>(null);
   const [faixaFilter, setFaixaFilter] = React.useState<string | null>(null);
+  const [gradeFilter, setGradeFilter] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState(false);
   const [syncMsg, setSyncMsg] = React.useState<string | null>(null);
   const [syncErrType, setSyncErrType] = React.useState<"account_access" | "permission" | "generic" | null>(null);
 
-  const hasAnyFilter = !!(tipoFilter || estadoFilter || platformFilter || faixaFilter);
+  const hasAnyFilter = !!(tipoFilter || estadoFilter || platformFilter || faixaFilter || gradeFilter);
 
   function clearAllFilters() {
     setTipoFilter(null);
     setEstadoFilter(null);
     setPlatformFilter(null);
     setFaixaFilter(null);
+    setGradeFilter(null);
   }
 
   const params = new URLSearchParams({ agrupamento });
@@ -291,9 +296,10 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
   if (estadoFilter) params.set("estado", estadoFilter);
   if (platformFilter) params.set("platform", platformFilter);
   if (faixaFilter) params.set("faixaFaturamento", faixaFilter);
+  if (gradeFilter) params.set("grade", gradeFilter);
 
   const { data, isLoading, error, refetch } = useQuery<LeadScoringData>({
-    queryKey: ["lead-scoring", clienteId, dateFilter.dataInicio, dateFilter.dataFim, agrupamento, tipoFilter, estadoFilter, platformFilter, faixaFilter],
+    queryKey: ["lead-scoring", clienteId, dateFilter.dataInicio, dateFilter.dataFim, agrupamento, tipoFilter, estadoFilter, platformFilter, faixaFilter, gradeFilter],
     queryFn: async () => {
       const res = await fetch(`/api/clientes/${clienteId}/lead-scoring?${params.toString()}`);
       if (!res.ok) throw new Error("Falha ao carregar dados de leads");
@@ -526,6 +532,11 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                 Faturamento: {formatFaixa(faixaFilter)} <button onClick={() => setFaixaFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
               </span>
             )}
+            {gradeFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-400">
+                Grade: {gradeFilter} <button onClick={() => setGradeFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+              </span>
+            )}
           </div>
           <button
             onClick={clearAllFilters}
@@ -678,6 +689,139 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
         </CardContent>
       </Card>
 
+      {/* ── Classificação de Leads A–E ── */}
+      {data.gradeDistribuicao && data.gradeDistribuicao.some((g) => g.total > 0) && (() => {
+        const GRADE_COLORS: Record<string, string> = {
+          A: "#10b981",
+          B: "#06b6d4",
+          C: "#3b82f6",
+          D: "#f59e0b",
+          E: "#6b7280",
+        };
+        const GRADE_BG: Record<string, string> = {
+          A: "rgba(16,185,129,0.08)",
+          B: "rgba(6,182,212,0.08)",
+          C: "rgba(59,130,246,0.08)",
+          D: "rgba(245,158,11,0.08)",
+          E: "rgba(107,114,128,0.08)",
+        };
+        const total = data.gradeDistribuicao.reduce((s, g) => s + g.total, 0);
+        return (
+          <Card className="overflow-hidden rounded-2xl border-[var(--border)]">
+            <CardHeader className="pb-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--foreground)]">Classificação de Leads</h3>
+                  <p className="text-xs text-[var(--muted-foreground)]">Por faixa de faturamento declarado · clique para filtrar</p>
+                </div>
+                {gradeFilter && (
+                  <button
+                    onClick={() => setGradeFilter(null)}
+                    className="rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
+                  >
+                    Limpar ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Stacked proportion bar */}
+              <div className="mt-4 flex h-3 w-full overflow-hidden rounded-full">
+                {data.gradeDistribuicao.map((g) => {
+                  const pct = total > 0 ? (g.total / total) * 100 : 0;
+                  if (pct === 0) return null;
+                  return (
+                    <button
+                      key={g.grade}
+                      onClick={() => setGradeFilter(gradeFilter === g.grade ? null : g.grade)}
+                      title={`${g.grade}: ${g.total} leads (${pct.toFixed(1)}%)`}
+                      className="h-full cursor-pointer transition-opacity hover:opacity-80"
+                      style={{
+                        width: `${pct}%`,
+                        backgroundColor: GRADE_COLORS[g.grade],
+                        opacity: gradeFilter === null || gradeFilter === g.grade ? 1 : 0.3,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </CardHeader>
+
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-5 gap-2">
+                {data.gradeDistribuicao.map((g) => {
+                  const pct = total > 0 ? (g.total / total) * 100 : 0;
+                  const color = GRADE_COLORS[g.grade];
+                  const isActive = gradeFilter === g.grade;
+                  const isOther = gradeFilter !== null && gradeFilter !== g.grade;
+                  return (
+                    <button
+                      key={g.grade}
+                      onClick={() => setGradeFilter(isActive ? null : g.grade)}
+                      className={`group relative flex flex-col items-center overflow-hidden rounded-2xl border p-4 text-center transition-all ${
+                        isActive
+                          ? "shadow-lg"
+                          : isOther
+                          ? "border-[var(--border)] opacity-40"
+                          : "border-[var(--border)] hover:opacity-90"
+                      }`}
+                      style={isActive
+                        ? { backgroundColor: `${color}15`, borderColor: `${color}50` }
+                        : { backgroundColor: GRADE_BG[g.grade] }
+                      }
+                    >
+                      {/* Glow on hover */}
+                      <div
+                        className="pointer-events-none absolute inset-0 opacity-0 blur-xl transition-opacity group-hover:opacity-20"
+                        style={{ backgroundColor: color }}
+                      />
+
+                      {/* Grade letter */}
+                      <div
+                        className="flex h-11 w-11 items-center justify-center rounded-xl text-2xl font-black"
+                        style={{ color, backgroundColor: `${color}20` }}
+                      >
+                        {g.grade}
+                      </div>
+
+                      {/* Count */}
+                      <p className="mt-2.5 text-2xl font-black tabular-nums leading-none text-[var(--foreground)]">
+                        {fmt(g.total)}
+                      </p>
+                      <p className="mt-0.5 text-[10px] font-bold tabular-nums" style={{ color }}>
+                        {pct.toFixed(1)}%
+                      </p>
+
+                      {/* Mini bar */}
+                      <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-[var(--border)]">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${pct}%`, backgroundColor: color }}
+                        />
+                      </div>
+
+                      {/* Label */}
+                      <p className="mt-2 text-[9px] font-semibold leading-tight text-[var(--muted-foreground)]">
+                        {g.label}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                {data.gradeDistribuicao.map((g) => (
+                  <span key={g.grade} className="flex items-center gap-1.5 text-[10px] text-[var(--muted-foreground)]">
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: GRADE_COLORS[g.grade] }} />
+                    <span className="font-bold" style={{ color: GRADE_COLORS[g.grade] }}>{g.grade}</span>
+                    <span>— {g.label}</span>
+                  </span>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* ── Seção Leads por Estado (com mapa Brasil) ── */}
       {data.estadosDistribuicao.length > 0 && (
@@ -1058,7 +1202,14 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
                   <button onClick={() => setFaixaFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
                 </span>
               )}
-              {[tipoFilter, estadoFilter, platformFilter, faixaFilter].filter(Boolean).length > 1 && (
+              {gradeFilter && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  Grade: {gradeFilter}
+                  <button onClick={() => setGradeFilter(null)} className="opacity-60 hover:opacity-100">✕</button>
+                </span>
+              )}
+              {[tipoFilter, estadoFilter, platformFilter, faixaFilter, gradeFilter].filter(Boolean).length > 1 && (
                 <button
                   onClick={clearAllFilters}
                   className="rounded-full border border-[var(--border)] bg-[var(--card)] px-2.5 py-1 text-[11px] font-semibold text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]"
@@ -1082,82 +1233,82 @@ export function LeadScoringPanel({ clienteId, dateFilter }: Props) {
           <Card className="overflow-hidden rounded-[2rem] border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,21,26,0.98),rgba(12,12,16,1))] shadow-[0_24px_80px_rgba(0,0,0,0.38)]">
             <CardContent className="px-3 pb-4 pt-4 sm:px-5">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px] border-separate [border-spacing:0_6px]">
+                <table className="w-full min-w-[700px] border-separate [border-spacing:0_6px]">
                   <thead>
                     <tr>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Data
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Nome / Empresa
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Tipo
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Faturamento
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Est.
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Plat.
-                      </th>
-                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">
-                        Campanha
-                      </th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Data</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Nome / Empresa</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Tipo</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Faturamento</th>
+                      <th className="px-4 pb-1 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Grade</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Est.</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Plat.</th>
+                      <th className="px-4 pb-1 text-left text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Campanha</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.leads.map((lead) => {
-                      const dt = new Date(lead.createdTime);
-                      const dateStr = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+                    {(() => {
+                      const GRADE_COLORS: Record<string, string> = {
+                        A: "#10b981", B: "#06b6d4", C: "#3b82f6", D: "#f59e0b", E: "#6b7280",
+                      };
                       const PLAT_DOT: Record<string, string> = { Instagram: "#e1306c", Facebook: "#1877f2" };
-                      const platColor = lead.platform ? (PLAT_DOT[lead.platform] ?? "#6b7280") : "#6b7280";
-                      return (
-                        <tr key={lead.id} className="group">
-                          <td className="rounded-l-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <p className="whitespace-nowrap text-xs font-semibold text-[var(--foreground)]">{dateStr}</p>
-                          </td>
-                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <p className="max-w-[160px] truncate text-xs font-semibold text-[var(--foreground)]">
-                              {lead.fullName ?? lead.nomeEmpresa ?? "—"}
-                            </p>
-                            {lead.fullName && lead.nomeEmpresa && (
-                              <p className="max-w-[160px] truncate text-[11px] text-[var(--muted-foreground)]">{lead.nomeEmpresa}</p>
-                            )}
-                          </td>
-                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <span className="text-xs text-[var(--muted-foreground)]">{lead.tipoEmpresa ?? "—"}</span>
-                          </td>
-                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <span className="max-w-[140px] truncate text-xs text-[var(--muted-foreground)]">
-                              {formatFaixa(lead.faixaFaturamento)}
-                            </span>
-                          </td>
-                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <span className="text-xs font-semibold text-[var(--foreground)]">
-                              {lead.estado ?? "—"}
-                            </span>
-                          </td>
-                          <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            {lead.platform ? (
-                              <span className="inline-flex items-center gap-1.5">
-                                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: platColor }} />
-                                <span className="text-xs text-[var(--muted-foreground)]">{lead.platform}</span>
+                      return data.leads.map((lead) => {
+                        const dt = new Date(lead.createdTime);
+                        const dateStr = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+                        const platColor = lead.platform ? (PLAT_DOT[lead.platform] ?? "#6b7280") : "#6b7280";
+                        const grade = lead.grade ?? "E";
+                        const gradeColor = GRADE_COLORS[grade] ?? "#6b7280";
+                        return (
+                          <tr key={lead.id} className="group">
+                            <td className="rounded-l-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <p className="whitespace-nowrap text-xs font-semibold text-[var(--foreground)]">{dateStr}</p>
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <p className="max-w-[140px] truncate text-xs font-semibold text-[var(--foreground)]">
+                                {lead.fullName ?? lead.nomeEmpresa ?? "—"}
+                              </p>
+                              {lead.fullName && lead.nomeEmpresa && (
+                                <p className="max-w-[140px] truncate text-[11px] text-[var(--muted-foreground)]">{lead.nomeEmpresa}</p>
+                              )}
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <span className="text-xs text-[var(--muted-foreground)]">{lead.tipoEmpresa ?? "—"}</span>
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <span className="max-w-[130px] truncate text-xs text-[var(--muted-foreground)]">
+                                {formatFaixa(lead.faixaFaturamento)}
                               </span>
-                            ) : (
-                              <span className="text-xs text-[var(--muted-foreground)]">—</span>
-                            )}
-                          </td>
-                          <td className="rounded-r-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
-                            <p className="max-w-[160px] truncate text-xs text-[var(--muted-foreground)]">
-                              {lead.campaignName ?? lead.formName ?? "—"}
-                            </p>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 text-center transition-colors group-hover:bg-white/[0.05]">
+                              <span
+                                className="inline-flex h-6 w-6 items-center justify-center rounded-lg text-[11px] font-black"
+                                style={{ color: gradeColor, backgroundColor: `${gradeColor}20` }}
+                              >
+                                {grade}
+                              </span>
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <span className="text-xs font-semibold text-[var(--foreground)]">{lead.estado ?? "—"}</span>
+                            </td>
+                            <td className="bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              {lead.platform ? (
+                                <span className="inline-flex items-center gap-1.5">
+                                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: platColor }} />
+                                  <span className="text-xs text-[var(--muted-foreground)]">{lead.platform}</span>
+                                </span>
+                              ) : (
+                                <span className="text-xs text-[var(--muted-foreground)]">—</span>
+                              )}
+                            </td>
+                            <td className="rounded-r-2xl bg-white/[0.03] px-4 py-3 transition-colors group-hover:bg-white/[0.05]">
+                              <p className="max-w-[140px] truncate text-xs text-[var(--muted-foreground)]">
+                                {lead.campaignName ?? lead.formName ?? "—"}
+                              </p>
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
                   </tbody>
                 </table>
               </div>
