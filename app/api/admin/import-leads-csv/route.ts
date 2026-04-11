@@ -5,7 +5,7 @@ import { dddToEstado } from "@/lib/utils/dddToEstado";
 const SHEET_CSV_URL =
   "https://docs.google.com/spreadsheets/d/1K3RjX3a8MsItZ7KJB5Ns1z8cLKBTiO-OCAVR6cuzP9Y/export?format=csv";
 
-const INOUT_CLIENTE_ID = "cmntcyl3m0001qv2p40rs5xmz";
+const INOUT_SLUG = "inout";
 
 function isAuthorized(request: NextRequest): boolean {
   const secret = request.nextUrl.searchParams.get("secret");
@@ -106,7 +106,7 @@ function parseLine(line: string, delimiter: string): string[] {
   return result;
 }
 
-async function processRows(rows: Record<string, string>[]) {
+async function processRows(rows: Record<string, string>[], clienteId: string) {
   let created = 0;
   let updated = 0;
   let failed = 0;
@@ -144,7 +144,7 @@ async function processRows(rows: Record<string, string>[]) {
 
     try {
       const existing = await prisma.metaLeadIndividual.findUnique({
-        where: { clienteId_metaLeadId: { clienteId: INOUT_CLIENTE_ID, metaLeadId: leadId } },
+        where: { clienteId_metaLeadId: { clienteId, metaLeadId: leadId } },
         select: { id: true },
       });
 
@@ -172,13 +172,13 @@ async function processRows(rows: Record<string, string>[]) {
 
       if (existing) {
         await prisma.metaLeadIndividual.update({
-          where: { clienteId_metaLeadId: { clienteId: INOUT_CLIENTE_ID, metaLeadId: leadId } },
+          where: { clienteId_metaLeadId: { clienteId, metaLeadId: leadId } },
           data,
         });
         updated++;
       } else {
         await prisma.metaLeadIndividual.create({
-          data: { clienteId: INOUT_CLIENTE_ID, metaLeadId: leadId, ...data },
+          data: { clienteId, metaLeadId: leadId, ...data },
         });
         created++;
       }
@@ -215,6 +215,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Resolve the Inout clienteId dynamically from the DB (safe across dev and production)
+    const inoutCliente = await prisma.cliente.findUnique({
+      where: { slug: INOUT_SLUG },
+      select: { id: true },
+    });
+    if (!inoutCliente) {
+      return NextResponse.json(
+        { error: `Cliente com slug '${INOUT_SLUG}' não encontrado no banco de dados.` },
+        { status: 404 }
+      );
+    }
+    const clienteId = inoutCliente.id;
+
     const contentType = request.headers.get("content-type") ?? "";
 
     // If uploading a file via multipart/form-data
@@ -233,7 +246,7 @@ export async function POST(request: NextRequest) {
           colunasDetectadas: headers,
         }, { status: 400 });
       }
-      const result = await processRows(rows);
+      const result = await processRows(rows, clienteId);
       return NextResponse.json({ ok: true, source: "upload", colunasDetectadas: headers, ...result });
     }
 
@@ -259,7 +272,7 @@ export async function POST(request: NextRequest) {
     const csv = await res.text();
     const { rows, headers } = parseCSV(csv);
     console.log(`[import-leads-csv] sheets: ${rows.length} linhas | colunas: ${headers.join(", ")} | url: ${sheetsUrl}`);
-    const result = await processRows(rows);
+    const result = await processRows(rows, clienteId);
     return NextResponse.json({ ok: true, source: "sheets", colunasDetectadas: headers, ...result });
   } catch (e) {
     return NextResponse.json(
