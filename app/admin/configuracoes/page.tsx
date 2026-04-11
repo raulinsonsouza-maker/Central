@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle2, KeyRound, Shield } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FileSpreadsheet, KeyRound, RefreshCw, Shield, Upload } from "lucide-react";
 
 function getHeaders(token?: string, includeJson = false): HeadersInit {
   const headers: HeadersInit = {};
@@ -52,6 +52,16 @@ async function updateIntegrationsConfigApi(
   };
 }
 
+type ImportResult = {
+  ok: boolean;
+  source: "upload" | "sheets";
+  total: number;
+  created: number;
+  updated: number;
+  failed: number;
+  errors?: string[];
+};
+
 export default function AdminIntegrationsConfigPage() {
   const [adminToken, setAdminToken] = useState("");
   const [tokenInput, setTokenInput] = useState("");
@@ -61,6 +71,13 @@ export default function AdminIntegrationsConfigPage() {
   const [googleRefreshToken, setGoogleRefreshToken] = useState("");
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
+
+  // CSV Import state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importError, setImportError] = useState("");
+  const [importLoading, setImportLoading] = useState(false);
 
   const {
     data,
@@ -93,6 +110,50 @@ export default function AdminIntegrationsConfigPage() {
   });
 
   const unauthorized = error instanceof Error && error.message === "Unauthorized";
+
+  async function handleImportFile() {
+    if (!selectedFile) return;
+    setImportLoading(true);
+    setImportError("");
+    setImportResult(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", selectedFile);
+      const res = await fetch("/api/admin/import-leads-csv", {
+        method: "POST",
+        headers: { "x-admin-token": adminToken },
+        body: fd,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.statusText);
+      setImportResult(json as ImportResult);
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setImportLoading(false);
+    }
+  }
+
+  async function handleSyncSheets() {
+    setImportLoading(true);
+    setImportError("");
+    setImportResult(null);
+    try {
+      const res = await fetch("/api/admin/import-leads-csv", {
+        method: "POST",
+        headers: { "x-admin-token": adminToken },
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.statusText);
+      setImportResult(json as ImportResult);
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setImportLoading(false);
+    }
+  }
 
   if (!adminToken || unauthorized) {
     return (
@@ -268,6 +329,139 @@ export default function AdminIntegrationsConfigPage() {
           {mutation.isPending ? "Salvando..." : "Salvar alterações"}
         </button>
       </section>
+
+      {/* ── Importação de Leads (CSV) ── */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-bold tracking-tight text-[var(--foreground)]">
+          Importação de Leads — Inout
+        </h2>
+        <p className="text-sm text-[var(--muted-foreground)]">
+          Faça o upload de um arquivo CSV exportado da planilha de leads, ou sincronize diretamente
+          da planilha do Google Sheets. Novos leads são criados; existentes são atualizados.
+        </p>
+      </section>
+
+      <Card className="rounded-2xl border-[var(--border)]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileSpreadsheet className="h-4 w-4 text-[var(--primary)]" />
+            Upload de arquivo CSV
+          </CardTitle>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+            Selecione o arquivo <code className="rounded bg-white/5 px-1 py-0.5">.csv</code> exportado da planilha de leads da InOut.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Drop zone / file selector */}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[var(--border)] bg-white/[0.02] px-6 py-10 transition-colors hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] transition-transform group-hover:scale-105">
+              <Upload className="h-6 w-6" />
+            </div>
+            {selectedFile ? (
+              <div className="text-center">
+                <p className="text-sm font-semibold text-[var(--foreground)]">{selectedFile.name}</p>
+                <p className="text-xs text-[var(--muted-foreground)]">
+                  {(selectedFile.size / 1024).toFixed(1)} KB · Clique para trocar
+                </p>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-sm font-medium text-[var(--foreground)]">Clique para selecionar o arquivo</p>
+                <p className="text-xs text-[var(--muted-foreground)]">ou arraste e solte aqui · CSV</p>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) { setSelectedFile(f); setImportResult(null); setImportError(""); }
+              }}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              disabled={!selectedFile || importLoading}
+              onClick={handleImportFile}
+              className="flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary-foreground)] transition hover:opacity-90 disabled:opacity-40"
+            >
+              {importLoading && !selectedFile ? null : importLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              {importLoading ? "Importando..." : "Importar CSV"}
+            </button>
+
+            <button
+              disabled={importLoading}
+              onClick={handleSyncSheets}
+              className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-[var(--foreground)] transition hover:bg-white/[0.06] disabled:opacity-40"
+            >
+              {importLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              Sincronizar Google Sheets
+            </button>
+          </div>
+
+          {/* Error */}
+          {importError && (
+            <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-red-400" />
+              <span className="text-red-400">{importError}</span>
+            </div>
+          )}
+
+          {/* Result */}
+          {importResult && (
+            <div className="space-y-3 rounded-2xl border border-[var(--border)] bg-white/[0.02] p-5">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <span className="text-sm font-semibold text-[var(--foreground)]">
+                  Importação concluída
+                  <span className="ml-2 text-xs font-normal text-[var(--muted-foreground)]">
+                    via {importResult.source === "upload" ? "arquivo enviado" : "Google Sheets"}
+                  </span>
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { label: "Total", value: importResult.total, color: "text-[var(--foreground)]" },
+                  { label: "Criados", value: importResult.created, color: "text-emerald-400" },
+                  { label: "Atualizados", value: importResult.updated, color: "text-cyan-400" },
+                  { label: "Falhas", value: importResult.failed, color: importResult.failed > 0 ? "text-red-400" : "text-[var(--muted-foreground)]" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-[var(--border)] bg-white/[0.03] px-4 py-3 text-center">
+                    <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              {importResult.errors && importResult.errors.length > 0 && (
+                <details className="rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+                  <summary className="cursor-pointer text-xs font-semibold text-red-400">
+                    {importResult.errors.length} erro(s) detalhados
+                  </summary>
+                  <ul className="mt-2 space-y-1">
+                    {importResult.errors.map((e, i) => (
+                      <li key={i} className="font-mono text-[10px] text-red-300">{e}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </main>
   );
 }
