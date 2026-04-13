@@ -191,6 +191,7 @@ export async function GET(
       custoporVenda: v.purchases > 0 ? v.investimento / v.purchases : 0,
       ticketMedio: v.purchases > 0 ? v.faturamento / v.purchases : 0,
     }))
+    .filter((c) => c.faturamento > 0)
     .sort((a, b) => b.faturamento - a.faturamento);
 
   const diasSelecionados = Math.max(
