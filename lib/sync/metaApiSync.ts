@@ -1,11 +1,11 @@
-import { fetchAccountInsights, fetchCampaignInsightsAggregatedByDay, fetchAdsWithCreatives } from "@/lib/meta/metaClient";
+import { fetchAccountInsights, fetchCampaignInsightsAggregatedByDay, fetchCampaignInsightsPerCampaign, fetchAdsWithCreatives } from "@/lib/meta/metaClient";
 import { mapMetaInsightToFatoPayload } from "@/lib/mappers/metaToDomain";
 import { upsertFatoMidia } from "@/lib/repositories/fatosMidiaRepository";
 import { upsertMetaAdsCriativo } from "@/lib/repositories/metaAdsCriativosRepository";
 import { findAllClientes } from "@/lib/repositories/clientesRepository";
 import { prisma } from "@/lib/db";
 import { getIntegrationsConfig } from "@/lib/config/integrations";
-import { isFlorien } from "@/lib/clientProfiles";
+import { isFlorien, isHotelFazendaSaoJoao } from "@/lib/clientProfiles";
 
 const DEFAULT_DATE_FROM = "2026-01-01";
 
@@ -63,20 +63,38 @@ export async function syncMetaCliente(
   const creativeDateTo = options?.creativeDateTo ?? options?.dateTo ?? today;
 
   try {
-    // Florien uses profile-visit campaigns — ig_profile_visit only appears at campaign level
     const cliente = await prisma.cliente.findUnique({ where: { id: clienteId }, select: { nome: true, slug: true } });
     const useCampaignLevel = isFlorien(cliente);
+    const useCampaignPerRow = isHotelFazendaSaoJoao(cliente);
 
-    const response = useCampaignLevel
-      ? await fetchCampaignInsightsAggregatedByDay(accountId, token, dateFrom, dateTo)
-      : await fetchAccountInsights(accountId, token, dateFrom, dateTo);
-    const rows = response.data ?? [];
+    let rows: Awaited<ReturnType<typeof fetchCampaignInsightsPerCampaign>>;
+    if (useCampaignPerRow) {
+      // Per-campaign rows: each row has campaign_name and is stored separately
+      rows = await fetchCampaignInsightsPerCampaign(accountId, token, dateFrom, dateTo);
+    } else if (useCampaignLevel) {
+      // Florien: campaign-level aggregated by day (no campaign name stored)
+      const resp = await fetchCampaignInsightsAggregatedByDay(accountId, token, dateFrom, dateTo);
+      rows = resp.data ?? [];
+    } else {
+      const resp = await fetchAccountInsights(accountId, token, dateFrom, dateTo);
+      rows = resp.data ?? [];
+    }
+
     let contaId: string | null = null;
-
     const conta = await prisma.conta.findFirst({
       where: { clienteId, plataforma: "META", accountIdPlataforma: accountId },
     });
     if (conta) contaId = conta.id;
+
+    // For per-campaign mode: remove old aggregate rows (campaignName="") for the period
+    // to prevent double-counting when campaign-level rows are inserted.
+    if (useCampaignPerRow && rows.length > 0) {
+      const periodStart = new Date(dateFrom + "T00:00:00Z");
+      const periodEnd = new Date(dateTo + "T23:59:59Z");
+      await prisma.fatoMidiaDiario.deleteMany({
+        where: { clienteId, canal: "META", campaignName: "", data: { gte: periodStart, lte: periodEnd } },
+      });
+    }
 
     for (const row of rows) {
       const payload = mapMetaInsightToFatoPayload(row);
@@ -99,6 +117,7 @@ export async function syncMetaCliente(
         checkoutIniciado: payload.checkoutIniciado,
         profileVisits: payload.profileVisits,
         contaId: contaId ?? undefined,
+        campaignName: payload.campaignName,
       });
     }
 

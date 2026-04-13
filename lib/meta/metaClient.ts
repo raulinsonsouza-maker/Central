@@ -409,6 +409,8 @@ export interface MetaInsightRow {
   actions?: Array<{ action_type: string; value: string }>;
   action_values?: Array<{ action_type: string; value: string }>;
   unique_actions?: Array<{ action_type: string; value: string }>;
+  campaign_id?: string;
+  campaign_name?: string;
   /**
    * Campaign-level primary result KPI — present only when level=campaign.
    * Structure: [{indicator: "profile_visit_view", values: [{value: "45"}]}, ...]
@@ -707,6 +709,48 @@ export async function fetchCampaignInsightsAggregatedByDay(
   }
 
   return { data: Array.from(byDay.values()) };
+}
+
+/**
+ * Fetch campaign-level daily insights keeping each campaign as a separate row.
+ * Returns rows that include campaign_id and campaign_name alongside metrics.
+ * Used when per-campaign breakdown is needed (e.g. Hotel Fazenda São João).
+ */
+export async function fetchCampaignInsightsPerCampaign(
+  accountId: string,
+  token: string,
+  dateFrom: string,
+  dateTo: string
+): Promise<MetaInsightRow[]> {
+  const actId = ensureActPrefix(accountId);
+  const params = new URLSearchParams({
+    access_token: token,
+    level: "campaign",
+    fields: "campaign_id,campaign_name,spend,impressions,clicks,inline_link_clicks,reach,ctr,cpc,actions,action_values,unique_actions",
+    time_increment: "1",
+    limit: "200",
+    "time_range": JSON.stringify({ since: dateFrom, until: dateTo }),
+  });
+
+  const all: MetaInsightRow[] = [];
+  let url: string | null = `${GRAPH_BASE}/${actId}/insights?${params.toString()}`;
+
+  while (url) {
+    const res = await fetch(url);
+    const data = (await res.json()) as MetaInsightsResponse;
+    if (!res.ok) {
+      throw new Error(data?.error?.message ?? `Meta API error: ${res.status}`);
+    }
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+    if (data.data?.length) {
+      all.push(...data.data);
+    }
+    url = data.paging?.next ?? null;
+  }
+
+  return all;
 }
 
 async function fetchAdImagesByHash(
