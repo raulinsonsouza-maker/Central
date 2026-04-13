@@ -76,10 +76,11 @@ model FatoMidiaDiario {
   alcance                         Int      @default(0)
   checkoutIniciado                Int      @default(0)
   profileVisits                   Int      @default(0)
+  campaignName                    String   @default("")
   cliente                         Cliente  @relation(fields: [clienteId], references: [id], onDelete: Cascade)
   conta                           Conta?   @relation(fields: [contaId], references: [id])
 
-  @@unique([clienteId, data, canal])
+  @@unique([clienteId, data, canal, campaignName])
   @@index([clienteId, data])
   @@index([clienteId, canal, data])
 }

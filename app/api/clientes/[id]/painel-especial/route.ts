@@ -163,6 +163,36 @@ export async function GET(
       ...buildDerivedMetrics(week),
     }));
 
+  // Group by campaign name — only campaigns that generated at least 1 sale
+  const byCampanha = new Map<string, { investimento: number; purchases: number; faturamento: number }>();
+  for (const fato of fatos) {
+    if (!fato.purchases) continue;
+    const nome = fato.campaignName.trim() || "Campanha sem nome";
+    const existing = byCampanha.get(nome);
+    if (existing) {
+      existing.investimento += Number(fato.investimento);
+      existing.purchases += fato.purchases;
+      existing.faturamento += Number(fato.websitePurchasesConversionValue);
+    } else {
+      byCampanha.set(nome, {
+        investimento: Number(fato.investimento),
+        purchases: fato.purchases,
+        faturamento: Number(fato.websitePurchasesConversionValue),
+      });
+    }
+  }
+
+  const campanhas = Array.from(byCampanha.entries())
+    .map(([nome, v]) => ({
+      nome,
+      investimento: v.investimento,
+      vendas: v.purchases,
+      faturamento: v.faturamento,
+      custoporVenda: v.purchases > 0 ? v.investimento / v.purchases : 0,
+      ticketMedio: v.purchases > 0 ? v.faturamento / v.purchases : 0,
+    }))
+    .sort((a, b) => b.faturamento - a.faturamento);
+
   const diasSelecionados = Math.max(
     1,
     Math.floor((dataFim.getTime() - dataInicio.getTime()) / (24 * 60 * 60 * 1000)) + 1
@@ -177,6 +207,7 @@ export async function GET(
       ...buildDerivedMetrics(resumo),
     },
     series,
+    campanhas,
     leadMix: {
       onFacebookLeads: resumo.onFacebookLeads,
       websiteLeads: resumo.websiteLeads,

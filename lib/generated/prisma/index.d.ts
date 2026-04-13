@@ -4964,6 +4964,7 @@ export namespace Prisma {
     alcance: number | null
     checkoutIniciado: number | null
     profileVisits: number | null
+    campaignName: string | null
   }
 
   export type FatoMidiaDiarioMaxAggregateOutputType = {
@@ -4992,6 +4993,7 @@ export namespace Prisma {
     alcance: number | null
     checkoutIniciado: number | null
     profileVisits: number | null
+    campaignName: string | null
   }
 
   export type FatoMidiaDiarioCountAggregateOutputType = {
@@ -5020,6 +5022,7 @@ export namespace Prisma {
     alcance: number
     checkoutIniciado: number
     profileVisits: number
+    campaignName: number
     _all: number
   }
 
@@ -5090,6 +5093,7 @@ export namespace Prisma {
     alcance?: true
     checkoutIniciado?: true
     profileVisits?: true
+    campaignName?: true
   }
 
   export type FatoMidiaDiarioMaxAggregateInputType = {
@@ -5118,6 +5122,7 @@ export namespace Prisma {
     alcance?: true
     checkoutIniciado?: true
     profileVisits?: true
+    campaignName?: true
   }
 
   export type FatoMidiaDiarioCountAggregateInputType = {
@@ -5146,6 +5151,7 @@ export namespace Prisma {
     alcance?: true
     checkoutIniciado?: true
     profileVisits?: true
+    campaignName?: true
     _all?: true
   }
 
@@ -5261,6 +5267,7 @@ export namespace Prisma {
     alcance: number
     checkoutIniciado: number
     profileVisits: number
+    campaignName: string
     _count: FatoMidiaDiarioCountAggregateOutputType | null
     _avg: FatoMidiaDiarioAvgAggregateOutputType | null
     _sum: FatoMidiaDiarioSumAggregateOutputType | null
@@ -5308,6 +5315,7 @@ export namespace Prisma {
     alcance?: boolean
     checkoutIniciado?: boolean
     profileVisits?: boolean
+    campaignName?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5338,6 +5346,7 @@ export namespace Prisma {
     alcance?: boolean
     checkoutIniciado?: boolean
     profileVisits?: boolean
+    campaignName?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5368,6 +5377,7 @@ export namespace Prisma {
     alcance?: boolean
     checkoutIniciado?: boolean
     profileVisits?: boolean
+    campaignName?: boolean
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
   }, ExtArgs["result"]["fatoMidiaDiario"]>
@@ -5398,9 +5408,10 @@ export namespace Prisma {
     alcance?: boolean
     checkoutIniciado?: boolean
     profileVisits?: boolean
+    campaignName?: boolean
   }
 
-  export type FatoMidiaDiarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "data" | "canal" | "impressoes" | "cliques" | "leads" | "conversoes" | "investimento" | "cpl" | "rawRowHash" | "createdAt" | "updatedAt" | "contacts" | "costPerPurchase" | "messagingConversationsStarted" | "onFacebookLeads" | "purchases" | "websiteLeads" | "websitePurchaseRoas" | "websitePurchasesConversionValue" | "alcance" | "checkoutIniciado" | "profileVisits", ExtArgs["result"]["fatoMidiaDiario"]>
+  export type FatoMidiaDiarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "clienteId" | "contaId" | "data" | "canal" | "impressoes" | "cliques" | "leads" | "conversoes" | "investimento" | "cpl" | "rawRowHash" | "createdAt" | "updatedAt" | "contacts" | "costPerPurchase" | "messagingConversationsStarted" | "onFacebookLeads" | "purchases" | "websiteLeads" | "websitePurchaseRoas" | "websitePurchasesConversionValue" | "alcance" | "checkoutIniciado" | "profileVisits" | "campaignName", ExtArgs["result"]["fatoMidiaDiario"]>
   export type FatoMidiaDiarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cliente?: boolean | ClienteDefaultArgs<ExtArgs>
     conta?: boolean | FatoMidiaDiario$contaArgs<ExtArgs>
@@ -5446,6 +5457,7 @@ export namespace Prisma {
       alcance: number
       checkoutIniciado: number
       profileVisits: number
+      campaignName: string
     }, ExtArgs["result"]["fatoMidiaDiario"]>
     composites: {}
   }
@@ -5896,6 +5908,7 @@ export namespace Prisma {
     readonly alcance: FieldRef<"FatoMidiaDiario", 'Int'>
     readonly checkoutIniciado: FieldRef<"FatoMidiaDiario", 'Int'>
     readonly profileVisits: FieldRef<"FatoMidiaDiario", 'Int'>
+    readonly campaignName: FieldRef<"FatoMidiaDiario", 'String'>
   }
     
 
@@ -19510,7 +19523,8 @@ export namespace Prisma {
     websitePurchasesConversionValue: 'websitePurchasesConversionValue',
     alcance: 'alcance',
     checkoutIniciado: 'checkoutIniciado',
-    profileVisits: 'profileVisits'
+    profileVisits: 'profileVisits',
+    campaignName: 'campaignName'
   };
 
   export type FatoMidiaDiarioScalarFieldEnum = (typeof FatoMidiaDiarioScalarFieldEnum)[keyof typeof FatoMidiaDiarioScalarFieldEnum]
@@ -20102,6 +20116,7 @@ export namespace Prisma {
     alcance?: IntFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
     profileVisits?: IntFilter<"FatoMidiaDiario"> | number
+    campaignName?: StringFilter<"FatoMidiaDiario"> | string
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
     conta?: XOR<ContaNullableScalarRelationFilter, ContaWhereInput> | null
   }
@@ -20132,13 +20147,14 @@ export namespace Prisma {
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
     profileVisits?: SortOrder
+    campaignName?: SortOrder
     cliente?: ClienteOrderByWithRelationInput
     conta?: ContaOrderByWithRelationInput
   }
 
   export type FatoMidiaDiarioWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    clienteId_data_canal?: FatoMidiaDiarioClienteIdDataCanalCompoundUniqueInput
+    clienteId_data_canal_campaignName?: FatoMidiaDiarioClienteIdDataCanalCampaignNameCompoundUniqueInput
     AND?: FatoMidiaDiarioWhereInput | FatoMidiaDiarioWhereInput[]
     OR?: FatoMidiaDiarioWhereInput[]
     NOT?: FatoMidiaDiarioWhereInput | FatoMidiaDiarioWhereInput[]
@@ -20166,9 +20182,10 @@ export namespace Prisma {
     alcance?: IntFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
     profileVisits?: IntFilter<"FatoMidiaDiario"> | number
+    campaignName?: StringFilter<"FatoMidiaDiario"> | string
     cliente?: XOR<ClienteScalarRelationFilter, ClienteWhereInput>
     conta?: XOR<ContaNullableScalarRelationFilter, ContaWhereInput> | null
-  }, "id" | "clienteId_data_canal">
+  }, "id" | "clienteId_data_canal_campaignName">
 
   export type FatoMidiaDiarioOrderByWithAggregationInput = {
     id?: SortOrder
@@ -20196,6 +20213,7 @@ export namespace Prisma {
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
     profileVisits?: SortOrder
+    campaignName?: SortOrder
     _count?: FatoMidiaDiarioCountOrderByAggregateInput
     _avg?: FatoMidiaDiarioAvgOrderByAggregateInput
     _max?: FatoMidiaDiarioMaxOrderByAggregateInput
@@ -20232,6 +20250,7 @@ export namespace Prisma {
     alcance?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
     profileVisits?: IntWithAggregatesFilter<"FatoMidiaDiario"> | number
+    campaignName?: StringWithAggregatesFilter<"FatoMidiaDiario"> | string
   }
 
   export type AgregadoMidiaSemanalWhereInput = {
@@ -21551,6 +21570,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
     cliente: ClienteCreateNestedOneWithoutFatosMidiaInput
     conta?: ContaCreateNestedOneWithoutFatosMidiaInput
   }
@@ -21581,6 +21601,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type FatoMidiaDiarioUpdateInput = {
@@ -21607,6 +21628,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUpdateOneRequiredWithoutFatosMidiaNestedInput
     conta?: ContaUpdateOneWithoutFatosMidiaNestedInput
   }
@@ -21637,6 +21659,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type FatoMidiaDiarioCreateManyInput = {
@@ -21665,6 +21688,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type FatoMidiaDiarioUpdateManyMutationInput = {
@@ -21691,6 +21715,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type FatoMidiaDiarioUncheckedUpdateManyInput = {
@@ -21719,6 +21744,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type AgregadoMidiaSemanalCreateInput = {
@@ -23299,10 +23325,11 @@ export namespace Prisma {
     isNot?: ContaWhereInput | null
   }
 
-  export type FatoMidiaDiarioClienteIdDataCanalCompoundUniqueInput = {
+  export type FatoMidiaDiarioClienteIdDataCanalCampaignNameCompoundUniqueInput = {
     clienteId: string
     data: Date | string
     canal: string
+    campaignName: string
   }
 
   export type FatoMidiaDiarioCountOrderByAggregateInput = {
@@ -23331,6 +23358,7 @@ export namespace Prisma {
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
     profileVisits?: SortOrder
+    campaignName?: SortOrder
   }
 
   export type FatoMidiaDiarioAvgOrderByAggregateInput = {
@@ -23379,6 +23407,7 @@ export namespace Prisma {
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
     profileVisits?: SortOrder
+    campaignName?: SortOrder
   }
 
   export type FatoMidiaDiarioMinOrderByAggregateInput = {
@@ -23407,6 +23436,7 @@ export namespace Prisma {
     alcance?: SortOrder
     checkoutIniciado?: SortOrder
     profileVisits?: SortOrder
+    campaignName?: SortOrder
   }
 
   export type FatoMidiaDiarioSumOrderByAggregateInput = {
@@ -25647,6 +25677,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
     conta?: ContaCreateNestedOneWithoutFatosMidiaInput
   }
 
@@ -25675,6 +25706,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type FatoMidiaDiarioCreateOrConnectWithoutClienteInput = {
@@ -26142,6 +26174,7 @@ export namespace Prisma {
     alcance?: IntFilter<"FatoMidiaDiario"> | number
     checkoutIniciado?: IntFilter<"FatoMidiaDiario"> | number
     profileVisits?: IntFilter<"FatoMidiaDiario"> | number
+    campaignName?: StringFilter<"FatoMidiaDiario"> | string
   }
 
   export type GoogleAdsCriativoUpsertWithWhereUniqueWithoutClienteInput = {
@@ -26459,6 +26492,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
     cliente: ClienteCreateNestedOneWithoutFatosMidiaInput
   }
 
@@ -26487,6 +26521,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type FatoMidiaDiarioCreateOrConnectWithoutContaInput = {
@@ -28193,6 +28228,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type GoogleAdsCriativoCreateManyClienteInput = {
@@ -28517,6 +28553,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
     conta?: ContaUpdateOneWithoutFatosMidiaNestedInput
   }
 
@@ -28545,6 +28582,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type FatoMidiaDiarioUncheckedUpdateManyWithoutClienteInput = {
@@ -28572,6 +28610,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type GoogleAdsCriativoUpdateWithoutClienteInput = {
@@ -28909,6 +28948,7 @@ export namespace Prisma {
     alcance?: number
     checkoutIniciado?: number
     profileVisits?: number
+    campaignName?: string
   }
 
   export type GoogleAdsCriativoCreateManyContaInput = {
@@ -29031,6 +29071,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
     cliente?: ClienteUpdateOneRequiredWithoutFatosMidiaNestedInput
   }
 
@@ -29059,6 +29100,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type FatoMidiaDiarioUncheckedUpdateManyWithoutContaInput = {
@@ -29086,6 +29128,7 @@ export namespace Prisma {
     alcance?: IntFieldUpdateOperationsInput | number
     checkoutIniciado?: IntFieldUpdateOperationsInput | number
     profileVisits?: IntFieldUpdateOperationsInput | number
+    campaignName?: StringFieldUpdateOperationsInput | string
   }
 
   export type GoogleAdsCriativoUpdateWithoutContaInput = {
